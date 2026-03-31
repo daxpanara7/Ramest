@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Overview | Ramest Technolabs</title>
+    <meta name="description" content="Join Ramest Technolabs — explore career opportunities and grow with us.">
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .careers-intro {
+            max-width: 680px;
+            margin: 0 auto 3.5rem;
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .perks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .perk-card {
+            background-color: var(--container-color);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: .3s;
+        }
+
+        [data-theme="dark"] .perk-card {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .perk-card:hover {
+            border-color: var(--first-color);
+            transform: translateY(-5px);
+        }
+
+        .perk-icon {
+            font-size: 2rem;
+            color: var(--first-color);
+            margin-bottom: 1rem;
+        }
+
+        .perk-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .perk-desc {
+            font-size: var(--small-font-size);
+            color: var(--text-color);
+        }
+
+        .careers-cta {
+            text-align: center;
+        }
+
+        @media(max-width:768px) {
+            .perks-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width:480px) {
+            .perks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+
+    <header class="header" id="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo_final.png" alt="Ramest Technolabs Logo" class="logo-img">
+            </a>
+
+            <nav class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="index.html" class="nav-link ">Home</a></li>
+                    <li class="nav-item"><a href="services.html" class="nav-link ">Services</a></li>
+                    <li class="nav-item"><a href="hire-developers.html" class="nav-link ">Hire Developers</a></li>
+                    <li class="nav-item has-dropdown">
+                        <a href="company.html" class="nav-link active dropdown-toggle">
+                            Company <i class="fa-solid fa-chevron-down nav-link-arrow"></i>
+                        </a>
+                        <div class="dropdown-panel">
+                            <p class="dropdown-header">Overview</p>
+                            <div class="dropdown-grid">
+                                <a href="about.html" class="dropdown-item">
+                                    <i class="fa-solid fa-building-columns dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">About Us</div>
+                                        <div class="dropdown-item-sub">Transforming challenges into opportunities with tech.</div>
+                                    </div>
+                                </a>
+                                <a href="infrastructure.html" class="dropdown-item">
+                                    <i class="fa-solid fa-server dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Our Infrastructure</div>
+                                        <div class="dropdown-item-sub">Tech capabilities for scalable and reliable solutions.</div>
+                                    </div>
+                                </a>
+                                <a href="team.html" class="dropdown-item">
+                                    <i class="fa-solid fa-people-group dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Our Team</div>
+                                        <div class="dropdown-item-sub">Dedicated experts transforming ideas into powerful digital solutions.</div>
+                                    </div>
+                                </a>
+                                <a href="methodology.html" class="dropdown-item">
+                                    <i class="fa-solid fa-diagram-project dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Development Methodology</div>
+                                        <div class="dropdown-item-sub">Seamless development with a focus on quality and speed.</div>
+                                    </div>
+                                </a>
+                                <a href="certifications.html" class="dropdown-item">
+                                    <i class="fa-solid fa-award dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Certifications</div>
+                                        <div class="dropdown-item-sub">Industry-recognized certifications backing our quality.</div>
+                                    </div>
+                                </a>
+                                <a href="careers.html" class="dropdown-item">
+                                    <i class="fa-solid fa-briefcase dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Career Overview</div>
+                                        <div class="dropdown-item-sub">Grow with us and build rewarding careers.</div>
+                                    </div>
+                                </a>
+                                <a href="contact.html" class="dropdown-item">
+                                    <i class="fa-solid fa-envelope-open-text dropdown-item-icon"></i>
+                                    <div class="dropdown-item-content">
+                                        <div class="dropdown-item-title">Contact Us</div>
+                                        <div class="dropdown-item-sub">Connect with Ramest to bring your tech ideas to life.</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nav-close" id="nav-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+            </nav>
+
+            <div class="nav-btns">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+                    <i class="fa-solid fa-sun" id="theme-icon"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section" style="padding-top:8rem;">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Career Overview</h2>
+                    <p class="section-subtitle">Grow with us and build rewarding careers</p>
+                </div>
+                <p class="careers-intro">
+                    At Ramest Technolabs, we believe great people build great products. We're always looking for
+                    passionate engineers, designers, and strategists who want to make an impact. Join a team that values
+                    creativity, collaboration, and continuous learning.
+                </p>
+                <div class="perks-grid">
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-rocket"></i></div>
+                        <div class="perk-title">Fast Growth</div>
+                        <div class="perk-desc">Work on cutting-edge projects and grow your skills rapidly in a
+                            supportive environment.</div>
+                    </div>
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-people-group"></i></div>
+                        <div class="perk-title">Great Culture</div>
+                        <div class="perk-desc">Collaborative, inclusive team culture where your ideas are heard and
+                            recognized.</div>
+                    </div>
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-laptop-house"></i></div>
+                        <div class="perk-title">Flexible Work</div>
+                        <div class="perk-desc">Remote-friendly environment with flexible hours to support work-life
+                            balance.</div>
+                    </div>
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="perk-title">Learning Budget</div>
+                        <div class="perk-desc">Annual budget for courses, certifications, and conferences to keep you
+                            ahead.</div>
+                    </div>
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div class="perk-title">Competitive Pay</div>
+                        <div class="perk-desc">Market-competitive salaries reviewed regularly with performance bonuses.
+                        </div>
+                    </div>
+                    <div class="perk-card">
+                        <div class="perk-icon"><i class="fa-solid fa-star"></i></div>
+                        <div class="perk-title">Work on Purpose</div>
+                        <div class="perk-desc">Build real products that solve real problems for clients across the
+                            globe.</div>
+                    </div>
+                </div>
+                <div class="careers-cta">
+                    <a href="contact.html" class="button button-primary">Get in Touch <i
+                            class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+                    <footer class="footer">
+        <div class="container footer-container footer-container-4">
+            <div class="footer-col">
+                <a href="index.html" class="logo footer-logo">Ramest <span class="highlight">Technolabs</span></a>
+                <p class="footer-text">Empowering businesses with next-gen technology. We turn ideas into powerful
+                    digital products.</p>
+                <div class="social-links" style="margin-top:1.25rem;">
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="hire-developers.html">Hire Developers</a></li>
+                    <li><a href="company.html">Company</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-title">Company</h3>
+                <ul class="footer-links">
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="team.html">Our Team</a></li>
+                    <li><a href="methodology.html">Methodology</a></li>
+                    <li><a href="certifications.html">Certifications</a></li>
+                    <li><a href="careers.html">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-title">Contact</h3>
+                <ul class="footer-links footer-contact">
+                    <li><i class="fa-solid fa-envelope"></i> hr@ramesttechnolabs.com</li>
+                    <li><i class="fa-solid fa-phone"></i> +91 9510903725</li>
+                    <li><i class="fa-solid fa-location-dot"></i> satellite road ahmedabad, Gujarat, India</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ramest Technolabs. All rights reserved. &nbsp;|&nbsp; Built with <i class="fa-solid fa-heart"
+                    style="color:var(--first-color);"></i> in India</p>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/animations.js"></script>
+</body>
+
+</html>

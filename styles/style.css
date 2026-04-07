@@ -275,8 +275,8 @@ img {
 
 .header.scrolled {
     top: 1rem;
-    background-color: rgba(233, 63, 46, 0.9);
-    backdrop-filter: blur(10px);
+    background-color: var(--first-color);
+    backdrop-filter: none;
 }
 
 .nav-container {
@@ -403,7 +403,7 @@ img {
     align-items: center;
 }
 
-/* Reveal when logo is interacted with or header is hovered */
+/* Reveal when header is hovered */
 .header:hover .nav-menu,
 .header.menu-open .nav-menu {
     max-width: 1000px;
@@ -411,7 +411,6 @@ img {
     margin-left: 1.5rem;
     pointer-events: auto;
     overflow: visible;
-    /* Allow dropdowns to be seen */
 }
 
 .nav-list {

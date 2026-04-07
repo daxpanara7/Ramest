@@ -117,15 +117,13 @@ const logo = document.querySelector('.logo');
 const header = document.getElementById('header');
 
 if (logo) {
-    logo.addEventListener('click', (e) => {
-        if (window.innerWidth > 768) {
-            e.preventDefault();
-            header.classList.toggle('menu-open');
-        }
-    });
-
-    // Close menu when clicking outside
+    // Logo always navigates to home — no menu toggle on click
     document.addEventListener('click', (e) => {
+        if (!e.target.closest('.has-dropdown')) {
+            document.querySelectorAll('.has-dropdown.open').forEach(el => {
+                el.classList.remove('open');
+            });
+        }
         if (!header.contains(e.target)) {
             header.classList.remove('menu-open');
         }

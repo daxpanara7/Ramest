@@ -647,6 +647,7 @@ img {
 
     .logo-img {
         height: 35px;
+        mix-blend-mode: screen;
     }
 
     .dropdown-panel {

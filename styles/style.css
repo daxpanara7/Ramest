@@ -302,11 +302,8 @@ img {
 
 .logo-img {
     height: 55px;
-    /* Tuned for perfect fit in 4.5rem (72px) header */
-    /* Massively increased as requested */
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 }
 
 .nav-btns {
@@ -1587,5 +1584,238 @@ img {
 @media (max-width: 576px) {
     .about-stats {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==================== MOBILE RESPONSIVE FIXES ==================== */
+
+/* Prevent horizontal overflow on all screens */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+
+    /* ---- HEADER PILL ---- */
+    .header {
+        width: calc(100% - 2rem) !important;
+        max-width: calc(100% - 2rem) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 1rem !important;
+        padding-inline: 1rem 1.25rem !important;
+        height: 4rem !important;
+    }
+
+    /* Hide nav on mobile by default — show via hamburger */
+    .nav-menu {
+        position: fixed !important;
+        top: 0 !important;
+        right: -100% !important;
+        left: auto !important;
+        width: 80% !important;
+        max-width: 320px !important;
+        height: 100vh !important;
+        background-color: #1a0505 !important;
+        padding: 5rem 2rem 2rem !important;
+        transition: right 0.4s ease !important;
+        z-index: 999 !important;
+        overflow-y: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        opacity: 1 !important;
+        max-width: unset !important;
+        margin-left: 0 !important;
+        border-left: 1px solid rgba(233,63,46,0.2) !important;
+    }
+
+    .nav-menu.show-menu {
+        right: 0 !important;
+    }
+
+    .nav-list {
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100%;
+    }
+
+    .nav-item {
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        padding: 0.75rem 0;
+    }
+
+    .nav-link {
+        color: #fff !important;
+        font-size: 1.05rem !important;
+        display: block;
+        padding: 0.25rem 0;
+    }
+
+    .nav-toggle {
+        display: block !important;
+        font-size: 1.3rem;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .nav-close {
+        display: block !important;
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        font-size: 1.5rem;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    /* Dropdown on mobile — static, no absolute */
+    .dropdown-panel {
+        position: static !important;
+        transform: none !important;
+        min-width: unset !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0.5rem !important;
+        padding: 0.75rem 0 0.5rem 0.5rem !important;
+        background-color: rgba(255,255,255,0.04) !important;
+        margin-top: 0.5rem !important;
+        backdrop-filter: none !important;
+        display: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .has-dropdown.open .dropdown-panel {
+        display: block !important;
+    }
+
+    .dropdown-panel::before {
+        display: none !important;
+    }
+
+    .dropdown-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.25rem !important;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 0.5rem !important;
+        border-radius: 0.5rem !important;
+    }
+
+    .dropdown-item-title {
+        font-size: 0.9rem !important;
+    }
+
+    .dropdown-item-sub {
+        display: none;
+    }
+
+    /* ---- HERO WATERMARK — fit full word on mobile ---- */
+    .hero-watermark {
+        font-size: 18vw !important;
+        white-space: nowrap !important;
+        letter-spacing: 0.05em !important;
+    }
+
+    /* ---- HERO CONTENT ---- */
+    .hero-section {
+        padding-top: 6rem !important;
+        padding-inline: 0 !important;
+    }
+
+    .hero-content {
+        padding-inline: 1.25rem !important;
+        padding-block: 2rem !important;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 9vw, 3rem) !important;
+    }
+
+    .hero-desc {
+        font-size: 0.95rem !important;
+    }
+
+    .hero-actions {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1rem !important;
+    }
+
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        width: 100% !important;
+        justify-content: center !important;
+        max-width: 300px;
+    }
+
+    /* ---- ORB RINGS ---- */
+    .hero-orb-container {
+        width: 100vw !important;
+        height: 100vw !important;
+    }
+
+    .hero-orb-1 { width: 60vw !important; height: 60vw !important; }
+    .hero-orb-2 { width: 80vw !important; height: 80vw !important; }
+    .hero-orb-3 { width: 100vw !important; height: 100vw !important; }
+
+    /* ---- STATS BAND ---- */
+    .stats-band-inner {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 1.5rem !important;
+    }
+
+    .stat-sep { display: none !important; }
+
+    .stat-item { min-width: 40% !important; }
+
+    /* ---- SERVICES GRID ---- */
+    .services-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .service-card {
+        margin-top: 0 !important;
+    }
+
+    /* ---- WHY GRID ---- */
+    .why-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* ---- CTA ---- */
+    .cta-container {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer-container,
+    .footer-container.footer-container-4 {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+    }
+
+    .footer-col:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .why-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .footer-container,
+    .footer-container.footer-container-4 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero-title {
+        font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
     }
 }

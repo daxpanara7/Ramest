@@ -2,6 +2,8 @@
 .hero-section {
     position: relative;
     min-height: 100vh;
+    min-height: 100dvh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -369,7 +371,9 @@
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
     .hero-watermark {
-        font-size: clamp(5rem, 38vw, 10rem);
+        opacity: 0.25;
+        -webkit-text-stroke: 1px rgba(233, 63, 46, 0.04);
+        animation: none;
     }
 
     .hero-orb-container {

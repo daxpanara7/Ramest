@@ -1,0 +1,10 @@
+@import "../styles/style.css";
+@import "../styles/home.css";
+@import "../styles/company.css";
+@import "../styles/careers.css";
+@import "../styles/certifications.css";
+
+:root {
+  --body-font: var(--font-inter), "Inter", sans-serif;
+  --title-font: var(--font-dm-serif), "DM Serif Display", serif;
+}

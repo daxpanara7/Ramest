@@ -1,0 +1,93 @@
+/* Company overview grid */
+.company-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.company-overview-item {
+    display: block;
+    padding: 2.25rem 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    transition: background 0.25s, padding-left 0.25s;
+    position: relative;
+}
+
+.company-overview-item:nth-child(even) {
+    border-right: none;
+}
+
+.company-overview-item:nth-last-child(-n+2) {
+    border-bottom: none;
+}
+
+.company-overview-item:hover {
+    background-color: rgba(233, 63, 46, 0.04);
+    padding-left: 3rem;
+}
+
+[data-theme="dark"] .company-overview-item:hover {
+    background-color: rgba(233, 63, 46, 0.07);
+}
+
+.company-overview-item-icon {
+    font-size: 1.6rem;
+    color: var(--first-color);
+    margin-bottom: 1rem;
+}
+
+.company-overview-item h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--title-color);
+    transition: color 0.2s;
+}
+
+.company-overview-item:hover h3 {
+    color: var(--first-color);
+}
+
+.company-overview-item p {
+    font-size: var(--small-font-size);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.company-overview-item .item-arrow {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    opacity: 0;
+    transition: opacity 0.2s, right 0.2s;
+}
+
+.company-overview-item:hover .item-arrow {
+    opacity: 1;
+    right: 1.25rem;
+}
+
+@media (max-width: 640px) {
+    .company-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .company-overview-item {
+        border-right: none;
+    }
+
+    .company-overview-item:nth-last-child(-n+2) {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .company-overview-item:last-child {
+        border-bottom: none;
+    }
+}

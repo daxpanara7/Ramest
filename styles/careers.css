@@ -1,0 +1,64 @@
+.careers-intro {
+    max-width: 680px;
+    margin: 0 auto 3.5rem;
+    text-align: center;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.perks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.perk-card {
+    background-color: var(--container-color);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: .3s;
+}
+
+[data-theme="dark"] .perk-card {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.perk-card:hover {
+    border-color: var(--first-color);
+    transform: translateY(-5px);
+}
+
+.perk-icon {
+    font-size: 2rem;
+    color: var(--first-color);
+    margin-bottom: 1rem;
+}
+
+.perk-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.perk-desc {
+    font-size: var(--small-font-size);
+    color: var(--text-color);
+}
+
+.careers-cta {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .perks-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .perks-grid {
+        grid-template-columns: 1fr;
+    }
+}

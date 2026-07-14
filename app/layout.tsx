@@ -61,9 +61,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  icons: {
-    icon: SITE.logo,
-  },
 };
 
 export const viewport: Viewport = {

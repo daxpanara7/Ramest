@@ -42,14 +42,6 @@ export default function Page() {
                         <span className="team-role">Full Stack Developer</span>
                     </div>
 
-                    <div className="team-card">
-                        <div className="team-img-box">
-                            <img src="/assets/WhatsApp Image 2026-03-05 at 7.30.35 PM.png" alt="Yash Rabadia" className="team-img" />
-                        </div>
-                        <h3 className="team-name">Yash Rabadia</h3>
-                        <span className="team-role">Backend Developer & IOT Manager</span>
-                    </div>
-
                 </div>
             </div>
         </section>

@@ -1,50 +1,38 @@
-import type { Metadata } from "next";
-import SiteLayout from "@/components/SiteLayout";
+import SectionHeader from "@/components/sections/SectionHeader";
+import { teamMembers } from "@/lib/team";
+import { createPageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Our Team",
   description: "Meet the expert team behind Ramest Technolabs.",
-};
+  path: "/team",
+});
 
 export default function Page() {
   return (
-    <SiteLayout activePage="team" includeHireInFooter={true}>
-      {/* TEAM SECTION */}
-        <section className="team section" id="team" style={{ paddingTop: "8rem" }}>
-            <div className="container">
-                <div className="section-header">
-                    <h2 className="section-title">Meet Our Team</h2>
-                    <p className="section-subtitle">The innovative minds behind our success.</p>
-                </div>
+    <section className="team section" id="team" style={{ paddingTop: "8rem" }}>
+      <div className="container">
+        <SectionHeader
+          title="Meet Our Team"
+          subtitle="The innovative minds behind our success."
+        />
 
-                <div className="team-grid">
-                    <div className="team-card">
-                        <div className="team-img-box">
-                            <img src="/assets/image (8).png" alt="Founder" className="team-img" />
-                        </div>
-                        <h3 className="team-name">Dax Panara</h3>
-                        <span className="team-role">Founder & CEO</span>
-                    </div>
-
-                    <div className="team-card">
-                        <div className="team-img-box">
-                            <img src="/assets/image.png" alt="Deep Radaliya" className="team-img" />
-                        </div>
-                        <h3 className="team-name">Deep Radaliya</h3>
-                        <span className="team-role">Co-Founder</span>
-                    </div>
-
-                    <div className="team-card">
-                        <div className="team-img-box">
-                            <img src="/assets/Gemini_Generated_Image_ehgr7mehgr7mehgr.png" alt="Het Gadhiya" className="team-img" />
-                        </div>
-                        <h3 className="team-name">Het Gadhiya</h3>
-                        <span className="team-role">Full Stack Developer</span>
-                    </div>
-
-                </div>
+        <div className="team-grid">
+          {teamMembers.map((member) => (
+            <div className="team-card" key={member.name}>
+              <div className="team-img-box">
+                <img
+                  src={member.image}
+                  alt={member.alt}
+                  className="team-img"
+                />
+              </div>
+              <h3 className="team-name">{member.name}</h3>
+              <span className="team-role">{member.role}</span>
             </div>
-        </section>
-    </SiteLayout>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

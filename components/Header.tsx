@@ -2,23 +2,37 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   companyDropdown,
+  getNavPageFromPath,
   isCompanyActive,
   type NavPage,
 } from "@/lib/nav";
+import {
+  DEFAULT_ENTER_DELAY,
+  DEFAULT_LEAVE_DELAY,
+  useDelayedHover,
+} from "@/hooks/useDelayedHover";
 
 const MOBILE_BREAKPOINT = 768;
 
-type HeaderProps = {
-  activePage: NavPage;
-};
+/** Capsule expand/collapse hover timings */
+const CAPSULE_ENTER_DELAY = DEFAULT_ENTER_DELAY; // 120ms
+const CAPSULE_LEAVE_DELAY = DEFAULT_LEAVE_DELAY; // 180ms
 
-export default function Header({ activePage }: HeaderProps) {
+/** Company dropdown hover timings (slightly snappier than capsule) */
+const DROPDOWN_ENTER_DELAY = 100;
+const DROPDOWN_LEAVE_DELAY = 160;
+
+export default function Header() {
+  const pathname = usePathname();
+  const activePage = getNavPageFromPath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
   const navMenuRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const navContainerRef = useRef<HTMLDivElement>(null);
@@ -26,6 +40,33 @@ export default function Header({ activePage }: HeaderProps) {
 
   const isMobile = () =>
     typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT;
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${MOBILE_BREAKPOINT + 1}px)`);
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const capsuleHover = useDelayedHover({
+    enterDelay: CAPSULE_ENTER_DELAY,
+    leaveDelay: CAPSULE_LEAVE_DELAY,
+    enabled: isDesktop && !menuOpen,
+  });
+
+  const companyHover = useDelayedHover({
+    enterDelay: DROPDOWN_ENTER_DELAY,
+    leaveDelay: DROPDOWN_LEAVE_DELAY,
+    enabled: isDesktop && capsuleHover.isHovered && !menuOpen,
+  });
+
+  // Collapse company dropdown when the capsule closes
+  useEffect(() => {
+    if (!capsuleHover.isHovered) {
+      companyHover.setHovered(false);
+    }
+  }, [capsuleHover.isHovered, companyHover.setHovered]);
 
   const placeNavMenu = useCallback(() => {
     const navMenu = navMenuRef.current;
@@ -59,6 +100,23 @@ export default function Header({ activePage }: HeaderProps) {
     return () => window.removeEventListener("resize", placeNavMenu);
   }, [placeNavMenu]);
 
+  const collapseNav = useCallback(() => {
+    setMenuOpen(false);
+    setDropdownOpen(false);
+    capsuleHover.setHovered(false);
+    companyHover.setHovered(false);
+    document.body.classList.remove("menu-open");
+    // Drop focus so a clicked dropdown link cannot keep menus visually open
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }, [capsuleHover.setHovered, companyHover.setHovered]);
+
+  // Close menus on route change
+  useEffect(() => {
+    collapseNav();
+  }, [pathname, collapseNav]);
+
   useEffect(() => {
     document.body.classList.toggle("menu-open", menuOpen);
     if (!menuOpen) setDropdownOpen(false);
@@ -91,8 +149,7 @@ export default function Header({ activePage }: HeaderProps) {
   };
 
   const closeMenu = () => {
-    setMenuOpen(false);
-    setDropdownOpen(false);
+    collapseNav();
   };
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -116,9 +173,16 @@ export default function Header({ activePage }: HeaderProps) {
     `nav-link${activePage === page ? " active" : ""}`;
 
   const companyActive = isCompanyActive(activePage);
+  const companyDropdownVisible = dropdownOpen || companyHover.isHovered;
 
   return (
-    <header className="header" id="header" ref={headerRef}>
+    <header
+      className={`header${capsuleHover.isHovered ? " is-hovered" : ""}${menuOpen ? " menu-open" : ""}`}
+      id="header"
+      ref={headerRef}
+      onMouseEnter={capsuleHover.onMouseEnter}
+      onMouseLeave={capsuleHover.onMouseLeave}
+    >
       <div className="container nav-container" ref={navContainerRef}>
         <Link href="/" className="logo">
           <Image
@@ -161,7 +225,11 @@ export default function Header({ activePage }: HeaderProps) {
                 Hire Developers
               </Link>
             </li>
-            <li className={`nav-item has-dropdown${dropdownOpen ? " open" : ""}`}>
+            <li
+              className={`nav-item has-dropdown${companyDropdownVisible ? " open is-hovered" : ""}`}
+              onMouseEnter={companyHover.onMouseEnter}
+              onMouseLeave={companyHover.onMouseLeave}
+            >
               <Link
                 href="/company"
                 className={`nav-link dropdown-toggle${companyActive ? " active" : ""}`}

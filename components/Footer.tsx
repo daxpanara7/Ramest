@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { SITE } from "@/lib/site";
 
-type FooterProps = {
-  includeHireDevelopers?: boolean;
-};
+export default function Footer() {
+  const pathname = usePathname();
+  // Preserve existing home behavior: hide Hire Developers on `/`.
+  const includeHireDevelopers = pathname !== "/";
 
-export default function Footer({ includeHireDevelopers = true }: FooterProps) {
   return (
     <footer className="footer">
       <div className="container footer-container footer-container-4">
@@ -75,22 +79,23 @@ export default function Footer({ includeHireDevelopers = true }: FooterProps) {
           <ul className="footer-links footer-contact">
             <li>
               <i className="fa-solid fa-envelope" />{" "}
-              <a href="mailto:hr@ramesttechnolabs.com">hr@ramesttechnolabs.com</a>
+              <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
             </li>
             <li>
               <i className="fa-solid fa-phone" />{" "}
-              <a href="tel:+919510903725">+91 9510903725</a>
+              <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
             </li>
             <li>
-              <i className="fa-solid fa-location-dot" /> RE11 - 2nd Floor, Iscon,
-              Ambli Rd, Ahmedabad, Gujarat 380058
+              <i className="fa-solid fa-location-dot" /> {SITE.address.street},{" "}
+              {SITE.address.city}, {SITE.address.region}{" "}
+              {SITE.address.postalCode}
             </li>
           </ul>
         </div>
       </div>
       <div className="footer-bottom">
         <p>
-          &copy; 2026 Ramest Technolabs. All rights reserved. &nbsp;|&nbsp; Built
+          &copy; 2026 {SITE.name}. All rights reserved. &nbsp;|&nbsp; Built
           with{" "}
           <i className="fa-solid fa-heart" style={{ color: "var(--first-color)" }} />{" "}
           in India

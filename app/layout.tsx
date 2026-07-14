@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Inter } from "next/font/google";
 import Script from "next/script";
 import ClientEffects from "@/components/ClientEffects";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import JsonLd from "@/components/JsonLd";
+import { SITE } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,13 +22,48 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.ramesttechnolabs.com"),
+  metadataBase: new URL(SITE.url),
   title: {
-    default: "Ramest Technolabs | Innovative IT Solutions",
-    template: "%s | Ramest Technolabs",
+    default: `${SITE.name} | Innovative IT Solutions`,
+    template: `%s | ${SITE.name}`,
   },
-  description:
-    "Ramest Technolabs - Leading IT company providing Web Development, App Development, UI/UX Design, and AI/ML Solutions to transform your business.",
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.name, url: SITE.url }],
+  creator: SITE.name,
+  publisher: SITE.name,
+  keywords: [
+    "Ramest Technolabs",
+    "web development",
+    "app development",
+    "UI/UX design",
+    "AI ML solutions",
+    "hire Python developers",
+    "custom software",
+    "Ahmedabad IT company",
+  ],
+  openGraph: {
+    type: "website",
+    locale: SITE.locale,
+    url: SITE.url,
+    siteName: SITE.name,
+    title: `${SITE.name} | Innovative IT Solutions`,
+    description: SITE.description,
+    images: [{ url: SITE.logo, alt: SITE.name }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} | Innovative IT Solutions`,
+    description: SITE.description,
+    images: [SITE.logo],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: SITE.logo,
+  },
 };
 
 export const viewport: Viewport = {
@@ -55,8 +94,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div className="bg-grid" />
-        {children}
+        <Header />
+        <main className="main">{children}</main>
+        <Footer />
         <ClientEffects />
+        <JsonLd />
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function(){try{var t=localStorage.getItem('selected-theme');if(t){document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}}catch(e){}})();`}
         </Script>

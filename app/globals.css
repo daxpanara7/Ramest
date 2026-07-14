@@ -8,3 +8,16 @@
   --body-font: var(--font-inter), "Inter", sans-serif;
   --title-font: var(--font-dm-serif), "DM Serif Display", serif;
 }
+
+/* Visually hidden but available to screen readers / SEO labels */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

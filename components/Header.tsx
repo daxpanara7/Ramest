@@ -4,10 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import MobileServicesAccordion from "@/components/nav/MobileServicesAccordion";
+import ServicesMegaMenu from "@/components/nav/ServicesMegaMenu";
 import {
   companyDropdown,
   getNavPageFromPath,
   isCompanyActive,
+  isServicesActive,
   type NavPage,
 } from "@/lib/nav";
 import {
@@ -18,19 +21,18 @@ import {
 
 const MOBILE_BREAKPOINT = 768;
 
-/** Capsule expand/collapse hover timings */
-const CAPSULE_ENTER_DELAY = DEFAULT_ENTER_DELAY; // 120ms
-const CAPSULE_LEAVE_DELAY = DEFAULT_LEAVE_DELAY; // 180ms
-
-/** Company dropdown hover timings (slightly snappier than capsule) */
+const CAPSULE_ENTER_DELAY = DEFAULT_ENTER_DELAY;
+const CAPSULE_LEAVE_DELAY = DEFAULT_LEAVE_DELAY;
 const DROPDOWN_ENTER_DELAY = 100;
-const DROPDOWN_LEAVE_DELAY = 160;
+const DROPDOWN_LEAVE_DELAY = 200;
+
+type MobilePanel = "services" | "company" | null;
 
 export default function Header() {
   const pathname = usePathname();
   const activePage = getNavPageFromPath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<MobilePanel>(null);
   const [isDark, setIsDark] = useState(true);
   const [isDesktop, setIsDesktop] = useState(false);
   const navMenuRef = useRef<HTMLElement>(null);
@@ -55,18 +57,37 @@ export default function Header() {
     enabled: isDesktop && !menuOpen,
   });
 
+  const servicesHover = useDelayedHover({
+    enterDelay: DROPDOWN_ENTER_DELAY,
+    leaveDelay: DROPDOWN_LEAVE_DELAY,
+    enabled: isDesktop && capsuleHover.isHovered && !menuOpen,
+  });
+
   const companyHover = useDelayedHover({
     enterDelay: DROPDOWN_ENTER_DELAY,
     leaveDelay: DROPDOWN_LEAVE_DELAY,
     enabled: isDesktop && capsuleHover.isHovered && !menuOpen,
   });
 
-  // Collapse company dropdown when the capsule closes
+  // Only one desktop dropdown open at a time
+  useEffect(() => {
+    if (servicesHover.isHovered) companyHover.setHovered(false);
+  }, [servicesHover.isHovered, companyHover.setHovered]);
+
+  useEffect(() => {
+    if (companyHover.isHovered) servicesHover.setHovered(false);
+  }, [companyHover.isHovered, servicesHover.setHovered]);
+
   useEffect(() => {
     if (!capsuleHover.isHovered) {
+      servicesHover.setHovered(false);
       companyHover.setHovered(false);
     }
-  }, [capsuleHover.isHovered, companyHover.setHovered]);
+  }, [
+    capsuleHover.isHovered,
+    servicesHover.setHovered,
+    companyHover.setHovered,
+  ]);
 
   const placeNavMenu = useCallback(() => {
     const navMenu = navMenuRef.current;
@@ -86,7 +107,7 @@ export default function Header() {
       navContainer.insertBefore(navMenu, navBtns);
     }
     setMenuOpen(false);
-    setDropdownOpen(false);
+    setMobilePanel(null);
     document.body.classList.remove("menu-open");
   }, []);
 
@@ -102,24 +123,27 @@ export default function Header() {
 
   const collapseNav = useCallback(() => {
     setMenuOpen(false);
-    setDropdownOpen(false);
+    setMobilePanel(null);
     capsuleHover.setHovered(false);
+    servicesHover.setHovered(false);
     companyHover.setHovered(false);
     document.body.classList.remove("menu-open");
-    // Drop focus so a clicked dropdown link cannot keep menus visually open
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-  }, [capsuleHover.setHovered, companyHover.setHovered]);
+  }, [
+    capsuleHover.setHovered,
+    servicesHover.setHovered,
+    companyHover.setHovered,
+  ]);
 
-  // Close menus on route change
   useEffect(() => {
     collapseNav();
   }, [pathname, collapseNav]);
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", menuOpen);
-    if (!menuOpen) setDropdownOpen(false);
+    if (!menuOpen) setMobilePanel(null);
   }, [menuOpen]);
 
   useEffect(() => {
@@ -160,12 +184,6 @@ export default function Header() {
       e.preventDefault();
       e.stopPropagation();
       closeMenu();
-      return;
-    }
-
-    if (target.closest(".dropdown-toggle")) {
-      e.preventDefault();
-      setDropdownOpen((open) => !open);
     }
   };
 
@@ -173,7 +191,9 @@ export default function Header() {
     `nav-link${activePage === page ? " active" : ""}`;
 
   const companyActive = isCompanyActive(activePage);
-  const companyDropdownVisible = dropdownOpen || companyHover.isHovered;
+  const servicesActive = isServicesActive(activePage);
+  const servicesOpen = servicesHover.isHovered;
+  const companyOpen = companyHover.isHovered || mobilePanel === "company";
 
   return (
     <header
@@ -187,7 +207,7 @@ export default function Header() {
         <Link href="/" className="logo">
           <Image
             src="/assets/logo_final.png"
-            alt="Ramest Technolabs Logo"
+            alt="Ramest Technolabs — IT consulting and software development"
             className="logo-img"
             width={687}
             height={267}
@@ -199,6 +219,7 @@ export default function Header() {
           ref={navMenuRef}
           className={`nav-menu${menuOpen ? " show-menu" : ""}`}
           id="nav-menu"
+          aria-label="Primary"
           onClick={handleMenuClick}
         >
           <ul className="nav-list">
@@ -207,15 +228,35 @@ export default function Header() {
                 Home
               </Link>
             </li>
-            <li className="nav-item">
+
+            {/* Desktop Services mega-menu */}
+            <li
+              className={`nav-item has-dropdown has-mega-menu desktop-only-dropdown${servicesOpen ? " open is-hovered" : ""}`}
+              onMouseEnter={servicesHover.onMouseEnter}
+              onMouseLeave={servicesHover.onMouseLeave}
+            >
               <Link
                 href="/services"
-                className={navLinkClass("services")}
-                onClick={closeMenu}
+                className={`nav-link dropdown-toggle${servicesActive ? " active" : ""}`}
+                aria-expanded={servicesOpen}
+                aria-haspopup="true"
               >
-                Services
+                Services{" "}
+                <i className="fa-solid fa-chevron-down nav-link-arrow" aria-hidden="true" />
               </Link>
+              <ServicesMegaMenu open={servicesOpen} onNavigate={closeMenu} />
             </li>
+
+            {/* Mobile Services accordion */}
+            <MobileServicesAccordion
+              open={mobilePanel === "services"}
+              onToggle={() =>
+                setMobilePanel((panel) => (panel === "services" ? null : "services"))
+              }
+              onNavigate={closeMenu}
+              servicesActive={servicesActive}
+            />
+
             <li className="nav-item">
               <Link
                 href="/hire-developers"
@@ -225,24 +266,52 @@ export default function Header() {
                 Hire Developers
               </Link>
             </li>
+
             <li
-              className={`nav-item has-dropdown${companyDropdownVisible ? " open is-hovered" : ""}`}
+              className={`nav-item has-dropdown${companyOpen ? " open is-hovered" : ""}`}
               onMouseEnter={companyHover.onMouseEnter}
               onMouseLeave={companyHover.onMouseLeave}
             >
-              <Link
-                href="/company"
-                className={`nav-link dropdown-toggle${companyActive ? " active" : ""}`}
-                onClick={(e) => {
-                  if (isMobile() && menuOpen) {
-                    e.preventDefault();
-                    setDropdownOpen((open) => !open);
+              <div className="mobile-accordion-head company-trigger-row">
+                <Link
+                  href="/company"
+                  className={`nav-link dropdown-toggle${companyActive ? " active" : ""}`}
+                  aria-expanded={companyOpen}
+                  aria-haspopup="true"
+                  onClick={(e) => {
+                    // Desktop: allow navigation. Mobile: collapse after navigate.
+                    if (!(isMobile() && menuOpen)) return;
+                    closeMenu();
+                  }}
+                >
+                  Company{" "}
+                  <i className="fa-solid fa-chevron-down nav-link-arrow" aria-hidden="true" />
+                </Link>
+                <button
+                  type="button"
+                  className="mobile-accordion-toggle company-mobile-toggle"
+                  aria-expanded={mobilePanel === "company"}
+                  aria-label={
+                    mobilePanel === "company"
+                      ? "Collapse Company menu"
+                      : "Expand Company menu"
                   }
-                }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMobilePanel((panel) =>
+                      panel === "company" ? null : "company"
+                    );
+                  }}
+                >
+                  <i
+                    className={`fa-solid fa-chevron-down${mobilePanel === "company" ? " is-rotated" : ""}`}
+                  />
+                </button>
+              </div>
+              <div
+                className={`dropdown-panel${mobilePanel === "company" ? " mobile-open" : ""}`}
               >
-                Company <i className="fa-solid fa-chevron-down nav-link-arrow" />
-              </Link>
-              <div className="dropdown-panel">
                 <p className="dropdown-header">Overview</p>
                 <div className="dropdown-grid">
                   {companyDropdown.map((item) => (
@@ -252,7 +321,7 @@ export default function Header() {
                       className="dropdown-item"
                       onClick={closeMenu}
                     >
-                      <i className={`fa-solid ${item.icon} dropdown-item-icon`} />
+                      <i className={`fa-solid ${item.icon} dropdown-item-icon`} aria-hidden="true" />
                       <div className="dropdown-item-content">
                         <div className="dropdown-item-title">{item.title}</div>
                         <div className="dropdown-item-sub">{item.sub}</div>
@@ -263,8 +332,14 @@ export default function Header() {
               </div>
             </li>
           </ul>
-          <div className="nav-close" id="nav-close" role="button" aria-label="Close menu">
-            <i className="fa-solid fa-xmark" />
+          <div
+            className="nav-close"
+            id="nav-close"
+            role="button"
+            aria-label="Close menu"
+            tabIndex={0}
+          >
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
           </div>
         </nav>
 
@@ -279,10 +354,18 @@ export default function Header() {
             <i
               className={`fa-solid ${isDark ? "fa-sun" : "fa-moon"}`}
               id="theme-icon"
+              aria-hidden="true"
             />
           </button>
-          <div className="nav-toggle" id="nav-toggle" role="button" aria-label="Open menu" onClick={openMenu}>
-            <i className="fa-solid fa-bars" />
+          <div
+            className="nav-toggle"
+            id="nav-toggle"
+            role="button"
+            aria-label="Open menu"
+            tabIndex={0}
+            onClick={openMenu}
+          >
+            <i className="fa-solid fa-bars" aria-hidden="true" />
           </div>
         </div>
       </div>

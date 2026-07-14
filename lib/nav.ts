@@ -29,7 +29,16 @@ export function getNavPageFromPath(pathname: string): NavPage {
     pathname.length > 1 && pathname.endsWith("/")
       ? pathname.slice(0, -1)
       : pathname;
+
+  if (normalized === "/services" || normalized.startsWith("/services/")) {
+    return "services";
+  }
+
   return PATH_TO_PAGE[normalized] ?? "home";
+}
+
+export function isServicesActive(page: NavPage) {
+  return page === "services";
 }
 
 export const companyDropdown = [

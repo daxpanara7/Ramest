@@ -1,184 +1,216 @@
+import Link from "next/link";
+import Script from "next/script";
 import CtaBanner from "@/components/sections/CtaBanner";
 import PageHero from "@/components/sections/PageHero";
-import { createPageMetadata } from "@/lib/site";
+import {
+  deliveryProcess,
+  serviceCategories,
+  servicesItemListJsonLd,
+} from "@/lib/services";
+import { SITE, createPageMetadata } from "@/lib/site";
 
 export const metadata = createPageMetadata({
-  title: "Services",
+  title: "IT Services & AI Solutions",
   description:
-    "Explore our services: Custom Software Development, Mobile & Web Apps, and AI/ML Solutions.",
+    "Enterprise software development, cloud infrastructure, AI solutions, and industry-focused digital engineering from Ramest Technolabs. Explore our services across products, AI, and industries.",
   path: "/services",
 });
 
-export default function Page() {
+export default function ServicesPage() {
+  const schema = servicesItemListJsonLd(SITE.url);
+
   return (
     <>
-      <PageHero
-        badge="What We Offer"
-        title={
-          <>
-            Our <span className="gradient-text">Services</span>
-          </>
-        }
-        description="From idea to launch — we build, scale, and maintain digital products that your users love."
+      <Script
+        id="services-itemlist-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* SERVICES SECTION */}
-      <section className="section" id="services">
+      <PageHero
+        className="page-hero section svc-hero"
+        badge="IT Services"
+        title={
+          <>
+            Engineering products that{" "}
+            <span className="gradient-text">perform at enterprise scale</span>
+          </>
+        }
+        description="Software, cloud, and AI delivery with the discipline of a consulting firm and the speed of a product team. Explore our capabilities across core engineering, artificial intelligence, and industry solutions."
+      >
+        <div className="svc-hero-actions">
+          <Link href="#our-services" className="button button-primary svc-hero-btn">
+            Explore services
+            <i className="fa-solid fa-arrow-down" aria-hidden="true" />
+          </Link>
+          <Link href="/contact" className="button button-secondary svc-hero-btn">
+            Book a consultation
+          </Link>
+        </div>
+        <nav className="svc-hero-jump" aria-label="Service categories">
+          {serviceCategories.map((category) => (
+            <a key={category.id} href={`#${category.id}`} className="svc-hero-jump-link">
+              <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
+              {category.title}
+            </a>
+          ))}
+        </nav>
+      </PageHero>
+
+      <section className="section svc-trust" aria-label="Engagement highlights">
         <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Our Expertise</h2>
-            <p className="section-subtitle">
-              Delivering precision and quality across all digital domains.
-            </p>
-          </div>
-          <div className="services-grid services-grid-2">
-            <div className="service-card reveal">
-              <div className="service-icon">
-                <i className="fa-solid fa-laptop-code"></i>
-              </div>
-              <h3 className="service-title">Custom Software Development</h3>
-              <p className="service-description">
-                Tailor-made software solutions designed to meet your specific
-                business requirements. We own the full lifecycle from architecture
-                to deployment.
-              </p>
-              <div className="service-tags">
-                <span>Node.js</span>
-                <span>Python</span>
-                <span>PostgreSQL</span>
-              </div>
-            </div>
-            <div className="service-card reveal-delayed">
-              <div className="service-icon">
-                <i className="fa-solid fa-mobile-button"></i>
-              </div>
-              <h3 className="service-title">Mobile & Web Applications</h3>
-              <p className="service-description">
-                Scalable mobile and web applications that drive user engagement
-                and business growth, designed for performance at any scale.
-              </p>
-              <div className="service-tags">
-                <span>React</span>
-                <span>Flutter</span>
-                <span>Next.js</span>
-              </div>
-            </div>
-            <div className="service-card reveal">
-              <div className="service-icon">
-                <i className="fa-solid fa-brain"></i>
-              </div>
-              <h3 className="service-title">AI / ML Solutions</h3>
-              <p className="service-description">
-                Leveraging AI and Machine Learning to automate processes, extract
-                insights, and build intelligent features into your product.
-              </p>
-              <div className="service-tags">
-                <span>TensorFlow</span>
-                <span>OpenAI</span>
-                <span>Python</span>
-              </div>
-            </div>
-            <div className="service-card reveal-delayed">
-              <div className="service-icon">
-                <i className="fa-solid fa-palette"></i>
-              </div>
-              <h3 className="service-title">UI / UX Design</h3>
-              <p className="service-description">
-                Beautiful, intuitive interfaces that convert users. We combine
-                design thinking and user research to create experiences people
-                love.
-              </p>
-              <div className="service-tags">
-                <span>Figma</span>
-                <span>Prototyping</span>
-                <span>Research</span>
-              </div>
-            </div>
-            <div className="service-card reveal">
-              <div className="service-icon">
-                <i className="fa-solid fa-cloud"></i>
-              </div>
-              <h3 className="service-title">Cloud & DevOps</h3>
-              <p className="service-description">
-                Reliable, scalable cloud infrastructure with automated CI/CD
-                pipelines and 24/7 monitoring to keep your product always-on.
-              </p>
-              <div className="service-tags">
-                <span>AWS</span>
-                <span>Docker</span>
-                <span>Kubernetes</span>
-              </div>
-            </div>
-            <div className="service-card reveal-delayed">
-              <div className="service-icon">
-                <i className="fa-solid fa-shield-halved"></i>
-              </div>
-              <h3 className="service-title">Security & Compliance</h3>
-              <p className="service-description">
-                Enterprise-grade security audits, penetration testing, and
-                compliance reviews to protect your data and meet industry
-                standards.
-              </p>
-              <div className="service-tags">
-                <span>ISO 27001</span>
-                <span>OWASP</span>
-                <span>GDPR</span>
-              </div>
-            </div>
-          </div>
+          <ul className="svc-trust-grid">
+            <li className="svc-trust-item reveal">
+              <span className="svc-trust-value">Full-stack</span>
+              <span className="svc-trust-label">Product engineering</span>
+            </li>
+            <li className="svc-trust-item reveal">
+              <span className="svc-trust-value">AI-ready</span>
+              <span className="svc-trust-label">Strategy to agents</span>
+            </li>
+            <li className="svc-trust-item reveal">
+              <span className="svc-trust-value">Cloud-native</span>
+              <span className="svc-trust-label">Secure infrastructure</span>
+            </li>
+            <li className="svc-trust-item reveal">
+              <span className="svc-trust-value">Industry-aware</span>
+              <span className="svc-trust-label">Domain delivery</span>
+            </li>
+          </ul>
         </div>
       </section>
 
-      {/* HOW WE WORK */}
-      <section className="section why-section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">How We Work</h2>
-            <p className="section-subtitle">
-              A streamlined process built for speed and quality
-            </p>
+      {serviceCategories.map((category, categoryIndex) => (
+        <section
+          key={category.id}
+          id={category.id}
+          className={`section svc-category${categoryIndex % 2 === 1 ? " svc-category--alt" : ""}`}
+          aria-labelledby={`${category.id}-heading`}
+        >
+          <div className="container">
+            <header className="svc-category-header reveal">
+              <div className="svc-category-badge">
+                <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
+                <span>{category.shortTitle}</span>
+              </div>
+              <h2 id={`${category.id}-heading`} className="svc-category-title">
+                {category.title}
+              </h2>
+              <p className="svc-category-desc">{category.description}</p>
+            </header>
+
+            <div className="svc-card-grid">
+              {category.items.map((service, index) => (
+                <article
+                  key={service.slug}
+                  id={service.slug}
+                  className={`svc-card reveal${index % 2 === 1 ? " reveal-delayed" : ""}`}
+                >
+                  <div className="svc-card-top">
+                    <span className="svc-card-icon" aria-hidden="true">
+                      <i className={`fa-solid ${service.icon}`} />
+                    </span>
+                    <Link
+                      href={service.href}
+                      className="svc-card-open"
+                      aria-label={`Learn more about ${service.title}`}
+                    >
+                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+                    </Link>
+                  </div>
+                  <h3 className="svc-card-title">
+                    <Link href={service.href}>{service.title}</Link>
+                  </h3>
+                  <p className="svc-card-desc">{service.shortDescription}</p>
+                  <ul className="svc-card-tags">
+                    {service.tags.map((tag) => (
+                      <li key={tag}>{tag}</li>
+                    ))}
+                  </ul>
+                  <Link href={service.href} className="svc-card-link">
+                    Learn more
+                    <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                  </Link>
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="why-grid">
-            <div className="why-card reveal">
-              <div className="why-icon why-step">01</div>
-              <h3 className="why-title">Discover</h3>
-              <p className="why-desc">
-                We understand your business, goals, and users before writing a
-                single line of code.
-              </p>
+        </section>
+      ))}
+
+      <section className="section svc-process" aria-labelledby="delivery-process-heading">
+        <div className="container">
+          <header className="svc-category-header reveal">
+            <div className="svc-category-badge">
+              <i className="fa-solid fa-route" aria-hidden="true" />
+              <span>Delivery</span>
             </div>
-            <div className="why-card reveal">
-              <div className="why-icon why-step">02</div>
-              <h3 className="why-title">Design</h3>
-              <p className="why-desc">
-                Wireframes and interactive prototypes let you see and refine the
-                product before development begins.
-              </p>
-            </div>
-            <div className="why-card reveal">
-              <div className="why-icon why-step">03</div>
-              <h3 className="why-title">Build</h3>
-              <p className="why-desc">
-                Agile sprints with weekly demos keep you in the loop while we
-                build a rock-solid product.
-              </p>
-            </div>
-            <div className="why-card reveal">
-              <div className="why-icon why-step">04</div>
-              <h3 className="why-title">Launch & Grow</h3>
-              <p className="why-desc">
-                Smooth deployment and post-launch support ensure your product
-                thrives in the real world.
-              </p>
-            </div>
+            <h2 id="delivery-process-heading" className="svc-category-title">
+              How we deliver
+            </h2>
+            <p className="svc-category-desc">
+              A clear engagement path designed for executive visibility and engineering excellence.
+            </p>
+          </header>
+
+          <ol className="svc-process-grid">
+            {deliveryProcess.map((step) => (
+              <li key={step.step} className="svc-process-card reveal">
+                <span className="svc-process-step" aria-hidden="true">
+                  {step.step}
+                </span>
+                <h3 className="svc-process-title">{step.title}</h3>
+                <p className="svc-process-desc">{step.description}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="section svc-related" aria-labelledby="related-paths-heading">
+        <div className="container">
+          <header className="svc-category-header reveal">
+            <h2 id="related-paths-heading" className="svc-category-title">
+              Continue exploring
+            </h2>
+            <p className="svc-category-desc">
+              Pair our services with dedicated teams or learn how we build and operate technology.
+            </p>
+          </header>
+          <div className="svc-related-grid">
+            <Link href="/hire-developers" className="svc-related-card reveal">
+              <i className="fa-solid fa-user-group" aria-hidden="true" />
+              <div>
+                <h3>Hire Developers</h3>
+                <p>Augment your team with specialists who ship.</p>
+              </div>
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+            </Link>
+            <Link href="/infrastructure" className="svc-related-card reveal">
+              <i className="fa-solid fa-server" aria-hidden="true" />
+              <div>
+                <h3>Infrastructure</h3>
+                <p>See how we run secure, scalable environments.</p>
+              </div>
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+            </Link>
+            <Link href="/contact" className="svc-related-card reveal">
+              <i className="fa-solid fa-handshake" aria-hidden="true" />
+              <div>
+                <h3>Contact Us</h3>
+                <p>Tell us about your roadmap — we&apos;ll respond quickly.</p>
+              </div>
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
 
       <CtaBanner
-        title="Have a Project in Mind?"
-        description="Let's talk about how we can help build and grow your digital product."
-        buttonLabel="Let's Talk"
+        title="Ready to modernize your technology stack?"
+        description="Share your goals — we'll recommend an engagement path across software, cloud, and AI."
+        buttonLabel="Start a conversation"
+        href="/contact"
       />
     </>
   );

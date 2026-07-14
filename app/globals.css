@@ -3,6 +3,7 @@
 @import "../styles/company.css";
 @import "../styles/careers.css";
 @import "../styles/certifications.css";
+@import "../styles/services.css";
 
 :root {
   --body-font: var(--font-inter), "Inter", sans-serif;

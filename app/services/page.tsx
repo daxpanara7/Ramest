@@ -30,6 +30,8 @@ export default function ServicesPage() {
       <PageHero
         className="page-hero section svc-hero"
         badge="IT Services"
+        centered
+        style={{ paddingTop: "8rem", paddingBottom: "3rem" }}
         title={
           <>
             Engineering products that{" "}
@@ -38,7 +40,7 @@ export default function ServicesPage() {
         }
         description="Software, cloud, and AI delivery with the discipline of a consulting firm and the speed of a product team. Explore our capabilities across core engineering, artificial intelligence, and industry solutions."
       >
-        <div className="svc-hero-actions">
+        <div className="svc-hero-actions svc-hero-actions--center">
           <Link href="#our-services" className="button button-primary svc-hero-btn">
             Explore services
             <i className="fa-solid fa-arrow-down" aria-hidden="true" />
@@ -47,7 +49,10 @@ export default function ServicesPage() {
             Book a consultation
           </Link>
         </div>
-        <nav className="svc-hero-jump" aria-label="Service categories">
+        <nav
+          className="svc-hero-jump svc-hero-jump--center"
+          aria-label="Service categories"
+        >
           {serviceCategories.map((category) => (
             <a key={category.id} href={`#${category.id}`} className="svc-hero-jump-link">
               <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
@@ -88,7 +93,7 @@ export default function ServicesPage() {
           aria-labelledby={`${category.id}-heading`}
         >
           <div className="container">
-            <header className="svc-category-header reveal">
+            <header className="svc-category-header svc-category-header--center reveal">
               <div className="svc-category-badge">
                 <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
                 <span>{category.shortTitle}</span>
@@ -140,7 +145,7 @@ export default function ServicesPage() {
 
       <section className="section svc-process" aria-labelledby="delivery-process-heading">
         <div className="container">
-          <header className="svc-category-header reveal">
+          <header className="svc-category-header svc-category-header--center reveal">
             <div className="svc-category-badge">
               <i className="fa-solid fa-route" aria-hidden="true" />
               <span>Delivery</span>
@@ -153,14 +158,14 @@ export default function ServicesPage() {
             </p>
           </header>
 
-          <ol className="svc-process-grid">
+          <ol className="svc-timeline svc-timeline--four reveal">
             {deliveryProcess.map((step) => (
-              <li key={step.step} className="svc-process-card reveal">
-                <span className="svc-process-step" aria-hidden="true">
+              <li key={step.step} className="svc-timeline-step">
+                <span className="svc-timeline-dot" aria-hidden="true">
                   {step.step}
                 </span>
-                <h3 className="svc-process-title">{step.title}</h3>
-                <p className="svc-process-desc">{step.description}</p>
+                <h3 className="svc-timeline-title">{step.title}</h3>
+                <p className="svc-timeline-desc">{step.description}</p>
               </li>
             ))}
           </ol>
@@ -169,7 +174,7 @@ export default function ServicesPage() {
 
       <section className="section svc-related" aria-labelledby="related-paths-heading">
         <div className="container">
-          <header className="svc-category-header reveal">
+          <header className="svc-category-header svc-category-header--center reveal">
             <h2 id="related-paths-heading" className="svc-category-title">
               Continue exploring
             </h2>

@@ -9,6 +9,7 @@ import {
   getServiceBySlug,
   serviceJsonLd,
 } from "@/lib/services";
+import { getServiceDetail } from "@/lib/service-details";
 import { SITE, createPageMetadata } from "@/lib/site";
 
 type PageProps = {
@@ -30,11 +31,24 @@ export async function generateMetadata({ params }: PageProps) {
     });
   }
 
+  const detail = getServiceDetail(slug);
   return createPageMetadata({
     title: `${service.title} Services`,
-    description: service.description.slice(0, 155),
+    description: (detail?.heroTagline ?? service.description).slice(0, 155),
     path: service.href,
   });
+}
+
+function faqJsonLd(faqs: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
 }
 
 export default async function ServiceDetailPage({ params }: PageProps) {
@@ -43,6 +57,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   if (!service) notFound();
 
   const category = getCategoryForSlug(slug);
+  const detail = getServiceDetail(slug);
   const related =
     category?.items.filter((item) => item.slug !== service.slug).slice(0, 3) ??
     [];
@@ -55,6 +70,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+      {detail?.faqs?.length ? (
+        <Script
+          id={`service-faq-jsonld-${service.slug}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqJsonLd(detail.faqs)),
+          }}
+        />
+      ) : null}
 
       <PageHero
         className="page-hero section svc-hero svc-detail-hero"
@@ -67,7 +91,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             </span>
           </>
         }
-        description={service.description}
+        description={detail?.heroTagline ?? service.description}
       >
         <div className="svc-hero-actions">
           <Link href="/contact" className="button button-primary svc-hero-btn">
@@ -87,11 +111,20 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         <div className="container svc-detail-layout">
           <article className="svc-detail-main reveal">
             <h2 className="svc-detail-heading">What you get</h2>
-            <p className="svc-detail-copy">
-              {service.description} Our team partners with product, engineering,
-              and business stakeholders to define outcomes, ship iterative
-              releases, and leave behind systems your organization can own.
-            </p>
+            {detail ? (
+              detail.intro.map((paragraph) => (
+                <p key={paragraph.slice(0, 32)} className="svc-detail-copy">
+                  {paragraph}
+                </p>
+              ))
+            ) : (
+              <p className="svc-detail-copy">
+                {service.description} Our team partners with product,
+                engineering, and business stakeholders to define outcomes, ship
+                iterative releases, and leave behind systems your organization
+                can own.
+              </p>
+            )}
 
             <h3 className="svc-detail-subheading">Capability focus</h3>
             <ul className="svc-detail-list">
@@ -138,6 +171,166 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </aside>
         </div>
       </section>
+
+      {detail ? (
+        <>
+          <section
+            className="section svc-category svc-category--alt"
+            aria-labelledby="offerings-heading"
+          >
+            <div className="container">
+              <header className="svc-category-header reveal">
+                <div className="svc-category-badge">
+                  <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
+                  <span>Offerings</span>
+                </div>
+                <h2 id="offerings-heading" className="svc-category-title">
+                  {detail.offeringsTitle}
+                </h2>
+                <p className="svc-category-desc">{detail.offeringsSubtitle}</p>
+              </header>
+              <div className="svc-card-grid">
+                {detail.offerings.map((offering, index) => (
+                  <article
+                    key={offering.title}
+                    className={`svc-card reveal${index % 2 === 1 ? " reveal-delayed" : ""}`}
+                  >
+                    <div className="svc-card-top">
+                      <span className="svc-card-icon" aria-hidden="true">
+                        <i className={`fa-solid ${offering.icon}`} />
+                      </span>
+                    </div>
+                    <h3 className="svc-card-title">{offering.title}</h3>
+                    <p className="svc-card-desc">{offering.description}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="section svc-process"
+            aria-labelledby="service-process-heading"
+          >
+            <div className="container">
+              <header className="svc-category-header reveal">
+                <div className="svc-category-badge">
+                  <i className="fa-solid fa-route" aria-hidden="true" />
+                  <span>Process</span>
+                </div>
+                <h2 id="service-process-heading" className="svc-category-title">
+                  How we deliver
+                </h2>
+                <p className="svc-category-desc">
+                  A proven path from first conversation to production — and
+                  beyond.
+                </p>
+              </header>
+              <ol className="svc-process-grid svc-process-grid--five">
+                {detail.process.map((step) => (
+                  <li key={step.step} className="svc-process-card reveal">
+                    <span className="svc-process-step" aria-hidden="true">
+                      {step.step}
+                    </span>
+                    <h3 className="svc-process-title">{step.title}</h3>
+                    <p className="svc-process-desc">{step.description}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+
+          <section
+            className="section svc-category svc-category--alt"
+            aria-labelledby="benefits-heading"
+          >
+            <div className="container">
+              <header className="svc-category-header reveal">
+                <div className="svc-category-badge">
+                  <i className="fa-solid fa-medal" aria-hidden="true" />
+                  <span>Why Ramest</span>
+                </div>
+                <h2 id="benefits-heading" className="svc-category-title">
+                  {detail.benefitsTitle}
+                </h2>
+              </header>
+              <div className="svc-card-grid svc-card-grid--compact">
+                {detail.benefits.map((benefit) => (
+                  <article key={benefit.title} className="svc-card reveal">
+                    <div className="svc-card-top">
+                      <span className="svc-card-icon" aria-hidden="true">
+                        <i className={`fa-solid ${benefit.icon}`} />
+                      </span>
+                    </div>
+                    <h3 className="svc-card-title">{benefit.title}</h3>
+                    <p className="svc-card-desc">{benefit.description}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="section svc-stack"
+            aria-labelledby="stack-heading"
+          >
+            <div className="container">
+              <header className="svc-category-header reveal">
+                <div className="svc-category-badge">
+                  <i className="fa-solid fa-layer-group" aria-hidden="true" />
+                  <span>Stack</span>
+                </div>
+                <h2 id="stack-heading" className="svc-category-title">
+                  Technologies we work with
+                </h2>
+                <p className="svc-category-desc">
+                  Chosen per project for fit and longevity — never by habit.
+                </p>
+              </header>
+              <div className="svc-stack-grid reveal">
+                {detail.techStack.map((group) => (
+                  <div key={group.category} className="svc-stack-row">
+                    <span className="svc-stack-category">{group.category}</span>
+                    <ul className="svc-card-tags svc-stack-tags">
+                      {group.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="section svc-faq"
+            aria-labelledby="faq-heading"
+          >
+            <div className="container">
+              <header className="svc-category-header reveal">
+                <div className="svc-category-badge">
+                  <i className="fa-solid fa-circle-question" aria-hidden="true" />
+                  <span>FAQ</span>
+                </div>
+                <h2 id="faq-heading" className="svc-category-title">
+                  Frequently asked questions
+                </h2>
+              </header>
+              <div className="svc-faq-list reveal">
+                {detail.faqs.map((faq) => (
+                  <details key={faq.question} className="svc-faq-item">
+                    <summary className="svc-faq-question">
+                      {faq.question}
+                      <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+                    </summary>
+                    <p className="svc-faq-answer">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      ) : null}
 
       {related.length > 0 ? (
         <section

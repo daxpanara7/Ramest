@@ -719,11 +719,14 @@ img {
 .button {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     column-gap: 0.5rem;
-    padding: 1rem 1.75rem;
+    min-height: 3.25rem;
+    padding: 0.85rem 1.75rem;
     border-radius: 0.5rem;
     font-weight: 600;
-    transition: .3s;
+    white-space: nowrap;
+    transition: background-color .3s, border-color .3s, color .3s, box-shadow .3s, transform .3s;
 }
 
 .button-primary {
@@ -1074,11 +1077,13 @@ img {
 .button-cta {
     background-color: #fff;
     color: #E93F2E;
-    padding: 1rem 2rem;
+    min-height: 3.25rem;
+    padding: 0.85rem 2rem;
     border-radius: 0.5rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     white-space: nowrap;
     transition: transform 0.3s, box-shadow 0.3s;

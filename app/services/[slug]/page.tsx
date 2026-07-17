@@ -112,10 +112,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <section className="section svc-detail-body">
         <div className="container svc-detail-layout">
           <article className="svc-detail-main reveal">
+            <div className="svc-category-badge">
+              <i className="fa-solid fa-circle-info" aria-hidden="true" />
+              <span>Overview</span>
+            </div>
             <h2 className="svc-detail-heading">What you get</h2>
             {detail ? (
-              detail.intro.map((paragraph) => (
-                <p key={paragraph.slice(0, 32)} className="svc-detail-copy">
+              detail.intro.map((paragraph, index) => (
+                <p
+                  key={paragraph.slice(0, 32)}
+                  className={`svc-detail-copy${index === 0 ? " svc-detail-lead" : ""}`}
+                >
                   {paragraph}
                 </p>
               ))
@@ -129,7 +136,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             )}
 
             <h3 className="svc-detail-subheading">Capability focus</h3>
-            <ul className="svc-detail-list svc-detail-list--grid">
+            <ul className="svc-chips">
               {service.tags.map((tag) => (
                 <li key={tag}>
                   <i className="fa-solid fa-check" aria-hidden="true" />
@@ -138,15 +145,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               ))}
               <li>
                 <i className="fa-solid fa-check" aria-hidden="true" />
-                Discovery workshops and technical assessments
+                Discovery workshops
               </li>
               <li>
                 <i className="fa-solid fa-check" aria-hidden="true" />
-                Architecture, implementation, and handover documentation
+                Architecture &amp; documentation
               </li>
               <li>
                 <i className="fa-solid fa-check" aria-hidden="true" />
-                Post-launch support and continuous improvement
+                Post-launch support
               </li>
             </ul>
           </article>
@@ -195,14 +202,14 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 {detail.offerings.map((offering, index) => (
                   <article
                     key={offering.title}
-                    className={`svc-card reveal${index % 2 === 1 ? " reveal-delayed" : ""}`}
+                    className={`svc-card svc-offer-card reveal${index % 2 === 1 ? " reveal-delayed" : ""}`}
                   >
-                    <div className="svc-card-top">
+                    <div className="svc-offer-head">
                       <span className="svc-card-icon" aria-hidden="true">
                         <i className={`fa-solid ${offering.icon}`} />
                       </span>
+                      <h3 className="svc-card-title">{offering.title}</h3>
                     </div>
-                    <h3 className="svc-card-title">{offering.title}</h3>
                     <p className="svc-card-desc">{offering.description}</p>
                   </article>
                 ))}
@@ -228,14 +235,14 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   beyond.
                 </p>
               </header>
-              <ol className="svc-process-grid svc-process-grid--five">
+              <ol className="svc-timeline reveal">
                 {detail.process.map((step) => (
-                  <li key={step.step} className="svc-process-card reveal">
-                    <span className="svc-process-step" aria-hidden="true">
+                  <li key={step.step} className="svc-timeline-step">
+                    <span className="svc-timeline-dot" aria-hidden="true">
                       {step.step}
                     </span>
-                    <h3 className="svc-process-title">{step.title}</h3>
-                    <p className="svc-process-desc">{step.description}</p>
+                    <h3 className="svc-timeline-title">{step.title}</h3>
+                    <p className="svc-timeline-desc">{step.description}</p>
                   </li>
                 ))}
               </ol>
@@ -256,14 +263,16 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   {detail.benefitsTitle}
                 </h2>
               </header>
-              <div className="svc-card-grid svc-card-grid--four">
+              <div className="svc-why-grid">
                 {detail.benefits.map((benefit) => (
-                  <article key={benefit.title} className="svc-card svc-card--centered reveal">
+                  <article key={benefit.title} className="svc-why-card reveal">
                     <span className="svc-card-icon" aria-hidden="true">
                       <i className={`fa-solid ${benefit.icon}`} />
                     </span>
-                    <h3 className="svc-card-title">{benefit.title}</h3>
-                    <p className="svc-card-desc">{benefit.description}</p>
+                    <div>
+                      <h3 className="svc-card-title">{benefit.title}</h3>
+                      <p className="svc-card-desc">{benefit.description}</p>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -310,11 +319,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </section>
 
           <section
-            className="section svc-faq"
+            className="section svc-faq svc-category--alt"
             aria-labelledby="faq-heading"
           >
-            <div className="container">
-              <header className="svc-category-header svc-category-header--center reveal">
+            <div className="container svc-faq-layout">
+              <div className="svc-faq-intro reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-circle-question" aria-hidden="true" />
                   <span>FAQ</span>
@@ -323,9 +332,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   Frequently asked questions
                 </h2>
                 <p className="svc-category-desc">
-                  Straight answers to the questions we hear most.
+                  Straight answers to the questions we hear most from teams
+                  planning this kind of work.
                 </p>
-              </header>
+                <div className="svc-faq-help">
+                  <p>Have a question we didn&apos;t cover?</p>
+                  <Link href="/contact" className="button button-primary">
+                    Talk to our team
+                    <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
               <div className="svc-faq-list reveal">
                 {detail.faqs.map((faq, index) => (
                   <details

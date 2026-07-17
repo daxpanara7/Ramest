@@ -756,11 +756,13 @@
 /* ==================== SERVICES PAGE ==================== */
 
 .svc-hero .page-hero-title {
-  max-width: 16ch;
+  max-width: 24ch;
+  margin-inline: auto;
 }
 
 .svc-hero .page-hero-desc {
   max-width: 40rem;
+  margin-inline: auto;
 }
 
 .svc-hero-actions {

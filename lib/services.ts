@@ -210,6 +210,14 @@ export const serviceCategories: ServiceCategory[] = [
         "fa-store",
         ["Omnichannel", "POS", "Loyalty", "Inventory"]
       ),
+      item(
+        "healthcare",
+        "Healthcare",
+        "Secure digital care and health-data platforms.",
+        "Patient portals, telehealth, and clinical data systems built with the privacy, reliability, and auditability that healthcare demands.",
+        "fa-heart-pulse",
+        ["Telehealth", "EHR", "Privacy", "Compliance"]
+      ),
     ],
   },
 ];

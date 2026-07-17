@@ -27,7 +27,7 @@ export default function Page() {
           <div className="about-image">
             <div className="img-box">
               <img
-                src="/assets/image (8).png"
+                src="/assets/dax-panara.webp"
                 alt="Dax Panara - Founder, Ramest Technolabs"
                 className="about-img"
               />

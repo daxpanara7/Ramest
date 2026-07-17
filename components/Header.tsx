@@ -206,7 +206,7 @@ export default function Header() {
       <div className="container nav-container" ref={navContainerRef}>
         <Link href="/" className="logo">
           <Image
-            src="/assets/logo_final.png"
+            src="/assets/logo_final.webp"
             alt="Ramest Technolabs — IT consulting and software development"
             className="logo-img"
             width={687}

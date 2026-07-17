@@ -25,6 +25,8 @@ export default function Page() {
                   src={member.image}
                   alt={member.alt}
                   className="team-img"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <h3 className="team-name">{member.name}</h3>

@@ -83,6 +83,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <PageHero
         className="page-hero section svc-hero svc-detail-hero"
         badge={category?.title ?? "Services"}
+        centered
+        style={{ paddingTop: "8rem", paddingBottom: "3rem" }}
         title={
           <>
             {service.title.split(" ").slice(0, -1).join(" ")}{" "}
@@ -93,7 +95,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         }
         description={detail?.heroTagline ?? service.description}
       >
-        <div className="svc-hero-actions">
+        <div className="svc-hero-actions svc-hero-actions--center">
           <Link href="/contact" className="button button-primary svc-hero-btn">
             Discuss this capability
             <i className="fa-solid fa-arrow-right" aria-hidden="true" />
@@ -127,7 +129,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             )}
 
             <h3 className="svc-detail-subheading">Capability focus</h3>
-            <ul className="svc-detail-list">
+            <ul className="svc-detail-list svc-detail-list--grid">
               {service.tags.map((tag) => (
                 <li key={tag}>
                   <i className="fa-solid fa-check" aria-hidden="true" />
@@ -179,7 +181,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             aria-labelledby="offerings-heading"
           >
             <div className="container">
-              <header className="svc-category-header reveal">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
                   <span>Offerings</span>
@@ -213,7 +215,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             aria-labelledby="service-process-heading"
           >
             <div className="container">
-              <header className="svc-category-header reveal">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-route" aria-hidden="true" />
                   <span>Process</span>
@@ -245,7 +247,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             aria-labelledby="benefits-heading"
           >
             <div className="container">
-              <header className="svc-category-header reveal">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-medal" aria-hidden="true" />
                   <span>Why Ramest</span>
@@ -254,14 +256,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   {detail.benefitsTitle}
                 </h2>
               </header>
-              <div className="svc-card-grid svc-card-grid--compact">
+              <div className="svc-card-grid svc-card-grid--four">
                 {detail.benefits.map((benefit) => (
-                  <article key={benefit.title} className="svc-card reveal">
-                    <div className="svc-card-top">
-                      <span className="svc-card-icon" aria-hidden="true">
-                        <i className={`fa-solid ${benefit.icon}`} />
-                      </span>
-                    </div>
+                  <article key={benefit.title} className="svc-card svc-card--centered reveal">
+                    <span className="svc-card-icon" aria-hidden="true">
+                      <i className={`fa-solid ${benefit.icon}`} />
+                    </span>
                     <h3 className="svc-card-title">{benefit.title}</h3>
                     <p className="svc-card-desc">{benefit.description}</p>
                   </article>
@@ -275,7 +275,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             aria-labelledby="stack-heading"
           >
             <div className="container">
-              <header className="svc-category-header reveal">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-layer-group" aria-hidden="true" />
                   <span>Stack</span>
@@ -288,9 +288,16 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </p>
               </header>
               <div className="svc-stack-grid reveal">
-                {detail.techStack.map((group) => (
-                  <div key={group.category} className="svc-stack-row">
-                    <span className="svc-stack-category">{group.category}</span>
+                {detail.techStack.map((group, index) => (
+                  <div key={group.category} className="svc-stack-card">
+                    <div className="svc-stack-head">
+                      <span className="svc-stack-index" aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="svc-stack-category">
+                        {group.category}
+                      </span>
+                    </div>
                     <ul className="svc-card-tags svc-stack-tags">
                       {group.items.map((item) => (
                         <li key={item}>{item}</li>
@@ -307,7 +314,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             aria-labelledby="faq-heading"
           >
             <div className="container">
-              <header className="svc-category-header reveal">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-circle-question" aria-hidden="true" />
                   <span>FAQ</span>
@@ -315,12 +322,24 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 <h2 id="faq-heading" className="svc-category-title">
                   Frequently asked questions
                 </h2>
+                <p className="svc-category-desc">
+                  Straight answers to the questions we hear most.
+                </p>
               </header>
               <div className="svc-faq-list reveal">
-                {detail.faqs.map((faq) => (
-                  <details key={faq.question} className="svc-faq-item">
+                {detail.faqs.map((faq, index) => (
+                  <details
+                    key={faq.question}
+                    className="svc-faq-item"
+                    {...(index === 0 ? { open: true } : {})}
+                  >
                     <summary className="svc-faq-question">
-                      {faq.question}
+                      <span className="svc-faq-num" aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="svc-faq-question-text">
+                        {faq.question}
+                      </span>
                       <i className="fa-solid fa-chevron-down" aria-hidden="true" />
                     </summary>
                     <p className="svc-faq-answer">{faq.answer}</p>
@@ -338,7 +357,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           aria-labelledby="related-services-heading"
         >
           <div className="container">
-            <header className="svc-category-header reveal">
+            <header className="svc-category-header svc-category-header--center reveal">
               <h2 id="related-services-heading" className="svc-category-title">
                 Related capabilities
               </h2>

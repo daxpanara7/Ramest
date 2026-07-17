@@ -107,6 +107,16 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             Back to {category?.shortTitle ?? "services"}
           </Link>
         </div>
+        {detail?.heroHighlights?.length ? (
+          <ul className="svc-chips svc-chips--hero">
+            {detail.heroHighlights.map((highlight) => (
+              <li key={highlight}>
+                <i className="fa-solid fa-circle-check" aria-hidden="true" />
+                {highlight}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </PageHero>
 
       <section className="section svc-detail-body">
@@ -116,7 +126,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               <i className="fa-solid fa-circle-info" aria-hidden="true" />
               <span>Overview</span>
             </div>
-            <h2 className="svc-detail-heading">What you get</h2>
+            <h2 className="svc-detail-heading">
+              {detail?.overviewTitle ?? "What you get"}
+            </h2>
             {detail ? (
               detail.intro.map((paragraph, index) => (
                 <p
@@ -228,12 +240,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   <span>Process</span>
                 </div>
                 <h2 id="service-process-heading" className="svc-category-title">
-                  How we deliver
+                  {detail.processTitle}
                 </h2>
-                <p className="svc-category-desc">
-                  A proven path from first conversation to production — and
-                  beyond.
-                </p>
+                <p className="svc-category-desc">{detail.processSubtitle}</p>
               </header>
               <ol className="svc-timeline reveal">
                 {detail.process.map((step) => (
@@ -290,11 +299,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   <span>Stack</span>
                 </div>
                 <h2 id="stack-heading" className="svc-category-title">
-                  Technologies we work with
+                  {detail.stackTitle}
                 </h2>
-                <p className="svc-category-desc">
-                  Chosen per project for fit and longevity — never by habit.
-                </p>
+                <p className="svc-category-desc">{detail.stackSubtitle}</p>
               </header>
               <div className="svc-stack-grid reveal">
                 {detail.techStack.map((group, index) => (
@@ -337,10 +344,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 <h2 id="faq-heading" className="svc-category-title">
                   Frequently asked questions
                 </h2>
-                <p className="svc-category-desc">
-                  Straight answers to the questions we hear most from teams
-                  planning this kind of work.
-                </p>
+                <p className="svc-category-desc">{detail.faqSubtitle}</p>
               </header>
               <div className="svc-faq-list reveal">
                 {detail.faqs.map((faq, index) => (

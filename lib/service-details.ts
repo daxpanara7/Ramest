@@ -29,15 +29,24 @@ export type ServiceFaq = {
 export type ServiceDetail = {
   /** Short line shown under the hero title. */
   heroTagline: string;
-  /** Overview paragraphs for the "What you get" section. */
+  /** Three short proof points shown as chips in the hero. */
+  heroHighlights: string[];
+  /** Overview section heading. */
+  overviewTitle: string;
+  /** Overview paragraphs. */
   intro: string[];
   offeringsTitle: string;
   offeringsSubtitle: string;
   offerings: ServiceOffering[];
   benefitsTitle: string;
   benefits: ServiceBenefit[];
+  processTitle: string;
+  processSubtitle: string;
   process: ServiceProcessStep[];
+  stackTitle: string;
+  stackSubtitle: string;
   techStack: ServiceStackGroup[];
+  faqSubtitle: string;
   faqs: ServiceFaq[];
 };
 
@@ -48,6 +57,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "software-development": {
     heroTagline:
       "Custom software engineered around the way your business actually works — not the other way around.",
+    heroHighlights: [
+      "MVP in 8–14 weeks",
+      "100% code & IP ownership",
+      "Senior engineers only",
+    ],
+    overviewTitle: "Software built around your business",
     intro: [
       "Off-the-shelf tools force your team to adapt to someone else's process. We build software that adapts to yours. From internal platforms that remove manual work to customer-facing products that generate revenue, we design, build, and operate systems that fit your workflows, your data, and your growth plans.",
       "Every engagement starts with understanding the business problem — not the feature list. We then translate that into clean architecture, an honest delivery plan, and working software you see improving sprint after sprint. When we hand over, you get documented, maintainable code your team can own — and we stay available for whatever comes next.",
@@ -94,6 +109,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "Why teams build with Ramest",
+    processTitle: "From idea to production in five steps",
+    processSubtitle:
+      "A delivery rhythm that keeps stakeholders aligned and risk low.",
+    stackTitle: "Our software engineering stack",
+    stackSubtitle:
+      "Proven technologies for backends, interfaces, data, and delivery.",
+    faqSubtitle:
+      "What founders and CTOs ask before starting a custom build.",
     benefits: [
       {
         icon: "fa-bullseye",
@@ -205,6 +228,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "web-application-development": {
     heroTagline:
       "Fast, secure, search-friendly web applications that turn visitors into customers and workflows into products.",
+    heroHighlights: [
+      "Core Web Vitals in the green",
+      "SEO-ready architecture",
+      "Built to convert",
+    ],
+    overviewTitle: "Web applications that earn their traffic",
     intro: [
       "The web is where your customers form their first impression and where your teams do their daily work. We build web applications that excel at both — customer-facing products that load instantly, rank well, and convert, and internal platforms that make complex operations feel simple.",
       "Our web engineering combines modern frameworks like Next.js and React with disciplined attention to performance budgets, accessibility, and security. The result is a product that feels premium on day one and stays fast, stable, and easy to extend as traffic and features grow.",
@@ -251,6 +280,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "What sets our web apps apart",
+    processTitle: "How your web app comes to life",
+    processSubtitle:
+      "From product discovery to a launch you can measure — with previews you can click at every step.",
+    stackTitle: "The stack behind fast web apps",
+    stackSubtitle:
+      "Modern frameworks and infrastructure tuned for speed, SEO, and scale.",
+    faqSubtitle:
+      "Common questions before building — or rebuilding — a web product.",
     benefits: [
       {
         icon: "fa-bolt",
@@ -362,6 +399,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "cloud-infrastructure": {
     heroTagline:
       "Cloud foundations that scale with your ambitions — secure, observable, and cost-efficient by design.",
+    heroHighlights: [
+      "Zero-downtime migrations",
+      "Everything as code",
+      "Costs you can explain",
+    ],
+    overviewTitle: "Infrastructure that accelerates delivery",
     intro: [
       "Your infrastructure is either an accelerator or a bottleneck. We design and operate cloud environments that let teams ship faster, sleep better, and spend less — combining solid architecture with the automation and observability that modern operations demand.",
       "Whether you're migrating from on-premise servers, taming an inherited cloud account, or building a platform for your next stage of growth, we bring DevOps maturity without enterprise bureaucracy: infrastructure as code, automated pipelines, real monitoring, and costs you can actually explain.",
@@ -408,6 +451,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "The Ramest approach to infrastructure",
+    processTitle: "Our path to a stable, scalable cloud",
+    processSubtitle:
+      "Assess, automate, migrate — with a rollback plan at every step.",
+    stackTitle: "Platforms and tooling we operate",
+    stackSubtitle:
+      "The cloud providers, automation, runtimes, and observability we run every day.",
+    faqSubtitle:
+      "What engineering leaders ask about cloud and DevOps engagements.",
     benefits: [
       {
         icon: "fa-file-code",
@@ -519,6 +570,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "mobile-app-development": {
     heroTagline:
       "Mobile apps your users keep — polished, performant, and connected to everything your business runs on.",
+    heroHighlights: [
+      "iOS & Android from one team",
+      "Store submission handled",
+      "Offline-first when it matters",
+    ],
+    overviewTitle: "Apps users keep on their home screen",
     intro: [
       "A mobile app lives or dies in its first week on a user's phone. We build apps that earn their place — fast to open, intuitive to use, and reliable enough that users trust them with daily tasks. From consumer products to field-operations tools, we cover the full journey: strategy, design, engineering, launch, and growth.",
       "We're honest about the native-versus-cross-platform decision. Flutter and React Native get most products to both stores faster with one codebase; Swift and Kotlin win when you need deep platform integration or maximum performance. We'll recommend what's right for your product — and build it to feel native either way.",
@@ -565,6 +622,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "Why our apps perform",
+    processTitle: "From concept to the app stores",
+    processSubtitle:
+      "Validate, design, build, launch — with beta builds in your hands throughout.",
+    stackTitle: "Mobile technologies we ship with",
+    stackSubtitle:
+      "Native and cross-platform stacks chosen for your product — not our habit.",
+    faqSubtitle:
+      "What product owners ask before building a mobile app.",
     benefits: [
       {
         icon: "fa-gauge-high",
@@ -676,6 +741,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "front-end-development": {
     heroTagline:
       "The layer your users actually touch — engineered to feel effortless, load instantly, and scale with your product.",
+    heroHighlights: [
+      "Pixel-faithful to your designs",
+      "WCAG-aware by default",
+      "Performance budgets enforced",
+    ],
+    overviewTitle: "Interfaces your users can feel",
     intro: [
       "Users judge your product by its interface. Slow pages, janky interactions, and inconsistent components quietly erode trust and conversion — no matter how good the backend is. Our front-end engineering turns design intent into interfaces that feel premium: fast, fluid, accessible, and pixel-faithful.",
       "We also build for the developers who come after us. Design systems, typed components, and documented patterns mean your team ships new screens quickly and consistently, instead of reinventing buttons and fighting CSS. Good front-end work is felt by users and loved by engineers.",
@@ -722,6 +793,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "What quality front-end delivers",
+    processTitle: "From design file to production UI",
+    processSubtitle:
+      "Foundation first, then features — with quality gates on every screen.",
+    stackTitle: "Tools of the front-end craft",
+    stackSubtitle:
+      "Frameworks, styling systems, and testing tools for UI that lasts.",
+    faqSubtitle:
+      "What design and product teams ask about front-end engagements.",
     benefits: [
       {
         icon: "fa-bolt",
@@ -833,6 +912,12 @@ export const serviceDetails: Record<string, ServiceDetail> = {
   "data-engineering": {
     heroTagline:
       "Turn scattered data into a reliable asset — pipelines, platforms, and analytics your teams actually trust.",
+    heroHighlights: [
+      "One source of truth",
+      "Pipelines monitored 24/7",
+      "AI-ready data models",
+    ],
+    overviewTitle: "Data your whole company can trust",
     intro: [
       "Most companies don't have a data shortage — they have a trust shortage. Numbers that disagree between reports, pipelines that break silently, insights that arrive too late to act on. We build data platforms that fix this: reliable ingestion, clean modeling, and analytics foundations where the numbers are current, consistent, and explainable.",
       "From your first proper warehouse to real-time streaming and ML-ready feature pipelines, we design for the scale you'll have — not just the scale you have today. And because AI initiatives live or die on data quality, our platforms are built to feed models as well as dashboards.",
@@ -879,6 +964,14 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     benefitsTitle: "The impact of solid data engineering",
+    processTitle: "From raw data to trusted insight",
+    processSubtitle:
+      "Audit, design, build — then operate and extend as your ambitions grow.",
+    stackTitle: "The modern data stack we deploy",
+    stackSubtitle:
+      "Warehouses, pipelines, streaming, and BI tools we build on daily.",
+    faqSubtitle:
+      "What teams ask before investing in a data platform.",
     benefits: [
       {
         icon: "fa-handshake",

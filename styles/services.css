@@ -1444,6 +1444,11 @@
   font-size: 0.78rem;
 }
 
+.svc-chips--hero {
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
 /* ---------- Service detail: offerings ---------- */
 
 .svc-offer-card {

@@ -307,9 +307,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                         {group.category}
                       </span>
                     </div>
-                    <ul className="svc-card-tags svc-stack-tags">
+                    <ul className="svc-stack-list">
                       {group.items.map((item) => (
-                        <li key={item}>{item}</li>
+                        <li key={item}>
+                          <i
+                            className="fa-solid fa-angle-right"
+                            aria-hidden="true"
+                          />
+                          {item}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -322,8 +328,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             className="section svc-faq svc-category--alt"
             aria-labelledby="faq-heading"
           >
-            <div className="container svc-faq-layout">
-              <div className="svc-faq-intro reveal">
+            <div className="container">
+              <header className="svc-category-header svc-category-header--center reveal">
                 <div className="svc-category-badge">
                   <i className="fa-solid fa-circle-question" aria-hidden="true" />
                   <span>FAQ</span>
@@ -335,14 +341,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   Straight answers to the questions we hear most from teams
                   planning this kind of work.
                 </p>
-                <div className="svc-faq-help">
-                  <p>Have a question we didn&apos;t cover?</p>
-                  <Link href="/contact" className="button button-primary">
-                    Talk to our team
-                    <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-                  </Link>
-                </div>
-              </div>
+              </header>
               <div className="svc-faq-list reveal">
                 {detail.faqs.map((faq, index) => (
                   <details
@@ -357,11 +356,26 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                       <span className="svc-faq-question-text">
                         {faq.question}
                       </span>
-                      <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+                      <span className="svc-faq-toggle" aria-hidden="true">
+                        <i className="fa-solid fa-plus" />
+                      </span>
                     </summary>
                     <p className="svc-faq-answer">{faq.answer}</p>
                   </details>
                 ))}
+              </div>
+              <div className="svc-faq-banner reveal">
+                <div>
+                  <h3>Still have questions?</h3>
+                  <p>
+                    Tell us about your project — we&apos;ll respond within one
+                    business day.
+                  </p>
+                </div>
+                <Link href="/contact" className="button button-primary">
+                  Talk to our team
+                  <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                </Link>
               </div>
             </div>
           </section>

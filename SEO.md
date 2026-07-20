@@ -69,9 +69,10 @@ because buyers and Google both verify them:
 
 - `/certifications` claimed ISO 27001, AWS, and Google Cloud certifications.
   Rebuilt as "Engineering Standards" describing practices we can demonstrate.
-- Homepage claimed "5+ Years of Experience", "100+ Projects Delivered",
-  "50+ Happy Clients" while `Organization.foundingDate` says 2024 — a
-  contradiction inside our own markup. Replaced with verifiable figures.
+- Homepage stats must stay consistent with `SITE.foundingYear` (2019), which
+  is published as `Organization.foundingDate`. A years-in-business figure that
+  disagrees with it is a contradiction Google can see in our own markup.
+  Current: 7+ years, 30+ projects, 100% code/IP ownership, 24/7 support.
 - About page said the company was founded in **Surat**; `lib/site.ts` and the
   Google Business Profile say **Ahmedabad**. Standardised on Ahmedabad.
 

@@ -7,12 +7,12 @@ import { breadcrumbJsonLd, createPageMetadata } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "Company",
   description:
-    "Ramest Technolabs is a software engineering company based in Ahmedabad, Gujarat, India, founded in 2024 — meet the team and explore what we do.",
+    "Ramest Technolabs is a software engineering company based in Ahmedabad, Gujarat, India, founded in 2019 — meet the team and explore what we do.",
   path: "/company",
 });
 
 const glance = [
-  { icon: "fa-calendar-day", label: "Founded 2024" },
+  { icon: "fa-calendar-day", label: "Founded 2019" },
   { icon: "fa-location-dot", label: "Ahmedabad, India" },
   { icon: "fa-people-group", label: "~5-person team" },
   { icon: "fa-diagram-project", label: "Web, mobile & AI" },
@@ -56,7 +56,7 @@ export default function Page() {
           <h2 className="section-title">Who we are</h2>
           <p className="about-text">
             Ramest Technolabs is a software engineering company founded in
-            2024 by Dax Panara. We design and build custom software, web and
+            2019 by Dax Panara. We design and build custom software, web and
             mobile applications, and applied AI and LLM systems — work that
             ranges from building a product&apos;s first working version to
             adding cloud infrastructure or AI capability to a system that is

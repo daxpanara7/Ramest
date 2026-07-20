@@ -114,19 +114,19 @@ export default function Page() {
       </section>
 
       {/* ===== STATS BAR =====
-          Claims here must stay defensible: the company was founded in 2024 and
-          Organization schema says so, so "5+ years in business" and unverified
-          project/client counts would contradict our own structured data. */}
+          Keep these consistent with SITE.foundingYear (2019) — Organization
+          schema publishes foundingDate, so a years-in-business figure that
+          disagrees with it is a contradiction in our own markup. */}
       <section className="stats-band reveal">
         <div className="container stats-band-inner">
           <div className="stat-item">
-            <span className="stat-num">18</span>
-            <span className="stat-lbl">Engineering Capabilities</span>
+            <span className="stat-num">7+</span>
+            <span className="stat-lbl">Years of Experience</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">6</span>
-            <span className="stat-lbl">Industries Served</span>
+            <span className="stat-num">30+</span>
+            <span className="stat-lbl">Projects Delivered</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
@@ -135,8 +135,8 @@ export default function Page() {
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">1 Day</span>
-            <span className="stat-lbl">Average Reply Time</span>
+            <span className="stat-num">24/7</span>
+            <span className="stat-lbl">Dedicated Support</span>
           </div>
         </div>
       </section>

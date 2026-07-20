@@ -9,3 +9,4 @@ npm-debug.log
 *.md
 prisma/migrations/**/migration.sql.bak
 .DS_Store
+uploads/

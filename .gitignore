@@ -28,3 +28,8 @@ yarn-error.log*
 
 # typescript
 next-env.d.ts
+
+# backend secrets & build
+backend/.env
+backend/node_modules/
+backend/dist/

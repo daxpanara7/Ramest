@@ -1231,7 +1231,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does AI strategy consulting cost?",
         answer:
-          "A focused strategy engagement — opportunity assessment, use-case prioritization, and roadmap — typically runs from around USD 4,000–12,000 (roughly INR 3.3–10 lakh), depending on the number of business units and use cases in scope. Larger, multi-department assessments with detailed governance frameworks sit above that range; we scope and quote after an initial discovery call.",
+          "Cost depends on scope — the number of business units involved, how many use cases you want assessed, and how much governance and framework design the roadmap requires. We tailor each engagement through a consultation-based scoping call, then agree a fixed quote before work begins, offered as either a fixed-scope engagement or a dedicated advisory team. We support organisations of every size, from a single-department opportunity assessment to a multi-department roadmap with full governance design, so a smaller, focused engagement is just as welcome as a large one.",
       },
       {
         question: "How long does an AI strategy engagement take?",
@@ -1404,7 +1404,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does AI chatbot development cost?",
         answer:
-          "A focused support or lead-qualification bot grounded in an existing knowledge base typically costs around USD 8,000–20,000 (roughly INR 6.5–17 lakh), depending on the number of flows, integrations, and channels involved. More complex assistants spanning multiple systems and languages sit higher; we provide a fixed estimate after scoping your use case.",
+          "Cost depends on scope — the number of conversation flows, integrations, and channels the bot needs to support, plus how many languages or systems it must work across. Every build is scoped individually through a consultation call, then quoted at a fixed price before work begins, delivered either as a fixed-scope engagement or with a dedicated team. We build for businesses of every size, from a single-channel support bot to a multi-system, multi-language assistant, so a focused, smaller project is genuinely welcome.",
       },
       {
         question: "How long does it take to build a chatbot?",
@@ -1579,7 +1579,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does AI integration cost?",
         answer:
-          "A focused integration — one AI capability added to one existing workflow, such as summarization or semantic search — typically costs around USD 6,000–15,000 (roughly INR 5–12.5 lakh). Integrations spanning multiple workflows, providers, or stricter compliance requirements cost more; we scope and quote after reviewing your current architecture.",
+          "Cost depends on scope — how many workflows the AI capability touches, the number of providers involved, and how strict your compliance requirements are. We scope every integration through a consultation call and review of your current architecture, then agree a fixed quote before work begins, offered as a fixed-scope engagement or a dedicated team. We work with businesses of every size, from adding one capability to a single workflow through to multi-system integrations, so smaller, focused projects are always welcome.",
       },
       {
         question: "How long does an AI integration take?",
@@ -1751,7 +1751,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does LLM consulting cost?",
         answer:
-          "Most LLM consulting and build engagements range from $15,000–$60,000 (roughly ₹12.5 lakh–₹50 lakh) for a scoped feature such as a RAG assistant or evaluation harness, with larger multi-model programmes running higher. Cost is driven by the number of use cases, data readiness, and how much evaluation and guardrail work the risk profile demands.",
+          "Cost depends on scope — how many use cases you need covered, how ready your data is, and how much evaluation and guardrail work your risk profile demands. We scope every engagement through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope project or a dedicated team. We build for businesses of every size, from a single scoped feature such as a RAG assistant to a larger multi-model programme, so a smaller, focused engagement is just as welcome as an enterprise one.",
       },
       {
         question: "How long does an LLM consulting engagement take?",
@@ -1923,7 +1923,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does building an AI agent cost?",
         answer:
-          "A single-workflow agent — for example, automating triage or reconciliation for one process — typically costs $20,000–$70,000 (roughly ₹16.5 lakh–₹58 lakh) to design, build, and put into supervised production. Multi-agent systems spanning several workflows cost more, with the main drivers being the number of tools and systems the agent must integrate with and the evaluation rigour the use case demands.",
+          "Cost depends on scope — how many tools and systems the agent must integrate with, how many workflows it spans, and how much evaluation rigour the use case demands. We scope every build through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for businesses of every size, from a single-workflow agent through to a multi-agent system spanning several processes, so a focused, smaller build is genuinely welcome.",
       },
       {
         question: "How long does it take to build an AI agent?",
@@ -2094,7 +2094,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does custom AI model development cost?",
         answer:
-          "A single custom model — a forecasting system or a computer vision classifier for one use case — typically costs $25,000–$90,000 (roughly ₹20 lakh–₹75 lakh) to build, evaluate, and deploy, depending on data readiness and accuracy requirements. Projects needing significant data labelling or multiple model versions cost more, while a narrow proof of concept on existing data can start below that range.",
+          "Cost depends on scope — how ready your data is, how demanding your accuracy requirements are, and how much labelling or how many model versions the project needs. We scope every build through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for businesses of every size, from a narrow proof of concept on existing data to a full production model with MLOps, so a smaller, focused project is genuinely welcome.",
       },
       {
         question: "How long does custom AI development take?",
@@ -2266,7 +2266,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does a manufacturing software project cost?",
         answer:
-          "Costs typically range from roughly USD 15,000–40,000 (approximately INR 12–33 lakh) for a single-line integration or quality-tracking system, up to USD 80,000–200,000+ (INR 65 lakh–1.6 crore+) for multi-plant MES and ERP integration programmes. The main drivers are the number of systems being connected, how many legacy protocols are involved, and whether the rollout spans one plant or several.",
+          "Cost depends on scope — the number of systems being connected, how many legacy protocols are involved, and whether the rollout spans one plant or several. We scope every project through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for manufacturers of every size, from a single-line integration or quality-tracking system to a multi-plant MES and ERP programme, so a smaller, focused project is genuinely welcome.",
       },
       {
         question:
@@ -2440,7 +2440,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does it cost to build a fintech platform?",
         answer:
-          "Costs typically start around USD 25,000–60,000 (roughly INR 20–50 lakh) for a focused payments or onboarding module, rising to USD 100,000–300,000+ (INR 80 lakh–2.5 crore+) for a full lending or core platform with multiple integrations. Security review, the number of external integrations, and audit or reporting requirements are the main cost drivers.",
+          "Cost depends on scope — the security review required, the number of external integrations, and how demanding your audit and reporting requirements are. We scope every build through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for businesses of every size, from a single payments or onboarding module to a full lending or core platform with multiple integrations, so a smaller, focused build is genuinely welcome.",
       },
       {
         question: "How long does it take to build a fintech product?",
@@ -2612,7 +2612,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does an ecommerce platform build cost?",
         answer:
-          "Costs generally range from USD 15,000–35,000 (roughly INR 12–29 lakh) for a headless storefront on top of an existing platform, up to USD 60,000–150,000+ (INR 50 lakh–1.25 crore+) for a custom storefront with ERP, WMS, and marketplace integrations. Catalog complexity and the number of systems you need connected are the biggest cost drivers.",
+          "Cost depends on scope — catalog complexity and the number of systems you need connected, such as ERP, WMS, or marketplace integrations. We scope every build through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for businesses of every size, from a headless storefront layered on an existing platform to a fully custom storefront with deep system integrations, so a smaller, focused build is genuinely welcome.",
       },
       {
         question: "How long does an ecommerce project take to launch?",
@@ -2788,7 +2788,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does a logistics software project cost?",
         answer:
-          "A focused shipment-tracking dashboard or carrier portal typically runs $25,000–$70,000 (roughly ₹20 lakh–₹58 lakh), while a full multi-carrier TMS/WMS integration platform runs $80,000–$250,000+ (₹66 lakh–₹2 crore+). The main cost drivers are the number of carrier and system integrations, real-time tracking requirements, and how many regions or depots are in scope.",
+          "Cost depends on scope — the number of carrier and system integrations, real-time tracking requirements, and how many regions or depots are involved. We scope every project through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for businesses of every size, from a single shipment-tracking dashboard or carrier portal to a full multi-carrier TMS and WMS integration platform, so a smaller, focused project is genuinely welcome.",
       },
       {
         question: "How long does it take to build a logistics platform?",
@@ -2966,7 +2966,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does retail software integration cost?",
         answer:
-          "A focused project — for example syncing POS and online inventory, or adding a loyalty engine — typically runs $20,000–$60,000 (roughly ₹16 lakh–₹50 lakh). A full omnichannel platform integrating POS, ERP, inventory, and storefront usually runs $70,000–$200,000+ (₹58 lakh–₹1.6 crore+). Scope, number of store locations, and integration complexity are the main cost drivers.",
+          "Cost depends on scope — the number of store locations, how many systems need connecting, and the overall integration complexity involved. We scope every project through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for retailers of every size, from a single project such as syncing POS and online inventory to a full omnichannel platform across POS, ERP, and storefront, so a smaller, focused project is genuinely welcome.",
       },
       {
         question: "How long does a retail integration take to build?",
@@ -3143,7 +3143,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       {
         question: "How much does healthcare software development cost?",
         answer:
-          "A focused build such as a patient portal or telehealth scheduling module typically runs $30,000–$90,000 (roughly ₹25 lakh–₹75 lakh). A full platform with EHR integration, clinical data pipelines, and multi-role access control usually runs $100,000–$300,000+ (₹83 lakh–₹2.5 crore+). Integration complexity, the number of EHR/EMR systems involved, and compliance requirements are the main cost drivers.",
+          "Cost depends on scope — integration complexity, the number of EHR and EMR systems involved, and how demanding your compliance requirements are. We scope every project through a consultation call, then agree a fixed quote before work begins, delivered as a fixed-scope engagement or a dedicated team. We build for organisations of every size, from a focused patient portal or telehealth scheduling module to a full platform with EHR integration and multi-role access control, so a smaller, focused build is genuinely welcome.",
       },
       {
         question: "How long does a healthcare software project take?",

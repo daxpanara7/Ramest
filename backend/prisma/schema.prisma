@@ -1,0 +1,321 @@
+// Ramest Technolabs — backend data model
+// PostgreSQL + Prisma. Conventions applied across every model:
+//   - cuid() primary keys (opaque, non-enumerable — safer than sequential ints)
+//   - createdAt / updatedAt audit fields on every table
+//   - deletedAt for soft delete on business data (never hard-delete leads/posts)
+//   - indexes on every column used for lookup, filtering, or sorting
+//   - explicit relations with referential actions
+//
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// AUTH & RBAC  (Tasks 07, 08)
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String // Argon2id — never store plaintext
+  name         String
+  isActive     Boolean   @default(true)
+  // 2FA-ready: null until enrolled (Task 07 "future ready")
+  totpSecret   String?
+  lastLoginAt  DateTime?
+
+  roles        UserRole[]
+  refreshTokens RefreshToken[]
+  activityLogs ActivityLog[]
+  authoredPosts BlogPost[]      @relation("PostAuthor")
+  mediaUploads MediaAsset[]
+  leadNotes    ContactLead[]    @relation("LeadAssignee")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([email])
+  @@index([isActive])
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String  @unique // e.g. "admin", "editor", "viewer"
+  description String?
+
+  users       UserRole[]
+  permissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id     String @id @default(cuid())
+  // "resource:action" — e.g. "blog:publish", "lead:read", "user:delete"
+  key    String @unique
+  label  String
+
+  roles  RolePermission[]
+
+  createdAt DateTime @default(now())
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Store a hash of the token, never the token itself
+  tokenHash String   @unique
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// BLOG CMS  (Task 09)
+// ---------------------------------------------------------------------------
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogPost {
+  id            String     @id @default(cuid())
+  slug          String     @unique
+  title         String
+  excerpt       String?
+  // Rich content stored as portable JSON (editor blocks) + rendered HTML cache
+  contentJson   Json?
+  contentHtml   String?
+  coverImageId  String?
+  coverImage    MediaAsset? @relation(fields: [coverImageId], references: [id])
+
+  status        PostStatus @default(DRAFT)
+  publishedAt   DateTime?  // set when PUBLISHED; future date == SCHEDULED
+  readingMinutes Int?
+
+  // SEO fields (Task 09)
+  metaTitle       String?
+  metaDescription String?
+  ogImageId       String?
+  ogImage         MediaAsset? @relation("PostOgImage", fields: [ogImageId], references: [id])
+  canonicalUrl    String?
+  noindex         Boolean  @default(false)
+
+  authorId      String
+  author        User       @relation("PostAuthor", fields: [authorId], references: [id])
+  categoryId    String?
+  category      Category?  @relation(fields: [categoryId], references: [id])
+  tags          PostTag[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([slug])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  description String?
+  posts       BlogPost[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([slug])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  slug  String    @unique
+  name  String
+  posts PostTag[]
+
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId])
+}
+
+// ---------------------------------------------------------------------------
+// NEWSLETTER  (Task 10)
+// ---------------------------------------------------------------------------
+
+enum SubscriberStatus {
+  PENDING // double opt-in sent, not yet confirmed
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+model NewsletterSubscriber {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String?
+  status          SubscriberStatus @default(PENDING)
+  // Double opt-in verification (Task 10)
+  verifyToken     String?          @unique
+  verifiedAt      DateTime?
+  unsubscribedAt  DateTime?
+  source          String? // "footer", "blog", "import", etc.
+  ip              String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([status])
+  @@index([email])
+}
+
+// ---------------------------------------------------------------------------
+// CONTACT LEADS  (Task 11)
+// ---------------------------------------------------------------------------
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+  SPAM
+}
+
+model ContactLead {
+  id         String     @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  service    String? // which service they enquired about
+  message    String
+  status     LeadStatus @default(NEW)
+  adminNotes String?
+
+  // Captured server-side, never trusted from the client
+  ip          String?
+  country     String?
+  userAgent   String?
+  // Spam signal from reCAPTCHA v3 (0.0–1.0)
+  recaptchaScore Float?
+
+  assigneeId String?
+  assignee   User?   @relation("LeadAssignee", fields: [assigneeId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+// ---------------------------------------------------------------------------
+// MEDIA LIBRARY  (Task 08)
+// ---------------------------------------------------------------------------
+
+model MediaAsset {
+  id        String  @id @default(cuid())
+  url       String
+  key       String  @unique // storage key (S3/R2/local)
+  mimeType  String
+  bytes     Int
+  width     Int?
+  height    Int?
+  alt       String?
+
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+
+  postCovers   BlogPost[]
+  postOgImages BlogPost[] @relation("PostOgImage")
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([mimeType])
+}
+
+// ---------------------------------------------------------------------------
+// SETTINGS & AUDIT  (Task 08)
+// ---------------------------------------------------------------------------
+
+model Setting {
+  key       String   @id // e.g. "site.title", "smtp.from"
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+// Immutable audit trail — every privileged action. Never soft-deleted.
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String // "post.publish", "lead.update", "user.login"
+  entity    String? // "BlogPost"
+  entityId  String?
+  metadata  Json?
+  ip        String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}

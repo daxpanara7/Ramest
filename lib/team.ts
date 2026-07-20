@@ -20,6 +20,14 @@ export const teamMembers: TeamMember[] = [
     expertise: ["Product Architecture", "Technical Strategy", "Client Delivery"],
   },
   {
+    name: "Harshjeetsinh Jadeja",
+    role: "Senior QA Automation Engineer",
+    image: "/assets/harshjeetsinh-jadeja.webp",
+    alt: "Portrait of Harshjeetsinh Jadeja, Senior QA Automation Engineer at Ramest Technolabs",
+    bio: "Harshjeetsinh builds the automated test suites and quality gates that sit between a commit and production, so regressions are caught by the pipeline rather than by your users after release.",
+    expertise: ["Test Automation", "E2E & API Testing", "CI Quality Gates"],
+  },
+  {
     name: "Het Gadhiya",
     role: "AI Engineer",
     image: "/assets/het-gadhiya.webp",
@@ -58,14 +66,5 @@ export const teamMembers: TeamMember[] = [
     alt: "Portrait of Param Suthar, Graphic & Motion Designer at Ramest Technolabs",
     bio: "Param shapes how our work looks and moves — brand systems, product visuals, and the motion design that makes an interface feel considered rather than decorated.",
     expertise: ["Brand Identity", "Motion Graphics", "Visual Design"],
-  },
-  {
-    name: "Harshjeetsinh Jadeja",
-    role: "Senior QA Automation Engineer",
-    // TODO: swap for "/assets/harshjeetsinh-jadeja.webp" once the photo is added.
-    image: "",
-    alt: "Portrait of Harshjeetsinh Jadeja, Senior QA Automation Engineer at Ramest Technolabs",
-    bio: "Harshjeetsinh builds the automated test suites and quality gates that sit between a commit and production, so regressions are caught by the pipeline rather than by your users after release.",
-    expertise: ["Test Automation", "E2E & API Testing", "CI Quality Gates"],
   },
 ];

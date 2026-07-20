@@ -28,6 +28,14 @@ export const teamMembers: TeamMember[] = [
     expertise: ["Test Automation", "E2E & API Testing", "CI Quality Gates"],
   },
   {
+    name: "Mihir Katariya",
+    role: "Senior Python Developer",
+    image: "/assets/mihir-katariya.webp",
+    alt: "Portrait of Mihir Katariya, Senior Python Developer at Ramest Technolabs",
+    bio: "Mihir builds the Python services and data pipelines behind our backend work — APIs, integrations, and the automation that keeps long-running jobs reliable once they are handling real production volume.",
+    expertise: ["Python & Django", "REST APIs", "Data Pipelines"],
+  },
+  {
     name: "Jay Gohel",
     role: "Senior Backend Developer",
     image: "/assets/jay-gohel.webp",
@@ -66,13 +74,5 @@ export const teamMembers: TeamMember[] = [
     alt: "Portrait of Param Suthar, Graphic & Motion Designer at Ramest Technolabs",
     bio: "Param shapes how our work looks and moves — brand systems, product visuals, and the motion design that makes an interface feel considered rather than decorated.",
     expertise: ["Brand Identity", "Motion Graphics", "Visual Design"],
-  },
-  {
-    name: "Mihir Katariya",
-    role: "Senior Python Developer",
-    image: "/assets/mihir-katariya.webp",
-    alt: "Portrait of Mihir Katariya, Senior Python Developer at Ramest Technolabs",
-    bio: "Mihir builds the Python services and data pipelines behind our backend work — APIs, integrations, and the automation that keeps long-running jobs reliable once they are handling real production volume.",
-    expertise: ["Python & Django", "REST APIs", "Data Pipelines"],
   },
 ];

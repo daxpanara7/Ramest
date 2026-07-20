@@ -11,10 +11,15 @@ export const metadata = createPageMetadata({
   path: "/company",
 });
 
+/**
+ * Keep these facts stable. Anything that changes as the company grows (head
+ * count, project totals) goes stale the moment nobody remembers to edit it,
+ * and a wrong number here contradicts the team page and our own schema.
+ */
 const glance = [
   { icon: "fa-calendar-day", label: "Founded 2019" },
   { icon: "fa-location-dot", label: "Ahmedabad, India" },
-  { icon: "fa-people-group", label: "~5-person team" },
+  { icon: "fa-key", label: "100% code & IP ownership" },
   { icon: "fa-diagram-project", label: "Web, mobile & AI" },
 ];
 
@@ -83,8 +88,8 @@ export default function Page() {
           <p className="about-text" style={{ marginTop: "1rem" }}>
             Most engagements start with a scoping conversation rather than a
             sales pitch, and we would rather say no to a project that is not
-            a good fit than take it on and stretch a five-person team too
-            thin to do it properly. Pricing and scope get agreed before work
+            a good fit than take it on and stretch a senior team too thin to
+            do it properly. Pricing and scope get agreed before work
             starts, progress stays visible sprint to sprint, and the
             standards we hold ourselves to — code review, security practice,
             and documented handover — are covered in detail on our{" "}

@@ -29,7 +29,7 @@ const homeFaqs = [
   {
     question: "How much does a custom software project cost?",
     answer:
-      "Most projects fall between roughly $8,000 and $60,000 (approximately ₹7 lakh to ₹50 lakh), depending on scope. A focused MVP or internal tool sits at the lower end; a multi-role platform with integrations, compliance requirements, and mobile apps sits at the upper end. We give an indicative range after a discovery call and a fixed scope before work begins.",
+      "A focused build — an MVP, an internal tool, or a single integration — typically runs $15,000–$60,000 (roughly ₹12.5 lakh–₹50 lakh). A larger platform with multiple user roles, third-party integrations, and compliance requirements usually runs $80,000–$300,000 (roughly ₹66 lakh–₹2.5 crore). The main cost drivers are integration count, compliance scope, and how many user roles the system supports. We give an indicative range after a discovery call and a fixed scope before work begins.",
   },
   {
     question: "How long does it take to build a product?",

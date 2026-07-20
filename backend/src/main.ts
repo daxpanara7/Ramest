@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -11,6 +12,7 @@ async function bootstrap() {
 
   // Security headers (Task 04/15).
   app.use(helmet());
+  app.use(cookieParser());
   app.set('trust proxy', 1); // real client IP behind Render/CDN
 
   // CORS + Origin allow-list — only our own sites may call the API.

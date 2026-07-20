@@ -3,6 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { LeadsService } from './leads.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('leads')
 export class LeadsController {
@@ -12,6 +13,7 @@ export class LeadsController {
    * Public endpoint the website contact form posts to. Rate-limited to 5
    * submissions per minute per IP (Task 04) on top of the global throttle.
    */
+  @Public()
   @Post()
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   async submit(@Body() dto: CreateLeadDto, @Ip() ip: string, @Req() req: Request) {

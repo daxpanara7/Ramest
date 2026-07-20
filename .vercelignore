@@ -1,0 +1,4 @@
+# The NestJS backend is a separate service deployed to Render, never to Vercel.
+# Excluding it here keeps it out of the frontend build context entirely.
+backend/
+docs/

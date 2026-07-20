@@ -90,6 +90,7 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -97,8 +98,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div className="bg-grid" />
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <Header />
-        <main className="main">{children}</main>
+        <main className="main" id="main-content">
+          {children}
+        </main>
         <Footer />
         <ClientEffects />
         <JsonLd />

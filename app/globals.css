@@ -10,6 +10,25 @@
   --title-font: var(--font-dm-serif), "DM Serif Display", serif;
 }
 
+/* Keyboard-only escape hatch past the nav — visible on focus. */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  background-color: var(--first-color, #e93f2e);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
 /* Visually hidden but available to screen readers / SEO labels */
 .sr-only {
   position: absolute;

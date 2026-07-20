@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Script from "next/script";
 import { notFound } from "next/navigation";
+import { JsonLdScript } from "@/components/JsonLd";
 import CtaBanner from "@/components/sections/CtaBanner";
 import PageHero from "@/components/sections/PageHero";
 import {
@@ -10,11 +10,14 @@ import {
   serviceJsonLd,
 } from "@/lib/services";
 import { getServiceDetail } from "@/lib/service-details";
-import { SITE, createPageMetadata } from "@/lib/site";
+import { SITE, breadcrumbJsonLd, createPageMetadata } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+/** Only the 18 known service slugs exist — anything else 404s immediately. */
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return allServiceItems.map((service) => ({ slug: service.slug }));
@@ -28,6 +31,7 @@ export async function generateMetadata({ params }: PageProps) {
       title: "Service Not Found",
       description: "The requested service could not be found.",
       path: `/services/${slug}`,
+      noindex: true,
     });
   }
 
@@ -62,29 +66,45 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     category?.items.filter((item) => item.slug !== service.slug).slice(0, 3) ??
     [];
   const schema = serviceJsonLd(service, SITE.url, SITE.name);
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+    { name: service.title, path: service.href },
+  ]);
 
   return (
     <>
-      <Script
-        id={`service-jsonld-${service.slug}`}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      <JsonLdScript id={`service-jsonld-${service.slug}`} data={schema} />
+      <JsonLdScript
+        id={`service-breadcrumb-${service.slug}`}
+        data={breadcrumbs}
       />
       {detail?.faqs?.length ? (
-        <Script
+        <JsonLdScript
           id={`service-faq-jsonld-${service.slug}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(faqJsonLd(detail.faqs)),
-          }}
+          data={faqJsonLd(detail.faqs)}
         />
       ) : null}
+
+      <nav aria-label="Breadcrumb" className="breadcrumb">
+        <div className="container">
+          <ol className="breadcrumb-list">
+            <li>
+              <Link href="/">Home</Link>
+            </li>
+            <li>
+              <Link href="/services">Services</Link>
+            </li>
+            <li aria-current="page">{service.title}</li>
+          </ol>
+        </div>
+      </nav>
 
       <PageHero
         className="page-hero section svc-hero svc-detail-hero"
         badge={category?.title ?? "Services"}
         centered
-        style={{ paddingTop: "8rem", paddingBottom: "3rem" }}
+        style={{ paddingTop: "1.5rem", paddingBottom: "3rem" }}
         title={
           <>
             {service.title.split(" ").slice(0, -1).join(" ")}{" "}
@@ -175,7 +195,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               <span className="svc-card-icon" aria-hidden="true">
                 <i className={`fa-solid ${service.icon}`} />
               </span>
-              <h2 className="svc-detail-card-title">{service.title}</h2>
+              {/* Not a heading: it repeats the H1 and would pollute the outline. */}
+              <p className="svc-detail-card-title">{service.title}</p>
               <p className="svc-detail-card-desc">{service.shortDescription}</p>
               <ul className="svc-card-tags">
                 {service.tags.map((tag) => (

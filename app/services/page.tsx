@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Script from "next/script";
+import { JsonLdScript } from "@/components/JsonLd";
 import CtaBanner from "@/components/sections/CtaBanner";
 import PageHero from "@/components/sections/PageHero";
 import {
@@ -21,11 +21,7 @@ export default function ServicesPage() {
 
   return (
     <>
-      <Script
-        id="services-itemlist-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+      <JsonLdScript id="services-itemlist-jsonld" data={schema} />
 
       <PageHero
         className="page-hero section svc-hero"

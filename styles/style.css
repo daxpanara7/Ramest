@@ -954,6 +954,45 @@ img {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* Breadcrumb sits below the fixed header and carries the top offset so the
+   hero that follows it can start flush. */
+.breadcrumb {
+    padding-top: 7.5rem;
+}
+
+.breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-color-light, var(--text-color));
+}
+
+.breadcrumb-list li+li::before {
+    content: "/";
+    margin-right: 0.5rem;
+    opacity: 0.45;
+}
+
+.breadcrumb-list a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-list a:hover {
+    color: var(--first-color);
+}
+
+.breadcrumb-list [aria-current="page"] {
+    color: var(--title-color);
+    font-weight: 600;
+}
+
 .page-hero-badge {
     display: inline-block;
     font-size: 0.75rem;

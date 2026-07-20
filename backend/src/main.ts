@@ -3,6 +3,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -33,6 +34,21 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api');
+
+  // Interactive API docs at /api/docs (guarded off in production unless
+  // ENABLE_SWAGGER=true, so the endpoint map isn't public by default).
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Ramest Technolabs API')
+      .setDescription('Admin, blog CMS, newsletter, leads, media and SEO APIs.')
+      .setVersion('1.0')
+      .addBearerAuth() // paste the accessToken from /auth/login into "Authorize"
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: { persistAuthorization: true },
+    });
+  }
 
   // Graceful shutdown: close HTTP server + Prisma connections on SIGTERM
   // (Render/Docker send SIGTERM on deploy and scale-down).

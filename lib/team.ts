@@ -70,8 +70,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Mihir Katariya",
     role: "Senior Python Developer",
-    // TODO: swap for "/assets/mihir-katariya.webp" once the photo is added.
-    image: "",
+    image: "/assets/mihir-katariya.webp",
     alt: "Portrait of Mihir Katariya, Senior Python Developer at Ramest Technolabs",
     bio: "Mihir builds the Python services and data pipelines behind our backend work — APIs, integrations, and the automation that keeps long-running jobs reliable once they are handling real production volume.",
     expertise: ["Python & Django", "REST APIs", "Data Pipelines"],

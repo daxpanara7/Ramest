@@ -54,8 +54,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Param Suthar",
     role: "Graphic & Motion Designer",
-    // TODO: swap for "/assets/param-suthar.webp" once the photo is added.
-    image: "",
+    image: "/assets/param-suthar.webp",
     alt: "Portrait of Param Suthar, Graphic & Motion Designer at Ramest Technolabs",
     bio: "Param shapes how our work looks and moves — brand systems, product visuals, and the motion design that makes an interface feel considered rather than decorated.",
     expertise: ["Brand Identity", "Motion Graphics", "Visual Design"],

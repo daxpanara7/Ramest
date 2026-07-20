@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Inter } from "next/font/google";
 import Script from "next/script";
 import ClientEffects from "@/components/ClientEffects";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
+import SiteFrame from "@/components/SiteFrame";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -98,14 +97,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div className="bg-grid" />
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <Header />
-        <main className="main" id="main-content">
-          {children}
-        </main>
-        <Footer />
+        <SiteFrame>{children}</SiteFrame>
         <ClientEffects />
         <JsonLd />
         <Script id="theme-init" strategy="beforeInteractive">

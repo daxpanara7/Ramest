@@ -28,8 +28,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Next.js build artefacts and API internals carry no ranking value.
-        disallow: ["/_next/static/chunks/", "/api/"],
+        // Admin panel + build artefacts / API internals carry no ranking value.
+        disallow: ["/admin", "/_next/static/chunks/", "/api/"],
       },
       ...AI_CRAWLERS.map((userAgent) => ({ userAgent, allow: "/" })),
     ],

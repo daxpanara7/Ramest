@@ -22,6 +22,16 @@ function anchorFor(name: string) {
   return name.toLowerCase().replace(/\s+/g, "-");
 }
 
+/** "Param Suthar" -> "PS". Used by the placeholder avatar. */
+function initialsFor(name: string) {
+  return name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
 export default function Page() {
   const peopleGraph = {
     "@context": "https://schema.org",
@@ -31,7 +41,8 @@ export default function Page() {
       name: member.name,
       jobTitle: member.role,
       description: member.bio,
-      image: `${SITE.url}${member.image}`,
+      // Omit entirely when there is no photo — an empty image URL is invalid.
+      ...(member.image ? { image: `${SITE.url}${member.image}` } : {}),
       knowsAbout: member.expertise,
       worksFor: { "@id": ENTITY.organization },
       url: `${SITE.url}/team#${anchorFor(member.name)}`,
@@ -87,14 +98,23 @@ export default function Page() {
                 id={anchorFor(member.name)}
               >
                 <div className="team-img-box">
-                  <Image
-                    src={member.image}
-                    alt={member.alt}
-                    className="team-img"
-                    width={320}
-                    height={320}
-                    sizes="(max-width: 768px) 45vw, 220px"
-                  />
+                  {member.image ? (
+                    <Image
+                      src={member.image}
+                      alt={member.alt}
+                      className="team-img"
+                      width={320}
+                      height={320}
+                      sizes="(max-width: 768px) 45vw, 220px"
+                    />
+                  ) : (
+                    // No photo yet — initials read as deliberate, a broken
+                    // <img> does not. The name below carries the meaning, so
+                    // this is decorative to assistive tech.
+                    <div className="team-img team-img-placeholder" aria-hidden="true">
+                      {initialsFor(member.name)}
+                    </div>
+                  )}
                 </div>
                 <h3 className="team-name">{member.name}</h3>
                 <span className="team-role">{member.role}</span>

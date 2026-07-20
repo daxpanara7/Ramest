@@ -1,6 +1,7 @@
 export type TeamMember = {
   name: string;
   role: string;
+  /** Empty string renders an initials avatar until a real photo is supplied. */
   image: string;
   /** Describes the photo — never just the name, which the adjacent heading already gives. */
   alt: string;
@@ -49,5 +50,14 @@ export const teamMembers: TeamMember[] = [
     alt: "Portrait of Deep Radaliya, Sales Associate at Ramest Technolabs",
     bio: "Deep is usually the first person you speak to. He scopes incoming projects and makes sure conversations reach the right engineers quickly instead of sitting in a pipeline.",
     expertise: ["Client Discovery", "Project Scoping", "Partnerships"],
+  },
+  {
+    name: "Param Suthar",
+    role: "Graphic & Motion Designer",
+    // TODO: swap for "/assets/param-suthar.webp" once the photo is added.
+    image: "",
+    alt: "Portrait of Param Suthar, Graphic & Motion Designer at Ramest Technolabs",
+    bio: "Param shapes how our work looks and moves — brand systems, product visuals, and the motion design that makes an interface feel considered rather than decorated.",
+    expertise: ["Brand Identity", "Motion Graphics", "Visual Design"],
   },
 ];

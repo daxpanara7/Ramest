@@ -28,14 +28,6 @@ export const teamMembers: TeamMember[] = [
     expertise: ["Test Automation", "E2E & API Testing", "CI Quality Gates"],
   },
   {
-    name: "Het Gadhiya",
-    role: "AI Engineer",
-    image: "/assets/het-gadhiya.webp",
-    alt: "Portrait of Het Gadhiya, AI Engineer at Ramest Technolabs",
-    bio: "Het builds the LLM and machine learning systems behind our AI work — retrieval pipelines, evaluation harnesses, and the guardrails that make generative features safe to ship.",
-    expertise: ["LLMs & RAG", "ML Pipelines", "Model Evaluation"],
-  },
-  {
     name: "Jay Gohel",
     role: "Senior Backend Developer",
     image: "/assets/jay-gohel.webp",
@@ -50,6 +42,14 @@ export const teamMembers: TeamMember[] = [
     alt: "Portrait of Jay Manek, Senior Frontend Developer at Ramest Technolabs",
     bio: "Jay turns product and brand intent into fast, accessible interfaces, and owns the design systems that keep our front-end work consistent across a client's product surface.",
     expertise: ["React & Next.js", "Design Systems", "Web Performance"],
+  },
+  {
+    name: "Het Gadhiya",
+    role: "AI Engineer",
+    image: "/assets/het-gadhiya.webp",
+    alt: "Portrait of Het Gadhiya, AI Engineer at Ramest Technolabs",
+    bio: "Het builds the LLM and machine learning systems behind our AI work — retrieval pipelines, evaluation harnesses, and the guardrails that make generative features safe to ship.",
+    expertise: ["LLMs & RAG", "ML Pipelines", "Model Evaluation"],
   },
   {
     name: "Deep Radaliya",

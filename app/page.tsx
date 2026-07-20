@@ -1,18 +1,69 @@
 import Link from "next/link";
+import { JsonLdScript } from "@/components/JsonLd";
 import CtaBanner from "@/components/sections/CtaBanner";
-import { createPageMetadata } from "@/lib/site";
+import { SITE, createPageMetadata } from "@/lib/site";
 
 export const metadata = createPageMetadata({
   title: "Ramest Technolabs | Innovative IT Solutions",
   description:
-    "Ramest Technolabs - Leading IT company providing Web Development, App Development, UI/UX Design, and AI/ML Solutions to transform your business.",
+    "IT company in Ahmedabad building custom software, web and mobile apps, and AI/ML solutions. Senior engineers, full code ownership, clients across India and worldwide.",
   path: "/",
   absoluteTitle: true,
 });
 
+/**
+ * Buyer-intent questions answered directly on the page. These drive the
+ * FAQPage rich result and are the passages answer engines quote when someone
+ * asks about the company.
+ */
+const homeFaqs = [
+  {
+    question: "What does Ramest Technolabs do?",
+    answer:
+      "Ramest Technolabs is a software engineering company based in Ahmedabad, Gujarat, India. We build custom software, web and mobile applications, AI and LLM systems, cloud infrastructure, and data platforms for clients in India and worldwide. We work across manufacturing, fintech, ecommerce, logistics, retail, and healthcare.",
+  },
+  {
+    question: "Where is Ramest Technolabs located?",
+    answer: `Our office is at ${SITE.address.street}, ${SITE.address.city}, ${SITE.address.region} ${SITE.address.postalCode}, India. We work remotely with clients across India, the United States, Europe, and the Middle East, and are reachable on ${SITE.phoneDisplay} or at ${SITE.email}.`,
+  },
+  {
+    question: "How much does a custom software project cost?",
+    answer:
+      "Most projects fall between roughly $8,000 and $60,000 (approximately ₹7 lakh to ₹50 lakh), depending on scope. A focused MVP or internal tool sits at the lower end; a multi-role platform with integrations, compliance requirements, and mobile apps sits at the upper end. We give an indicative range after a discovery call and a fixed scope before work begins.",
+  },
+  {
+    question: "How long does it take to build a product?",
+    answer:
+      "A working MVP typically takes 8 to 14 weeks from kickoff. Smaller internal tools and integrations often ship in 4 to 8 weeks, while larger platforms with several user roles and third-party systems usually run 4 to 8 months. You see working software every sprint rather than waiting until the end.",
+  },
+  {
+    question: "Do we own the code you write?",
+    answer:
+      "Yes. You own 100% of the source code and intellectual property, and it lives in your repositories from day one. We hand over documented architecture, runbooks, and environment setup so your team can operate and extend the system independently, with or without us.",
+  },
+  {
+    question: "Can you work with our existing development team?",
+    answer:
+      "Yes. Alongside full project delivery we provide engineers on dedicated and extended-team models, where our developers work directly inside your process, tools, and standups. This suits teams that need specific expertise or extra capacity without a long hiring cycle.",
+  },
+];
+
+function homeFaqJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: homeFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
 export default function Page() {
   return (
     <>
+      <JsonLdScript id="home-faq-jsonld" data={homeFaqJsonLd()} />
       {/* ===== HERO SECTION ===== */}
       <section className="hero-section" id="home">
         {/* Giant watermark background text */}
@@ -62,27 +113,30 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ===== STATS BAR ===== */}
+      {/* ===== STATS BAR =====
+          Claims here must stay defensible: the company was founded in 2024 and
+          Organization schema says so, so "5+ years in business" and unverified
+          project/client counts would contradict our own structured data. */}
       <section className="stats-band reveal">
         <div className="container stats-band-inner">
           <div className="stat-item">
-            <span className="stat-num">5+</span>
-            <span className="stat-lbl">Years of Experience</span>
+            <span className="stat-num">18</span>
+            <span className="stat-lbl">Engineering Capabilities</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">100+</span>
-            <span className="stat-lbl">Projects Delivered</span>
+            <span className="stat-num">6</span>
+            <span className="stat-lbl">Industries Served</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">50+</span>
-            <span className="stat-lbl">Happy Clients</span>
+            <span className="stat-num">100%</span>
+            <span className="stat-lbl">Code &amp; IP Ownership</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">24/7</span>
-            <span className="stat-lbl">Dedicated Support</span>
+            <span className="stat-num">1 Day</span>
+            <span className="stat-lbl">Average Reply Time</span>
           </div>
         </div>
       </section>
@@ -123,8 +177,8 @@ export default function Page() {
                 Tailor-made software solutions designed to meet your specific
                 business requirements and overcome complex challenges.
               </p>
-              <Link href="/services" className="service-link">
-                Learn More{" "}
+              <Link href="/services/software-development" className="service-link">
+                Explore software development{" "}
                 <i className="fa-solid fa-arrow-right"
                   style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
@@ -138,8 +192,8 @@ export default function Page() {
                 Scalable and robust mobile and web applications that drive user
                 engagement and fuel your business growth.
               </p>
-              <Link href="/services" className="service-link">
-                Learn More{" "}
+              <Link href="/services/mobile-app-development" className="service-link">
+                Explore app development{" "}
                 <i className="fa-solid fa-arrow-right"
                   style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
@@ -153,8 +207,8 @@ export default function Page() {
                 Leveraging modern AI and Machine Learning to automate processes
                 and provide smart, actionable business insights.
               </p>
-              <Link href="/services" className="service-link">
-                Learn More{" "}
+              <Link href="/services/custom-ai-development" className="service-link">
+                Explore AI &amp; ML solutions{" "}
                 <i className="fa-solid fa-arrow-right"
                   style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
@@ -231,6 +285,63 @@ export default function Page() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section className="section svc-faq reveal" aria-labelledby="home-faq-heading">
+        <div className="container">
+          <div
+            className="section-header"
+            style={{ textAlign: "center", marginBottom: "4rem" }}
+          >
+            <span className="section-eyebrow">COMMON QUESTIONS</span>
+            <h2
+              id="home-faq-heading"
+              className="section-title"
+              style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
+            >
+              Answers Before You Ask
+            </h2>
+            <p
+              className="section-subtitle"
+              style={{
+                fontSize: "1.1rem",
+                color: "var(--text-color)",
+                maxWidth: "600px",
+                margin: "0 auto",
+              }}
+            >
+              Cost, timelines, ownership, and how we work — answered plainly.
+            </p>
+          </div>
+
+          <div className="svc-faq-list">
+            {homeFaqs.map((faq, index) => (
+              <details
+                key={faq.question}
+                className="svc-faq-item"
+                {...(index === 0 ? { open: true } : {})}
+              >
+                <summary className="svc-faq-question">
+                  <span className="svc-faq-num" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="svc-faq-question-text">{faq.question}</span>
+                  <span className="svc-faq-toggle" aria-hidden="true">
+                    <i className="fa-solid fa-plus" aria-hidden="true" />
+                  </span>
+                </summary>
+                <p className="svc-faq-answer">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+
+          <p className="contact-note" style={{ textAlign: "center" }}>
+            More detail on <Link href="/services">what we build</Link>, how we{" "}
+            <Link href="/hire-developers">provide developers</Link>, and the{" "}
+            <Link href="/certifications">standards we work to</Link>.
+          </p>
         </div>
       </section>
 

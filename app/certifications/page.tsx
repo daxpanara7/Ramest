@@ -6,7 +6,7 @@ import { breadcrumbJsonLd, createPageMetadata } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "Engineering Standards & Practices",
   description:
-    "The security, quality, and delivery standards Ramest Technolabs holds itself to on every engagement — code review, encryption, CI/CD gates, and documented handover.",
+    "The security, quality, and delivery standards we hold ourselves to on every engagement — peer code review, encryption, CI/CD gates, and documented handover.",
   path: "/certifications",
 });
 

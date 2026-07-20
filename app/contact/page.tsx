@@ -12,7 +12,7 @@ import {
 export const metadata = createPageMetadata({
   title: "Contact Us",
   description:
-    "Talk to Ramest Technolabs about your software, AI, or cloud project. Based in Ahmedabad, Gujarat — working with clients across India and worldwide. Reply within one business day.",
+    "Talk to Ramest Technolabs about your software, AI, or cloud project. Based in Ahmedabad, Gujarat, working with clients worldwide. We reply within a business day.",
   path: "/contact",
 });
 

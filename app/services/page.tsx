@@ -12,7 +12,7 @@ import { SITE, createPageMetadata } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "IT Services & AI Solutions",
   description:
-    "Enterprise software development, cloud infrastructure, AI solutions, and industry-focused digital engineering from Ramest Technolabs. Explore our services across products, AI, and industries.",
+    "Software development, cloud infrastructure, AI solutions, and industry-focused engineering from Ramest Technolabs — 18 capabilities across three practices.",
   path: "/services",
 });
 

@@ -8,7 +8,7 @@ import { SITE, breadcrumbJsonLd, createPageMetadata } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "About Us",
   description:
-    "Ramest Technolabs is an IT company in Ahmedabad, Gujarat, founded in 2024 by Dax Panara — building custom software, mobile apps, and AI systems for clients worldwide.",
+    "IT company in Ahmedabad, Gujarat, founded in 2024 by Dax Panara. We build custom software, mobile apps, and AI systems for clients across India and worldwide.",
   path: "/about",
 });
 

@@ -9,7 +9,7 @@
 !.yarn/versions
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production

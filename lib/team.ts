@@ -67,4 +67,13 @@ export const teamMembers: TeamMember[] = [
     bio: "Param shapes how our work looks and moves — brand systems, product visuals, and the motion design that makes an interface feel considered rather than decorated.",
     expertise: ["Brand Identity", "Motion Graphics", "Visual Design"],
   },
+  {
+    name: "Mihir Katariya",
+    role: "Senior Python Developer",
+    // TODO: swap for "/assets/mihir-katariya.webp" once the photo is added.
+    image: "",
+    alt: "Portrait of Mihir Katariya, Senior Python Developer at Ramest Technolabs",
+    bio: "Mihir builds the Python services and data pipelines behind our backend work — APIs, integrations, and the automation that keeps long-running jobs reliable once they are handling real production volume.",
+    expertise: ["Python & Django", "REST APIs", "Data Pipelines"],
+  },
 ];

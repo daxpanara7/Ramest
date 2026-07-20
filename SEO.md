@@ -26,7 +26,7 @@ All JSON-LD is emitted as plain `<script type="application/ld+json">` in the
 | `ItemList` | `/services` | `lib/services.ts` |
 | `Service` | each `/services/{slug}` | `lib/services.ts` |
 | `FAQPage` | homepage + every service detail page with FAQs | `app/page.tsx`, `lib/service-details.ts` |
-| `Person` × 7 | `/team` | `lib/team.ts` |
+| `Person` × 8 | `/team` | `lib/team.ts` |
 
 Entities cross-reference by `@id` (`lib/site.ts` → `ENTITY`) rather than being
 duplicated, so Google resolves one company node, one website node, one founder.

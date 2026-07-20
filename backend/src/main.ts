@@ -32,9 +32,13 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  // Graceful shutdown: close HTTP server + Prisma connections on SIGTERM
+  // (Render/Docker send SIGTERM on deploy and scale-down).
+  app.enableShutdownHooks();
+
   const port = Number(process.env.PORT ?? 4000);
-  await app.listen(port);
-  Logger.log(`API listening on http://localhost:${port}/api`, 'Bootstrap');
+  await app.listen(port, '0.0.0.0'); // bind all interfaces for containers
+  Logger.log(`API listening on :${port}/api`, 'Bootstrap');
 }
 
 void bootstrap();

@@ -27,11 +27,22 @@ export const SITE = {
 } as const;
 
 /**
- * Public profiles for Organization.sameAs — the strongest Knowledge Graph
- * association signal. Only add URLs that resolve; a broken sameAs is worse
- * than an absent one.
+ * Public profiles, used for both the footer icons and Organization.sameAs —
+ * the strongest Knowledge Graph association signal.
+ *
+ * ⚠️ ADD REAL URLS HERE. Everything downstream is wired up and will light up
+ * the moment entries are added: the footer renders icons only for profiles
+ * listed here, and sameAs is derived from the same list. Only add URLs that
+ * resolve — a broken sameAs is worse than an absent one.
+ *
+ * Example:
+ *   { label: "LinkedIn", icon: "fa-brands fa-linkedin-in",
+ *     href: "https://www.linkedin.com/company/ramest-technolabs/" },
  */
-export const SOCIAL_PROFILES: string[] = [];
+export const SOCIAL_LINKS: { label: string; icon: string; href: string }[] = [];
+
+/** sameAs values for Organization schema — derived so the two never drift. */
+export const SOCIAL_PROFILES: string[] = SOCIAL_LINKS.map((s) => s.href);
 
 /** Stable @id values so schema nodes reference one another instead of repeating. */
 export const ENTITY = {

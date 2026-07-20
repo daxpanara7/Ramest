@@ -2069,3 +2069,140 @@ body.menu-open {
         font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Contact page layout, team bios, and nav control resets
+   --------------------------------------------------------------------------- */
+
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+@media screen and (max-width: 968px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+}
+
+.contact-nap {
+    font-style: normal;
+    margin: 1.5rem 0 2.5rem;
+}
+
+.contact-nap-line {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+.contact-nap-line i {
+    color: var(--first-color);
+    margin-top: 0.35rem;
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
+}
+
+.contact-nap-line a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.contact-nap-line a:hover {
+    color: var(--first-color);
+}
+
+.contact-enquiry-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+    display: grid;
+    gap: 1.5rem;
+}
+
+.contact-enquiry-list li {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.contact-enquiry-list i {
+    color: var(--first-color);
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+    width: 1.1rem;
+    text-align: center;
+}
+
+.contact-enquiry-list strong {
+    display: block;
+    color: var(--title-color);
+    margin-bottom: 0.35rem;
+}
+
+.contact-enquiry-list p {
+    color: var(--text-color);
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.contact-note {
+    margin-top: 2.5rem;
+    color: var(--text-color);
+    line-height: 1.8;
+}
+
+.contact-note a {
+    color: var(--first-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-note a:hover {
+    text-decoration: underline;
+}
+
+.team-bio {
+    margin-top: 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+.team-expertise {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.team-expertise li {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 100px;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+/* nav-toggle / nav-close are real <button>s now — strip UA button styling so
+   the original layout is unchanged. */
+.nav-toggle,
+.nav-close {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}

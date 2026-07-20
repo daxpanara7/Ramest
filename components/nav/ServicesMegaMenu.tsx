@@ -60,7 +60,7 @@ export default function ServicesMegaMenu({
                     onClick={() => selectCategory(category.id)}
                   >
                     <span className="mega-menu-cat-icon" aria-hidden="true">
-                      <i className={`fa-solid ${category.icon}`} />
+                      <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
                     </span>
                     <span className="mega-menu-cat-copy">
                       <span className="mega-menu-cat-title">{category.title}</span>
@@ -109,7 +109,7 @@ export default function ServicesMegaMenu({
                   onClick={onNavigate}
                 >
                   <span className="mega-menu-item-icon" aria-hidden="true">
-                    <i className={`fa-solid ${service.icon}`} />
+                    <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
                   </span>
                   <span className="mega-menu-item-copy">
                     <span className="mega-menu-item-title">{service.title}</span>

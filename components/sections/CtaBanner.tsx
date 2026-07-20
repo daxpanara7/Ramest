@@ -22,7 +22,7 @@ export default function CtaBanner({
           <p className="cta-desc">{description}</p>
         </div>
         <Link href={href} className="button button-cta">
-          {buttonLabel} <i className="fa-solid fa-arrow-right" />
+          {buttonLabel} <i className="fa-solid fa-arrow-right" aria-hidden="true" />
         </Link>
       </div>
     </section>

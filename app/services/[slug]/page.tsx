@@ -193,7 +193,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <aside className="svc-detail-aside reveal">
             <div className="svc-detail-card">
               <span className="svc-card-icon" aria-hidden="true">
-                <i className={`fa-solid ${service.icon}`} />
+                <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
               </span>
               {/* Not a heading: it repeats the H1 and would pollute the outline. */}
               <p className="svc-detail-card-title">{service.title}</p>
@@ -239,7 +239,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   >
                     <div className="svc-offer-head">
                       <span className="svc-card-icon" aria-hidden="true">
-                        <i className={`fa-solid ${offering.icon}`} />
+                        <i className={`fa-solid ${offering.icon}`} aria-hidden="true" />
                       </span>
                       <h3 className="svc-card-title">{offering.title}</h3>
                     </div>
@@ -297,7 +297,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 {detail.benefits.map((benefit) => (
                   <article key={benefit.title} className="svc-why-card reveal">
                     <span className="svc-card-icon" aria-hidden="true">
-                      <i className={`fa-solid ${benefit.icon}`} />
+                      <i className={`fa-solid ${benefit.icon}`} aria-hidden="true" />
                     </span>
                     <div>
                       <h3 className="svc-card-title">{benefit.title}</h3>
@@ -382,7 +382,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                         {faq.question}
                       </span>
                       <span className="svc-faq-toggle" aria-hidden="true">
-                        <i className="fa-solid fa-plus" />
+                        <i className="fa-solid fa-plus" aria-hidden="true" />
                       </span>
                     </summary>
                     <p className="svc-faq-answer">{faq.answer}</p>
@@ -426,7 +426,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 <article key={item.slug} className="svc-card reveal">
                   <div className="svc-card-top">
                     <span className="svc-card-icon" aria-hidden="true">
-                      <i className={`fa-solid ${item.icon}`} />
+                      <i className={`fa-solid ${item.icon}`} aria-hidden="true" />
                     </span>
                   </div>
                   <h3 className="svc-card-title">

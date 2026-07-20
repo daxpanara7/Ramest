@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SITE } from "@/lib/site";
+import { SITE, SOCIAL_LINKS } from "@/lib/site";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -20,20 +20,23 @@ export default function Footer() {
             Empowering businesses with next-gen technology. We turn ideas into
             powerful digital products.
           </p>
-          <div className="social-links" style={{ marginTop: "1.25rem" }}>
-            <a href="#" aria-label="LinkedIn">
-              <i className="fa-brands fa-linkedin-in" />
-            </a>
-            <a href="#" aria-label="Twitter">
-              <i className="fa-brands fa-twitter" />
-            </a>
-            <a href="#" aria-label="Instagram">
-              <i className="fa-brands fa-instagram" />
-            </a>
-            <a href="#" aria-label="GitHub">
-              <i className="fa-brands fa-github" />
-            </a>
-          </div>
+          {/* Rendered only for profiles that actually exist — href="#" placeholders
+              are dead links on every page and dilute crawl signals. */}
+          {SOCIAL_LINKS.length > 0 && (
+            <div className="social-links" style={{ marginTop: "1.25rem" }}>
+              {SOCIAL_LINKS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  aria-label={`${SITE.name} on ${social.label}`}
+                  target="_blank"
+                  rel="noopener noreferrer me"
+                >
+                  <i className={social.icon} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
         <div className="footer-col">
           <h3 className="footer-title">Quick Links</h3>
@@ -67,7 +70,7 @@ export default function Footer() {
               <Link href="/team">Our Team</Link>
             </li>
             <li>
-              <Link href="/certifications">Certifications</Link>
+              <Link href="/certifications">Engineering Standards</Link>
             </li>
             <li>
               <Link href="/careers">Careers</Link>
@@ -78,15 +81,15 @@ export default function Footer() {
           <h3 className="footer-title">Contact</h3>
           <ul className="footer-links footer-contact">
             <li>
-              <i className="fa-solid fa-envelope" />{" "}
+              <i className="fa-solid fa-envelope" aria-hidden="true" />{" "}
               <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
             </li>
             <li>
-              <i className="fa-solid fa-phone" />{" "}
+              <i className="fa-solid fa-phone" aria-hidden="true" />{" "}
               <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
             </li>
             <li>
-              <i className="fa-solid fa-location-dot" /> {SITE.address.street},{" "}
+              <i className="fa-solid fa-location-dot" aria-hidden="true" /> {SITE.address.street},{" "}
               {SITE.address.city}, {SITE.address.region}{" "}
               {SITE.address.postalCode}
             </li>
@@ -97,7 +100,7 @@ export default function Footer() {
         <p>
           &copy; 2026 {SITE.name}. All rights reserved. &nbsp;|&nbsp; Built
           with{" "}
-          <i className="fa-solid fa-heart" style={{ color: "var(--first-color)" }} />{" "}
+          <i className="fa-solid fa-heart" style={{ color: "var(--first-color)" }} aria-hidden="true" />{" "}
           in India
         </p>
       </div>

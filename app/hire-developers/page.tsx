@@ -28,7 +28,7 @@ export default function Page() {
       >
         <Link href="/contact" className="button button-primary">
           Onboard a Python Expert Within 3-5 Days{" "}
-          <i className="fa-solid fa-arrow-right"></i>
+          <i className="fa-solid fa-arrow-right" aria-hidden="true" />
         </Link>
       </PageHero>
 
@@ -68,7 +68,7 @@ export default function Page() {
           <div className="services-grid">
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-comments"></i>
+                <i className="fa-solid fa-comments" aria-hidden="true" />
               </div>
               <h3 className="service-title">Python Consulting</h3>
               <p className="service-description">
@@ -81,7 +81,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-laptop-code"></i>
+                <i className="fa-solid fa-laptop-code" aria-hidden="true" />
               </div>
               <h3 className="service-title">Python Web App Development</h3>
               <p className="service-description">
@@ -94,7 +94,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-network-wired"></i>
+                <i className="fa-solid fa-network-wired" aria-hidden="true" />
               </div>
               <h3 className="service-title">IoT Development</h3>
               <p className="service-description">
@@ -108,7 +108,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-database"></i>
+                <i className="fa-solid fa-database" aria-hidden="true" />
               </div>
               <h3 className="service-title">Big Data Development</h3>
               <p className="service-description">
@@ -121,7 +121,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-shuffle"></i>
+                <i className="fa-solid fa-shuffle" aria-hidden="true" />
               </div>
               <h3 className="service-title">Python Migration and Integration</h3>
               <p className="service-description">
@@ -134,7 +134,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-building"></i>
+                <i className="fa-solid fa-building" aria-hidden="true" />
               </div>
               <h3 className="service-title">Enterprise Python Applications</h3>
               <p className="service-description">
@@ -147,7 +147,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-cloud"></i>
+                <i className="fa-solid fa-cloud" aria-hidden="true" />
               </div>
               <h3 className="service-title">Cloud-Based Development</h3>
               <p className="service-description">
@@ -161,7 +161,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-layer-group"></i>
+                <i className="fa-solid fa-layer-group" aria-hidden="true" />
               </div>
               <h3 className="service-title">Python Front-End Developer</h3>
               <p className="service-description">
@@ -175,7 +175,7 @@ export default function Page() {
 
             <div className="service-card">
               <div className="service-icon">
-                <i className="fa-solid fa-server"></i>
+                <i className="fa-solid fa-server" aria-hidden="true" />
               </div>
               <h3 className="service-title">Python Back End Developer</h3>
               <p className="service-description">
@@ -224,24 +224,18 @@ export default function Page() {
               </p>
               <ul style={{ listStyleType: "none", marginBottom: "1.5rem" }}>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Full control over team and processes
                 </li>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Transparent monthly billing
                 </li>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Seamless scaling of resources
                 </li>
               </ul>
@@ -264,24 +258,18 @@ export default function Page() {
               </p>
               <ul style={{ listStyleType: "none", marginBottom: "1.5rem" }}>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Skip recruitment hassles
                 </li>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Direct integration with your team
                 </li>
                 <li style={{ marginBottom: "0.5rem" }}>
-                  <i
-                    className="fa-solid fa-check"
-                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }}
-                  ></i>{" "}
+                  <i className="fa-solid fa-check"
+                    style={{ color: "var(--first-color)", marginRight: "0.5rem" }} aria-hidden="true" />{" "}
                   Flexible engagement duration
                 </li>
               </ul>
@@ -303,7 +291,7 @@ export default function Page() {
           <div className="why-grid">
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-user-check"></i>
+                <i className="fa-solid fa-user-check" aria-hidden="true" />
               </div>
               <h3 className="why-title">Pre-Vetted Experts</h3>
               <p className="why-desc">
@@ -313,7 +301,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-bolt"></i>
+                <i className="fa-solid fa-bolt" aria-hidden="true" />
               </div>
               <h3 className="why-title">Fast Onboarding</h3>
               <p className="why-desc">
@@ -323,7 +311,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-shield-halved"></i>
+                <i className="fa-solid fa-shield-halved" aria-hidden="true" />
               </div>
               <h3 className="why-title">Zero Risk</h3>
               <p className="why-desc">
@@ -333,7 +321,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-comments"></i>
+                <i className="fa-solid fa-comments" aria-hidden="true" />
               </div>
               <h3 className="why-title">Direct Communication</h3>
               <p className="why-desc">

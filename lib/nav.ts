@@ -63,8 +63,8 @@ export const companyDropdown = [
   {
     href: "/certifications",
     icon: "fa-award",
-    title: "Certifications",
-    sub: "Industry-recognized certifications backing our quality.",
+    title: "Engineering Standards",
+    sub: "The security, quality, and delivery standards we work to.",
   },
   {
     href: "/careers",
@@ -103,8 +103,8 @@ export const companyOverviewItems = [
   {
     href: "/certifications",
     icon: "fa-certificate",
-    title: "Certifications",
-    sub: "Industry-recognized certifications backing our commitment to quality.",
+    title: "Engineering Standards",
+    sub: "The security, quality, and delivery standards we work to.",
   },
   {
     href: "/careers",

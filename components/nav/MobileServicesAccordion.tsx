@@ -49,7 +49,7 @@ export default function MobileServicesAccordion({
             onToggle();
           }}
         >
-          <i className={`fa-solid fa-chevron-down${open ? " is-rotated" : ""}`} />
+          <i className={`fa-solid fa-chevron-down${open ? " is-rotated" : ""}`} aria-hidden="true" />
         </button>
       </div>
 
@@ -72,7 +72,7 @@ export default function MobileServicesAccordion({
                 onClick={() => toggleCategory(category.id)}
               >
                 <span className="mobile-accordion-category-icon" aria-hidden="true">
-                  <i className={`fa-solid ${category.icon}`} />
+                  <i className={`fa-solid ${category.icon}`} aria-hidden="true" />
                 </span>
                 <span>{category.title}</span>
                 <i

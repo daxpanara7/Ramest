@@ -109,7 +109,7 @@ export default function ServicesPage() {
                 >
                   <div className="svc-card-top">
                     <span className="svc-card-icon" aria-hidden="true">
-                      <i className={`fa-solid ${service.icon}`} />
+                      <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
                     </span>
                     <Link
                       href={service.href}

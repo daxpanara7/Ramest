@@ -51,12 +51,12 @@ export default function Page() {
           <div className="hero-actions">
             <Link href="/contact" className="hero-btn-primary">
               <span className="hero-btn-icon">
-                <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
               </span>
               Schedule a Call
             </Link>
             <Link href="/services" className="hero-btn-secondary">
-              Explore Services <i className="fa-solid fa-chevron-right"></i>
+              Explore Services <i className="fa-solid fa-chevron-right" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function Page() {
           <div className="services-grid">
             <div className="service-card" style={{ marginTop: "3rem" }}>
               <div className="service-icon">
-                <i className="fa-solid fa-laptop-code"></i>
+                <i className="fa-solid fa-laptop-code" aria-hidden="true" />
               </div>
               <h3 className="service-title">Custom Software Dev</h3>
               <p className="service-description">
@@ -125,15 +125,13 @@ export default function Page() {
               </p>
               <Link href="/services" className="service-link">
                 Learn More{" "}
-                <i
-                  className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }}
-                ></i>
+                <i className="fa-solid fa-arrow-right"
+                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
             </div>
             <div className="service-card" style={{ marginTop: "-1rem" }}>
               <div className="service-icon">
-                <i className="fa-solid fa-mobile-button"></i>
+                <i className="fa-solid fa-mobile-button" aria-hidden="true" />
               </div>
               <h3 className="service-title">Mobile & Web Apps</h3>
               <p className="service-description">
@@ -142,15 +140,13 @@ export default function Page() {
               </p>
               <Link href="/services" className="service-link">
                 Learn More{" "}
-                <i
-                  className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }}
-                ></i>
+                <i className="fa-solid fa-arrow-right"
+                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
             </div>
             <div className="service-card" style={{ marginTop: "3rem" }}>
               <div className="service-icon">
-                <i className="fa-solid fa-brain"></i>
+                <i className="fa-solid fa-brain" aria-hidden="true" />
               </div>
               <h3 className="service-title">AI/ML Solutions</h3>
               <p className="service-description">
@@ -159,10 +155,8 @@ export default function Page() {
               </p>
               <Link href="/services" className="service-link">
                 Learn More{" "}
-                <i
-                  className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }}
-                ></i>
+                <i className="fa-solid fa-arrow-right"
+                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -198,7 +192,7 @@ export default function Page() {
           <div className="why-grid">
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-bolt"></i>
+                <i className="fa-solid fa-bolt" aria-hidden="true" />
               </div>
               <h3 className="why-title">Fast Delivery</h3>
               <p className="why-desc">
@@ -208,7 +202,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-lock"></i>
+                <i className="fa-solid fa-lock" aria-hidden="true" />
               </div>
               <h3 className="why-title">Secure by Default</h3>
               <p className="why-desc">
@@ -218,7 +212,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-headset"></i>
+                <i className="fa-solid fa-headset" aria-hidden="true" />
               </div>
               <h3 className="why-title">24/7 Support</h3>
               <p className="why-desc">
@@ -228,7 +222,7 @@ export default function Page() {
             </div>
             <div className="why-card">
               <div className="why-icon">
-                <i className="fa-solid fa-chart-line"></i>
+                <i className="fa-solid fa-chart-line" aria-hidden="true" />
               </div>
               <h3 className="why-title">Scalable Solutions</h3>
               <p className="why-desc">

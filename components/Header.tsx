@@ -304,9 +304,7 @@ export default function Header() {
                     );
                   }}
                 >
-                  <i
-                    className={`fa-solid fa-chevron-down${mobilePanel === "company" ? " is-rotated" : ""}`}
-                  />
+                  <i className={`fa-solid fa-chevron-down${mobilePanel === "company" ? " is-rotated" : ""}`} aria-hidden="true" />
                 </button>
               </div>
               <div
@@ -332,15 +330,15 @@ export default function Header() {
               </div>
             </li>
           </ul>
-          <div
+          <button
+            type="button"
             className="nav-close"
             id="nav-close"
-            role="button"
             aria-label="Close menu"
-            tabIndex={0}
+            onClick={closeMenu}
           >
             <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </div>
+          </button>
         </nav>
 
         <div className="nav-btns" ref={navBtnsRef}>
@@ -357,16 +355,17 @@ export default function Header() {
               aria-hidden="true"
             />
           </button>
-          <div
+          <button
+            type="button"
             className="nav-toggle"
             id="nav-toggle"
-            role="button"
             aria-label="Open menu"
-            tabIndex={0}
+            aria-expanded={menuOpen}
+            aria-controls="nav-menu"
             onClick={openMenu}
           >
             <i className="fa-solid fa-bars" aria-hidden="true" />
-          </div>
+          </button>
         </div>
       </div>
     </header>

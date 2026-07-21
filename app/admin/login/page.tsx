@@ -11,6 +11,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -30,49 +31,87 @@ export default function AdminLoginPage() {
 
   return (
     <div className="admin-login">
-      <form className="admin-login-card" onSubmit={onSubmit}>
-        <Image
-          className="admin-login-logo"
-          src="/assets/logo_final.webp"
-          alt="Ramest Technolabs"
-          width={687}
-          height={267}
-          priority
-        />
-        <h1 className="admin-login-title">Admin Panel</h1>
-        <p className="admin-login-sub">Sign in to manage content, leads, and settings.</p>
-
-        {error && (
-          <div className="admin-alert" role="alert">
-            {error}
+      <div className="admin-auth-card">
+        {/* Brand panel */}
+        <aside className="admin-auth-brand">
+          <Image
+            className="admin-auth-logo"
+            src="/assets/logo_final.webp"
+            alt="Ramest Technolabs"
+            width={687}
+            height={267}
+            priority
+          />
+          <div className="admin-auth-brand-body">
+            <h1>
+              Create. <span>Manage.</span> Grow.
+            </h1>
+            <p>
+              One command center for your content, leads, and everything that keeps
+              ramesttechnolabs.com moving forward.
+            </p>
           </div>
-        )}
+          <div className="admin-auth-brand-foot">
+            <strong>Ramest Technolabs</strong>
+            <span>© 2026 · All rights reserved.</span>
+          </div>
+        </aside>
 
-        <label className="admin-field">
-          <span>Email</span>
-          <input
-            type="email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label className="admin-field">
-          <span>Password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        {/* Form panel */}
+        <div className="admin-auth-form">
+          <h2>Welcome back</h2>
+          <p className="admin-auth-sub">Enter your credentials to access the panel.</p>
 
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
+          {error && (
+            <div className="admin-alert" role="alert">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={onSubmit}>
+            <label className="admin-field">
+              <span>Email</span>
+              <input
+                type="email"
+                autoComplete="username"
+                placeholder="you@ramesttechnolabs.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+
+            <label className="admin-field">
+              <span>Password</span>
+              <div className="admin-input-wrap">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="admin-eye"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <i
+                    className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+            </label>
+
+            <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
+              {busy ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

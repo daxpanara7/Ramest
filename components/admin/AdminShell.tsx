@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -50,9 +51,16 @@ function ShellBody({ children }: { children: React.ReactNode }) {
   return (
     <div className="admin-root admin-layout">
       <aside className="admin-sidebar">
-        <div className="admin-brand">
-          Ramest <span>Admin</span>
-        </div>
+        <Link href="/admin" className="admin-logo">
+          <Image
+            src="/assets/logo_final.webp"
+            alt="Ramest Technolabs"
+            width={687}
+            height={267}
+            priority
+          />
+        </Link>
+        <span className="admin-logo-tag">Admin Panel</span>
         <nav className="admin-nav">
           {NAV.filter((n) => !n.perm || user.permissions.includes(n.perm)).map((n) => {
             const active = n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href);

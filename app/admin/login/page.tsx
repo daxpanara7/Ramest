@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/admin/auth-context";
@@ -30,9 +31,15 @@ export default function AdminLoginPage() {
   return (
     <div className="admin-login">
       <form className="admin-login-card" onSubmit={onSubmit}>
-        <div className="admin-brand admin-login-brand">
-          Ramest <span>Admin</span>
-        </div>
+        <Image
+          className="admin-login-logo"
+          src="/assets/logo_final.webp"
+          alt="Ramest Technolabs"
+          width={687}
+          height={267}
+          priority
+        />
+        <h1 className="admin-login-title">Admin Panel</h1>
         <p className="admin-login-sub">Sign in to manage content, leads, and settings.</p>
 
         {error && (

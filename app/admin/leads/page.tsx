@@ -1,252 +1,177 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { api, API_BASE, getAccessToken } from "@/lib/admin/api";
-import { PageError } from "@/components/admin/status";
+import { useMemo, useState } from "react";
+import { Download, Filter, Search } from "lucide-react";
+import { PageHeader, Section, Stat } from "@/components/admin/primitives";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
+} from "@/components/ui/sheet";
+import { leads, type Lead } from "@/lib/mock-data";
+import { leadStatusBadge } from "@/components/admin/badges";
+import { Users2, PhoneCall, CheckCircle2, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
-type Lead = {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string | null;
-  company?: string | null;
-  service?: string | null;
-  message: string;
-  status: string;
-  adminNotes?: string | null;
-  country?: string | null;
-  createdAt: string;
-};
-
-const STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "WON", "LOST", "SPAM"];
 
 export default function LeadsPage() {
-  const [items, setItems] = useState<Lead[]>([]);
-  const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState("");
-  const [search, setSearch] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Lead | null>(null);
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState("all");
+  const [active, setActive] = useState<Lead | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (status) params.set("status", status);
-      if (search) params.set("search", search);
-      params.set("take", "50");
-      const res = await api<{ items: Lead[]; total: number }>(`/leads?${params}`);
-      setItems(res.items);
-      setTotal(res.total);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, [status, search]);
+  const rows = useMemo(() => leads.filter((l) =>
+    (status === "all" || l.status.toLowerCase() === status) &&
+    (!q || (l.name + l.company + l.email).toLowerCase().includes(q.toLowerCase()))
+  ), [q, status]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  return (
+    <Section>
+      <PageHeader
+        title="Contact Leads"
+        description="Inbound inquiries from your website and campaigns."
+        actions={
+          <>
+            <Button variant="outline" size="sm"><Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV</Button>
+            <Button size="sm">Add lead</Button>
+          </>
+        }
+      />
 
-  if (error) return <PageError message={error} />;
+      <div className="grid gap-3 md:grid-cols-4">
+        <Stat label="Total leads" value={342} delta="+18.4%" icon={<Users2 className="h-4 w-4" />} />
+        <Stat label="Contacted" value={198} delta="+7.2%" icon={<PhoneCall className="h-4 w-4" />} />
+        <Stat label="Won" value={54} delta="+22.0%" icon={<CheckCircle2 className="h-4 w-4" />} />
+        <Stat label="Lost" value={31} delta="-3.5%" icon={<XCircle className="h-4 w-4" />} />
+      </div>
 
+      <Card className="overflow-hidden p-0">
+        <div className="flex flex-col gap-3 border-b border-border/60 p-3 md:flex-row md:items-center">
+          <div className="relative w-full md:max-w-sm">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search leads…" className="h-9 pl-8" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="h-9 w-[150px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {["New", "Contacted", "Qualified", "Won", "Lost"].map((s) => (
+                  <SelectItem key={s} value={s.toLowerCase()}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm"><Filter className="mr-1.5 h-3.5 w-3.5" /> More filters</Button>
+          </div>
+        </div>
+
+        <Table>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Contact</TableHead>
+              <TableHead>Company</TableHead>
+              <TableHead>Service</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead className="text-right">Created</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((l) => (
+              <TableRow key={l.id} className="cursor-pointer" onClick={() => setActive(l)}>
+                <TableCell>
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-primary/15 text-[10px] text-primary">
+                        {l.name.split(" ").map((s) => s[0]).slice(0, 2).join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{l.name}</div>
+                      <div className="text-xs text-muted-foreground">{l.email}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>{l.company}</TableCell>
+                <TableCell><Badge variant="outline" className="text-[10.5px]">{l.service}</Badge></TableCell>
+                <TableCell>{leadStatusBadge(l.status)}</TableCell>
+                <TableCell className="font-mono text-xs text-muted-foreground">{l.phone}</TableCell>
+                <TableCell className="text-right text-muted-foreground">{l.createdAt}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+
+      <Sheet open={!!active} onOpenChange={(o) => !o && setActive(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-lg">
+          {active && (
+            <>
+              <SheetHeader>
+                <SheetTitle className="font-display text-2xl">{active.name}</SheetTitle>
+                <SheetDescription>{active.company} · {active.email}</SheetDescription>
+              </SheetHeader>
+
+              <div className="mt-6 space-y-6">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <Detail label="Phone" value={active.phone} />
+                  <Detail label="Service" value={active.service} />
+                  <Detail label="Status" value={active.status} />
+                  <Detail label="Created" value={active.createdAt} />
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">Timeline</h4>
+                  <ol className="relative space-y-4 border-l border-border/70 pl-4">
+                    {[
+                      { t: "Lead created from contact form", at: active.createdAt },
+                      { t: "Auto-response email sent", at: "just after" },
+                      { t: "Assigned to Aarav Shah", at: "1h later" },
+                    ].map((e, i) => (
+                      <li key={i} className="relative">
+                        <span className="absolute -left-[21px] top-1 h-2 w-2 rounded-full bg-primary" />
+                        <p className="text-sm">{e.t}</p>
+                        <p className="text-[11px] text-muted-foreground">{e.at}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Notes</h4>
+                  <Textarea placeholder="Add a private note about this lead…" rows={4} />
+                  <div className="mt-3 flex justify-end gap-2">
+                    <Button size="sm" variant="outline">Mark Contacted</Button>
+                    <Button size="sm">Save note</Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+    </Section>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <header className="admin-page-head">
-        <h1>Leads {total > 0 && <span className="admin-count">{total}</span>}</h1>
-        <p>Enquiries from the website contact form.</p>
-      </header>
-
-      <div className="admin-toolbar">
-        <input
-          className="admin-search"
-          placeholder="Search name, email, company…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select className="admin-select" value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">All statuses</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <a
-          className="admin-btn"
-          href={`${API_BASE}/leads/export${status ? `?status=${status}` : ""}`}
-          onClick={(e) => {
-            // Export needs the bearer token; open via fetch->blob instead.
-            e.preventDefault();
-            downloadCsv(status);
-          }}
-        >
-          <i className="fa-solid fa-download" aria-hidden="true" /> Export CSV
-        </a>
-      </div>
-
-      {loading ? (
-        <div className="admin-center" style={{ minHeight: "30vh" }}>
-          <div className="admin-spinner" aria-label="Loading" />
-        </div>
-      ) : items.length === 0 ? (
-        <p className="admin-muted">No leads match.</p>
-      ) : (
-        <div className="admin-card admin-card-flush">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Contact</th>
-                <th>Company</th>
-                <th>Status</th>
-                <th>Received</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((l) => (
-                <tr key={l.id}>
-                  <td>
-                    <strong>{l.name}</strong>
-                    <br />
-                    <span className="admin-muted">{l.email}</span>
-                  </td>
-                  <td>{l.company || <span className="admin-muted">—</span>}</td>
-                  <td>
-                    <span className={`admin-badge status-${l.status.toLowerCase()}`}>
-                      {l.status}
-                    </span>
-                  </td>
-                  <td className="admin-muted">{new Date(l.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <button className="admin-link-btn" onClick={() => setSelected(l)}>
-                      View
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {selected && (
-        <LeadDrawer
-          lead={selected}
-          onClose={() => setSelected(null)}
-          onSaved={() => {
-            setSelected(null);
-            load();
-          }}
-        />
-      )}
+      <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="mt-0.5 font-medium">{value}</p>
     </div>
   );
-}
-
-function LeadDrawer({
-  lead,
-  onClose,
-  onSaved,
-}: {
-  lead: Lead;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const [status, setStatus] = useState(lead.status);
-  const [notes, setNotes] = useState(lead.adminNotes ?? "");
-  const [saving, setSaving] = useState(false);
-
-  async function save() {
-    setSaving(true);
-    try {
-      await api(`/leads/${lead.id}`, {
-        method: "PATCH",
-        body: { status, adminNotes: notes },
-      });
-      onSaved();
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div className="admin-drawer-backdrop" onClick={onClose}>
-      <div className="admin-drawer" onClick={(e) => e.stopPropagation()}>
-        <header className="admin-drawer-head">
-          <h2>{lead.name}</h2>
-          <button className="admin-icon-btn" onClick={onClose} aria-label="Close">
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </button>
-        </header>
-        <dl className="admin-detail">
-          <dt>Email</dt>
-          <dd>
-            <a href={`mailto:${lead.email}`}>{lead.email}</a>
-          </dd>
-          {lead.phone && (
-            <>
-              <dt>Phone</dt>
-              <dd>{lead.phone}</dd>
-            </>
-          )}
-          {lead.company && (
-            <>
-              <dt>Company</dt>
-              <dd>{lead.company}</dd>
-            </>
-          )}
-          {lead.service && (
-            <>
-              <dt>Service</dt>
-              <dd>{lead.service}</dd>
-            </>
-          )}
-          <dt>Message</dt>
-          <dd className="admin-message">{lead.message}</dd>
-        </dl>
-
-        <label className="admin-field">
-          <span>Status</span>
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="admin-field">
-          <span>Internal notes</span>
-          <textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
-        </label>
-
-        <div className="admin-drawer-actions">
-          <button className="admin-btn" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving}>
-            {saving ? "Saving…" : "Save"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** CSV export with the auth header, via blob download. */
-async function downloadCsv(status: string) {
-  const res = await fetch(`${API_BASE}/leads/export${status ? `?status=${status}` : ""}`, {
-    headers: { Authorization: `Bearer ${getAccessToken()}` },
-    credentials: "include",
-  });
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "leads.csv";
-  a.click();
-  URL.revokeObjectURL(url);
 }

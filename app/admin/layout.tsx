@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
-import AdminShell from "@/components/admin/AdminShell";
-import "@/styles/admin.css";
+import { Fraunces } from "next/font/google";
+import AdminChrome from "@/components/admin/admin-chrome";
+import "./theme.css";
+
+// Display serif the ported design system uses (marketing keeps DM Serif).
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
 
 // The admin panel must never be indexed or crawled.
 export const metadata: Metadata = {
@@ -9,5 +17,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <div className={fraunces.variable}>
+      <AdminChrome>{children}</AdminChrome>
+    </div>
+  );
 }

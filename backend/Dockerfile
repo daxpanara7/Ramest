@@ -5,7 +5,13 @@
 # ---- deps: install ALL deps (dev included) for the build ----
 FROM node:20-slim AS deps
 WORKDIR /app
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# argon2 is a native addon: its install script runs node-gyp-build, which
+# compiles from source whenever no prebuilt binary matches this image. Without
+# python3/make/g++ that compile fails and `npm ci` exits 1. These stay in the
+# build-only stage — the runtime image below is unaffected.
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+      openssl python3 make g++ ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci
 

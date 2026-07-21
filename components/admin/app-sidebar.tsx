@@ -3,6 +3,7 @@
 // Ported from ramest-admin-hub (Vite/TanStack) to Next.js:
 // Link/useRouterState -> next/link + usePathname, URLs prefixed with /admin,
 // and the mock profile/logout wired to the real auth context.
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -80,19 +81,38 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border px-3 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <span className="font-display text-[15px] leading-none">R</span>
-          </div>
-          {!collapsed && (
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate font-display text-[15px] tracking-tight">Ramest</span>
-              <span className="truncate text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                Technolabs · Admin
+        {/* Real brand mark. Collapsed rail is only ~48px wide, so the wide
+            wordmark is swapped for the square icon rather than squashed. */}
+        <Link
+          href="/admin/dashboard"
+          aria-label="Ramest Technolabs admin — dashboard"
+          className="flex items-center gap-2.5 rounded-lg outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+        >
+          {collapsed ? (
+            <Image
+              src="/assets/logo-mark.png"
+              alt=""
+              width={512}
+              height={512}
+              priority
+              className="h-8 w-8 shrink-0 rounded-lg object-contain"
+            />
+          ) : (
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <Image
+                src="/assets/logo_final.webp"
+                alt="Ramest Technolabs"
+                width={687}
+                height={267}
+                priority
+                className="h-8 w-auto self-start"
+              />
+              <span className="truncate text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                Admin Console
               </span>
             </div>
           )}
-        </div>
+        </Link>
         {!collapsed && (
           <div className="relative mt-3">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />

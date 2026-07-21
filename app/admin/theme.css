@@ -166,3 +166,50 @@
     linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 5%, transparent) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+/* ---------------------------------------------------------------------------
+   Scrollbars (admin only)
+
+   The platform default paints a bright thumb that reads as a hard white line
+   against the dark sidebar. Scoped to .admin-scope so the marketing site keeps
+   its native scrollbars.
+   --------------------------------------------------------------------------- */
+
+/* Firefox */
+.admin-scope,
+.admin-scope * {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 14%, transparent) transparent;
+}
+
+/* WebKit / Chrome / Safari */
+.admin-scope ::-webkit-scrollbar,
+.admin-scope::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-scope ::-webkit-scrollbar-track,
+.admin-scope::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Transparent border + background-clip gives the thumb breathing room so it
+   reads as a floating pill rather than a solid edge-to-edge bar. */
+.admin-scope ::-webkit-scrollbar-thumb,
+.admin-scope::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 14%, transparent);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+.admin-scope ::-webkit-scrollbar-thumb:hover,
+.admin-scope::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklab, var(--foreground) 26%, transparent);
+}
+
+.admin-scope ::-webkit-scrollbar-corner,
+.admin-scope::-webkit-scrollbar-corner {
+  background: transparent;
+}

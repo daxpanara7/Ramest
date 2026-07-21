@@ -18,7 +18,9 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={fraunces.variable}>
+    // admin-scope keeps admin-only styling (e.g. subtle scrollbars) from
+    // leaking into the marketing site, which shares the same global CSS layer.
+    <div className={`admin-scope ${fraunces.variable}`}>
       <AdminChrome>{children}</AdminChrome>
     </div>
   );

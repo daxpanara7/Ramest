@@ -16,8 +16,12 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npm run build
-# Strip dev dependencies from node_modules for the runtime image
-RUN npm prune --omit=dev
+# Strip dev dependencies, then regenerate the Prisma client: prune can drop
+# the generated .prisma folder, and the runtime `prisma migrate deploy` needs
+# the pinned v6 CLI (prisma is a PROD dependency for exactly this reason —
+# if it were pruned, npx would fetch latest v7 at boot, which rejects our
+# schema and crash-loops the container).
+RUN npm prune --omit=dev && npx prisma generate
 
 # ---- runtime: minimal image, non-root ----
 FROM node:20-slim AS runtime

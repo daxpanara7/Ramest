@@ -20,7 +20,7 @@ services:
           name: ramest-postgres
           property: connectionString
       - key: CORS_ORIGINS
-        value: https://www.ramesttechnolabs.com
+        value: https://www.ramesttechnolabs.com,http://localhost:3000
       # Set these in the dashboard (Environment tab) — never commit real secrets.
       - key: JWT_ACCESS_SECRET
         sync: false

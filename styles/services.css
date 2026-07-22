@@ -9,7 +9,9 @@
 
 .mega-menu {
   position: absolute;
-  top: calc(100% + 0.85rem);
+  /* Clear the floating header capsule — at 0.85rem the panel tucked under its
+     rounded bottom edge and read as overlapping it. */
+  top: calc(100% + 1.6rem);
   left: 50%;
   transform: translateX(-50%) translateY(12px);
   width: min(1040px, calc(100vw - 2.5rem));
@@ -436,8 +438,10 @@
   transition: transform 0.35s ease-out;
 }
 
+/* Scale only — the previous rotate(-5deg) tilted the icon on hover, which read
+   as the icon slipping sideways. Growing in place keeps the focus. */
 .mega-menu-item:hover .mega-menu-item-icon {
-  transform: scale(1.12) rotate(-5deg);
+  transform: scale(1.18);
   background: transparent;
 }
 

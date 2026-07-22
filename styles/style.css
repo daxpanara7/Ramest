@@ -460,6 +460,13 @@ img {
         pointer-events: auto;
         overflow: visible;
     }
+
+    /* Expanded only: keep the theme toggle off the last nav link ("Company"),
+       which otherwise sits right against it. Collapsed capsule is unchanged. */
+    .header.is-hovered .nav-btns,
+    .header.menu-open .nav-btns {
+        margin-left: 1.25rem;
+    }
 }
 
 .nav-list {
@@ -536,7 +543,8 @@ img {
     opacity: 0;
     visibility: hidden;
     position: absolute;
-    top: calc(100% + 15px);
+    /* Matches the mega menu — enough clearance to not touch the capsule. */
+    top: calc(100% + 26px);
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     background-color: rgba(255, 255, 255, 0.95);

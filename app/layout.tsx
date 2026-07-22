@@ -80,7 +80,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
+      data-theme="light"
       className={`${inter.variable} ${dmSerif.variable}`}
       suppressHydrationWarning
     >
@@ -101,7 +101,7 @@ export default function RootLayout({
         <ClientEffects />
         <JsonLd />
         <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var t=localStorage.getItem('selected-theme');if(t){document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}}catch(e){}})();`}
+          {`(function(){try{var t=localStorage.getItem('selected-theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`}
         </Script>
       </body>
     </html>

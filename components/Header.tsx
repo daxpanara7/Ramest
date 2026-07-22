@@ -33,7 +33,8 @@ export default function Header() {
   const activePage = getNavPageFromPath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>(null);
-  const [isDark, setIsDark] = useState(true);
+  // First visit defaults to light; a stored choice wins (applied in the effect).
+  const [isDark, setIsDark] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const navMenuRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -113,7 +114,7 @@ export default function Header() {
 
   useEffect(() => {
     const saved = localStorage.getItem("selected-theme");
-    const dark = saved ? saved === "dark" : true;
+    const dark = saved === "dark";
     setIsDark(dark);
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     placeNavMenu();

@@ -501,11 +501,16 @@
    list and slides by exactly -50%, so the loop never jumps. It does NOT
    pause on hover — per the reference, hovering only highlights the single
    technology under the cursor while the strip keeps moving. */
+/* No hard border lines — the band blends into the sections around it with a
+   soft tint that fades to transparent at the top and bottom edges. */
 .tech-band {
     padding: 5rem 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
     overflow: hidden;
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(233, 63, 46, 0.025) 22%,
+            rgba(233, 63, 46, 0.025) 78%,
+            transparent 100%);
 }
 
 .tech-band-eyebrow {

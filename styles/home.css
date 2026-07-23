@@ -300,15 +300,23 @@
 }
 
 /* ==================== STATS BAND ==================== */
+/* Same edge-fading treatment as the other bands — no border lines, the tint
+   dissolves into the sections above and below. */
 .stats-band {
     padding: 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--container-color);
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(127, 127, 127, 0.05) 25%,
+            rgba(127, 127, 127, 0.05) 75%,
+            transparent 100%);
 }
 
 [data-theme="dark"] .stats-band {
-    background-color: rgba(255, 255, 255, 0.02);
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.02) 25%,
+            rgba(255, 255, 255, 0.02) 75%,
+            transparent 100%);
 }
 
 .stats-band-inner {

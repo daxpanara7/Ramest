@@ -141,78 +141,87 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ===== SERVICES PREVIEW ===== */}
+      {/* ===== SERVICES PREVIEW — "Engineering Excellence" grid =====
+          Six equal cards, whole card is the link (keeps every service page
+          one click from the homepage for internal-link SEO). */}
       <section className="section reveal" id="services-preview">
         <div className="container">
-          <div
-            className="section-header"
-            style={{ textAlign: "center", marginBottom: "4rem" }}
-          >
-            <span className="section-eyebrow">WHAT WE BUILD</span>
-            <h2
-              className="section-title"
-              style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
-            >
-              End-to-End Digital Solutions
+          <div className="eng-header">
+            <h2 className="eng-title">
+              Engineering <span className="highlight">Excellence</span>
             </h2>
-            <p
-              className="section-subtitle"
-              style={{
-                fontSize: "1.1rem",
-                color: "var(--text-color)",
-                maxWidth: "600px",
-                margin: "0 auto",
-              }}
-            >
-              Tailored for real business impact — from idea to launch and beyond.
+            <p className="eng-subtitle">
+              We deliver end-to-end technology solutions. From concept to
+              deployment, our expert teams build systems that drive growth.
             </p>
           </div>
-          <div className="services-grid">
-            <div className="service-card" style={{ marginTop: "3rem" }}>
-              <div className="service-icon">
-                <i className="fa-solid fa-laptop-code" aria-hidden="true" />
-              </div>
-              <h3 className="service-title">Custom Software Dev</h3>
-              <p className="service-description">
-                Tailor-made software solutions designed to meet your specific
-                business requirements and overcome complex challenges.
+
+          <div className="eng-grid">
+            <Link href="/services/software-development" className="eng-card">
+              <span className="eng-card-icon">
+                <i className="fa-solid fa-code" aria-hidden="true" />
+              </span>
+              <h3 className="eng-card-title">Custom Software</h3>
+              <p className="eng-card-desc">
+                Enterprise-grade software tailored to your specific business
+                workflows and scaling requirements.
               </p>
-              <Link href="/services/software-development" className="service-link">
-                Explore software development{" "}
-                <i className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
-              </Link>
-            </div>
-            <div className="service-card" style={{ marginTop: "-1rem" }}>
-              <div className="service-icon">
-                <i className="fa-solid fa-mobile-button" aria-hidden="true" />
-              </div>
-              <h3 className="service-title">Mobile & Web Apps</h3>
-              <p className="service-description">
-                Scalable and robust mobile and web applications that drive user
-                engagement and fuel your business growth.
+            </Link>
+
+            <Link href="/services/mobile-app-development" className="eng-card">
+              <span className="eng-card-icon">
+                <i className="fa-solid fa-mobile-screen-button" aria-hidden="true" />
+              </span>
+              <h3 className="eng-card-title">Mobile Apps</h3>
+              <p className="eng-card-desc">
+                Native and cross-platform mobile experiences that delight users
+                and drive engagement.
               </p>
-              <Link href="/services/mobile-app-development" className="service-link">
-                Explore app development{" "}
-                <i className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
-              </Link>
-            </div>
-            <div className="service-card" style={{ marginTop: "3rem" }}>
-              <div className="service-icon">
+            </Link>
+
+            <Link href="/services/web-application-development" className="eng-card">
+              <span className="eng-card-icon">
+                <i className="fa-solid fa-globe" aria-hidden="true" />
+              </span>
+              <h3 className="eng-card-title">Web Applications</h3>
+              <p className="eng-card-desc">
+                High-performance, scalable web applications built with modern
+                JavaScript frameworks.
+              </p>
+            </Link>
+
+            <Link href="/services/custom-ai-development" className="eng-card">
+              <span className="eng-card-icon">
                 <i className="fa-solid fa-brain" aria-hidden="true" />
-              </div>
-              <h3 className="service-title">AI/ML Solutions</h3>
-              <p className="service-description">
-                Leveraging modern AI and Machine Learning to automate processes
-                and provide smart, actionable business insights.
+              </span>
+              <h3 className="eng-card-title">AI &amp; ML Solutions</h3>
+              <p className="eng-card-desc">
+                Intelligent systems that automate processes, uncover insights,
+                and create competitive advantages.
               </p>
-              <Link href="/services/custom-ai-development" className="service-link">
-                Explore AI &amp; ML solutions{" "}
-                <i className="fa-solid fa-arrow-right"
-                  style={{ fontSize: "0.8rem" }} aria-hidden="true" />
-              </Link>
-            </div>
+            </Link>
+
+            <Link href="/services/cloud-infrastructure" className="eng-card">
+              <span className="eng-card-icon">
+                <i className="fa-solid fa-cloud" aria-hidden="true" />
+              </span>
+              <h3 className="eng-card-title">Cloud Infrastructure</h3>
+              <p className="eng-card-desc">
+                Resilient, secure, and scalable cloud architectures on AWS,
+                Azure, and Google Cloud.
+              </p>
+            </Link>
+
+            <Link href="/services/front-end-development" className="eng-card">
+              <span className="eng-card-icon">
+                <i className="fa-solid fa-pen-ruler" aria-hidden="true" />
+              </span>
+              <h3 className="eng-card-title">UI/UX Design</h3>
+              <p className="eng-card-desc">
+                User-centric design systems that ensure your products are as
+                intuitive as they are powerful.
+              </p>
+            </Link>
           </div>
         </div>
       </section>

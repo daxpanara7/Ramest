@@ -388,3 +388,110 @@
     .stat-sep { display: none; }
     .stats-band-inner { justify-content: center; gap: 2rem; }
 }
+
+/* ==================== ENGINEERING EXCELLENCE GRID ====================
+   Homepage services preview, rebuilt to the 6-card reference layout.
+   Uses the site's existing tokens (title font, first-color accent,
+   container/border colors) so it follows light and dark themes. */
+.eng-header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 4rem;
+}
+
+.eng-title {
+    font-family: var(--title-font);
+    font-size: clamp(2.2rem, 4.5vw, 3rem);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+}
+
+.eng-subtitle {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text-color);
+    margin: 0 auto;
+}
+
+.eng-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.75rem;
+}
+
+.eng-card {
+    display: block;
+    background-color: var(--container-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+    padding: 2.25rem 2rem 2.5rem;
+    transition:
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+.eng-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(233, 63, 46, 0.35);
+    box-shadow: 0 18px 40px rgba(233, 63, 46, 0.10);
+}
+
+.eng-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-small);
+    font-size: 1.35rem;
+    color: var(--first-color);
+    background-color: var(--first-color-light);
+    margin-bottom: 1.75rem;
+    transition: background-color 0.35s ease, color 0.35s ease, transform 0.35s ease;
+}
+
+[data-theme="dark"] .eng-card-icon {
+    background-color: rgba(233, 63, 46, 0.14);
+}
+
+.eng-card:hover .eng-card-icon {
+    background-color: var(--first-color);
+    color: #fff;
+    transform: scale(1.06);
+}
+
+.eng-card-title {
+    font-family: var(--title-font);
+    font-size: 1.35rem;
+    margin-bottom: 0.75rem;
+    transition: color 0.3s ease;
+}
+
+.eng-card:hover .eng-card-title {
+    color: var(--first-color);
+}
+
+.eng-card-desc {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-color);
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+    .eng-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .eng-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .eng-header {
+        margin-bottom: 2.75rem;
+    }
+}

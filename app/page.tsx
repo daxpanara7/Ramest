@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
 import CtaBanner from "@/components/sections/CtaBanner";
+import TechMarquee from "@/components/sections/TechMarquee";
 import { SITE, createPageMetadata } from "@/lib/site";
 
 export const metadata = createPageMetadata({
@@ -130,13 +131,13 @@ export default function Page() {
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">100%</span>
-            <span className="stat-lbl">Code &amp; IP Ownership</span>
+            <span className="stat-num">98%</span>
+            <span className="stat-lbl">Client Satisfaction</span>
           </div>
           <div className="stat-sep"></div>
           <div className="stat-item">
-            <span className="stat-num">24/7</span>
-            <span className="stat-lbl">Dedicated Support</span>
+            <span className="stat-num">7+</span>
+            <span className="stat-lbl">Countries Served</span>
           </div>
         </div>
       </section>
@@ -353,6 +354,8 @@ export default function Page() {
           </p>
         </div>
       </section>
+
+      <TechMarquee />
 
       <CtaBanner
         title="Ready to Build Something Great?"

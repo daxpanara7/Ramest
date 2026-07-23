@@ -495,3 +495,108 @@
         margin-bottom: 2.75rem;
     }
 }
+
+/* ==================== TECH MARQUEE ====================
+   Continuous logo strip above the CTA. The track holds two copies of the
+   list and slides by exactly -50%, so the loop never jumps. It does NOT
+   pause on hover — per the reference, hovering only highlights the single
+   technology under the cursor while the strip keeps moving. */
+.tech-band {
+    padding: 5rem 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.tech-band-eyebrow {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-color);
+    margin: 0 0 3rem;
+}
+
+.tech-marquee {
+    position: relative;
+    overflow: hidden;
+    /* Soft fade at both edges, like the reference's gradient overlays. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+.tech-track {
+    display: flex;
+    width: max-content;
+    animation: tech-scroll 30s linear infinite;
+}
+
+@keyframes tech-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.tech-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    width: 10rem;
+    flex-shrink: 0;
+    color: var(--text-color-light);
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.tech-item svg {
+    width: 46px;
+    height: 46px;
+    fill: currentColor;
+    opacity: 0.55;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.tech-item span {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Hover highlights only the item under the cursor — the strip keeps moving. */
+.tech-item:hover {
+    color: var(--title-color);
+}
+
+.tech-item:hover svg {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+@media (max-width: 768px) {
+    .tech-band {
+        padding: 3.5rem 0;
+    }
+
+    .tech-item {
+        width: 7.5rem;
+    }
+
+    .tech-item svg {
+        width: 38px;
+        height: 38px;
+    }
+
+    .tech-track {
+        animation-duration: 22s;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tech-track {
+        animation: none;
+    }
+}

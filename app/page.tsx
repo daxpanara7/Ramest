@@ -299,6 +299,8 @@ export default function Page() {
       </section>
 
       {/* ===== FAQ ===== */}
+      <TechMarquee />
+
       <section className="section svc-faq reveal" aria-labelledby="home-faq-heading">
         <div className="container">
           <div
@@ -354,8 +356,6 @@ export default function Page() {
           </p>
         </div>
       </section>
-
-      <TechMarquee />
 
       <CtaBanner
         title="Ready to Build Something Great?"

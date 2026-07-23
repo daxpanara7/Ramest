@@ -698,3 +698,136 @@
         margin-inline: auto;
     }
 }
+
+/* ==================== STACKED SECTION CARDS ====================
+   Each card is sticky, so the next section slides over the previous one —
+   the layered-card parallax from the reference. Sticky needs no JS; GSAP
+   adds the scale/dim on the covered card. */
+.stack {
+    position: relative;
+}
+
+.stack-card {
+    position: sticky;
+    /* --stack-top is set per-card by the motion engine to
+       min(0, viewportHeight - cardHeight): cards shorter than the screen pin
+       at the top, TALLER cards scroll all the way through and only pin when
+       their bottom reaches the viewport bottom. Without this, top:0 traps a
+       tall card's below-the-fold content forever (the mobile bug). */
+    top: var(--stack-top, 0px);
+    overflow: clip;
+    background-color: var(--body-color);
+    border-radius: 34px 34px 0 0;
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.16);
+    /* Top highlight edge so each new card reads as a surface, not a line. */
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.5rem;
+    will-change: transform;
+}
+
+[data-theme="dark"] .stack-card {
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* The first card holds the stats band right after the 100vh hero. */
+.stack-card:first-child {
+    border-radius: 0;
+    border-top: 0;
+    box-shadow: none;
+}
+
+/* Mobile/tablet keep the stacking — the --stack-top rule above makes tall
+   cards fully scrollable first — just with tighter corners and shadow. */
+@media (max-width: 768px) {
+    .stack-card {
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.14);
+    }
+}
+
+/* Dark veil for covered stack cards — GSAP drives --veil (0 -> 0.5) while
+   the next card slides over. A veil, not element opacity: translucent cards
+   would let the card behind bleed through. */
+.stack-card {
+    --veil: 0;
+}
+
+.stack-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: #000;
+    opacity: var(--veil);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* ==================== TRUST MARQUEE (below hero) ====================
+   Slow uppercase text strip, styled after the reference's
+   "trusted by mission-critical organizations" slider. */
+.trust-band {
+    padding: 3.25rem 0 3.5rem;
+    overflow: hidden;
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(233, 63, 46, 0.03) 30%,
+            rgba(233, 63, 46, 0.03) 70%,
+            transparent 100%);
+}
+
+.trust-band-eyebrow {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--first-color);
+    margin: 0 0 2.25rem;
+}
+
+.trust-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+}
+
+.trust-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: tech-scroll 38s linear infinite;
+}
+
+.trust-item {
+    flex-shrink: 0;
+    padding: 0 3.25rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-color-light);
+    white-space: nowrap;
+    transition: color 0.25s ease;
+}
+
+.trust-item:hover {
+    color: var(--title-color);
+}
+
+@media (max-width: 768px) {
+    .trust-band {
+        padding: 2.5rem 0;
+    }
+
+    .trust-item {
+        padding: 0 1.9rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trust-track {
+        animation: none;
+    }
+}

@@ -1,0 +1,895 @@
+/* ===========================================================================
+   HOMEPAGE DESIGN SYSTEM  (namespace: hx-)
+
+   One consistent language for the redesigned homepage: editorial serif
+   display type over Inter, hairline borders, layered soft light, a single
+   card treatment, and restrained motion. Everything themes through the
+   site's existing tokens plus the scales below.
+   =========================================================================== */
+
+:root {
+    /* type scale */
+    --hx-display: clamp(3rem, 7vw, 5.75rem);
+    --hx-h2: clamp(2.1rem, 4vw, 3.1rem);
+    --hx-h3: 1.3rem;
+    --hx-body: 1.02rem;
+    --hx-small: 0.86rem;
+
+    /* spacing scale */
+    --hx-s1: 0.5rem;
+    --hx-s2: 1rem;
+    --hx-s3: 1.75rem;
+    --hx-s4: 2.75rem;
+    --hx-s5: 4.5rem;
+    --hx-s6: 7rem;
+
+    /* radius + shadow scale */
+    --hx-r-sm: 12px;
+    --hx-r-md: 20px;
+    --hx-r-lg: 30px;
+    --hx-shadow-soft: 0 20px 60px -20px rgba(10, 8, 8, 0.18);
+    --hx-shadow-lift: 0 30px 70px -24px rgba(233, 63, 46, 0.22);
+
+    /* light */
+    --hx-hairline: var(--border-color);
+    --hx-red: var(--first-color);
+    --hx-red-soft: rgba(233, 63, 46, 0.08);
+}
+
+/* ------------------------------------------------------------------ shared */
+
+.hx-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--hx-red);
+}
+
+.hx-eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--hx-red);
+}
+
+.hx-title {
+    font-family: var(--title-font);
+    font-size: var(--hx-h2);
+    line-height: 1.12;
+    color: var(--title-color);
+    letter-spacing: -0.01em;
+    margin: 0.9rem 0 0;
+    text-wrap: balance;
+}
+
+.hx-title em {
+    font-style: italic;
+    color: var(--hx-red);
+}
+
+.hx-lede {
+    font-size: var(--hx-body);
+    line-height: 1.75;
+    color: var(--text-color);
+    max-width: 56ch;
+    margin: 1.25rem 0 0;
+}
+
+.hx-section {
+    padding: var(--hx-s6) 0;
+}
+
+.hx-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--hx-s3);
+    margin-bottom: var(--hx-s4);
+}
+
+.hx-section-head .hx-lede {
+    margin-top: 0.9rem;
+}
+
+.hx-head-link {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--hx-small);
+    font-weight: 600;
+    color: var(--title-color);
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--hx-hairline);
+    transition: color 0.25s ease, border-color 0.25s ease, gap 0.25s ease;
+}
+
+.hx-head-link:hover {
+    color: var(--hx-red);
+    border-color: var(--hx-red);
+    gap: 0.8rem;
+}
+
+/* Staggered child reveals, driven by the existing .reveal IntersectionObserver
+   (rect-based, so it works inside the sticky stack — unlike ScrollTrigger). */
+.reveal .hx-rise {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--rise, 0) * 80ms);
+}
+
+.reveal.active .hx-rise {
+    opacity: 1;
+    transform: none;
+}
+
+/* -------------------------------------------------------------------- hero */
+
+.hx-hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: clip;
+    padding: 7.5rem 0 4rem;
+}
+
+.hx-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.hx-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+}
+
+.hx-glow-a {
+    width: 46vw;
+    height: 46vw;
+    max-width: 640px;
+    max-height: 640px;
+    top: -12%;
+    right: -8%;
+    background: radial-gradient(circle, rgba(233, 63, 46, 0.16) 0%, transparent 68%);
+}
+
+.hx-glow-b {
+    width: 38vw;
+    height: 38vw;
+    max-width: 520px;
+    max-height: 520px;
+    bottom: -14%;
+    left: -6%;
+    background: radial-gradient(circle, rgba(255, 122, 48, 0.10) 0%, transparent 70%);
+}
+
+/* Concentric hairline rings, off-centre — quiet engineering motif. */
+.hx-ring {
+    position: absolute;
+    top: 50%;
+    right: -12%;
+    width: 56vw;
+    height: 56vw;
+    max-width: 860px;
+    max-height: 860px;
+    transform: translateY(-50%);
+    border: 1px solid rgba(233, 63, 46, 0.14);
+    border-radius: 50%;
+}
+
+.hx-ring-2 {
+    width: 40vw;
+    height: 40vw;
+    max-width: 620px;
+    max-height: 620px;
+    border-color: rgba(233, 63, 46, 0.08);
+}
+
+.hx-hero-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.hx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--hx-hairline);
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--container-color) 55%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0 0 var(--hx-s3);
+}
+
+.hx-chip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--hx-red);
+    box-shadow: 0 0 10px 2px rgba(233, 63, 46, 0.55);
+}
+
+.hx-hero-title {
+    font-family: var(--title-font);
+    font-size: var(--hx-display);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    color: var(--title-color);
+    max-width: 15ch;
+    margin: 0;
+}
+
+.hx-hero-title .hx-w {
+    display: inline-block;
+    will-change: transform;
+}
+
+/* Solid brand red on purpose — NOT background-clip:text. Gradient text
+   breaks when GSAP promotes the word spans to their own compositor layers
+   (Chrome paints it fully transparent), which made this whole line
+   invisible. Solid color cannot fail. */
+.hx-hero-title em {
+    font-style: italic;
+    color: var(--hx-red);
+}
+
+.hx-hero-sub {
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    line-height: 1.8;
+    color: var(--text-color);
+    max-width: 54ch;
+    margin: var(--hx-s3) 0 var(--hx-s4);
+}
+
+.hx-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--hx-s2);
+    flex-wrap: wrap;
+}
+
+/* hero stats — hairline row, counters animate via [data-countup] */
+.hx-hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hx-s3) var(--hx-s5);
+    margin: var(--hx-s5) 0 0;
+    padding-top: var(--hx-s3);
+    border-top: 1px solid var(--hx-hairline);
+}
+
+.hx-stat dt {
+    font-family: var(--title-font);
+    font-size: 2.1rem;
+    color: var(--title-color);
+    line-height: 1;
+}
+
+.hx-stat dt em {
+    font-style: normal;
+    color: var(--hx-red);
+    font-size: 0.65em;
+}
+
+.hx-stat dd {
+    margin: 0.45rem 0 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-color-light);
+}
+
+/* ---- hero visual: glass build-console + floating chips (decorative) ---- */
+.hx-hero-visual {
+    position: absolute;
+    top: 50%;
+    right: max(2vw, calc((100vw - 1140px) / 2 - 2rem));
+    transform: translateY(-52%);
+    z-index: 1;
+    width: min(30vw, 420px);
+    pointer-events: none;
+}
+
+.hx-console {
+    border: 1px solid var(--hx-hairline);
+    border-radius: var(--hx-r-md);
+    background: color-mix(in srgb, var(--container-color) 78%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--hx-shadow-soft);
+    overflow: hidden;
+}
+
+.hx-console-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid var(--hx-hairline);
+}
+
+.hx-console-bar i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--hx-hairline);
+}
+
+.hx-console-bar i:first-child {
+    background: var(--hx-red);
+}
+
+.hx-console-bar span {
+    margin-left: auto;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-color-light);
+}
+
+.hx-console-body {
+    padding: 1.2rem 1.3rem 1.4rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    line-height: 2.1;
+    color: var(--text-color);
+}
+
+.hx-console-body b {
+    color: var(--hx-red);
+    font-weight: 600;
+}
+
+.hx-console-body .ok {
+    color: #1e9e5a;
+    font-weight: 600;
+}
+
+/* Typed-line effect: lines appear one after another (pure CSS). */
+.hx-console-body div {
+    opacity: 0;
+    animation: hx-line-in 0.5s ease-out forwards;
+}
+
+.hx-console-body div:nth-child(1) { animation-delay: 0.9s; }
+.hx-console-body div:nth-child(2) { animation-delay: 1.5s; }
+.hx-console-body div:nth-child(3) { animation-delay: 2.1s; }
+.hx-console-body div:nth-child(4) { animation-delay: 2.7s; }
+.hx-console-body div:nth-child(5) { animation-delay: 3.3s; }
+
+@keyframes hx-line-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.hx-float-chip {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--hx-hairline);
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--container-color) 85%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--hx-shadow-soft);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--title-color);
+    animation: hx-float 7s ease-in-out infinite;
+}
+
+.hx-float-chip i {
+    color: var(--hx-red);
+}
+
+.hx-float-chip-a {
+    top: -1.6rem;
+    left: -3.2rem;
+}
+
+.hx-float-chip-b {
+    bottom: -1.4rem;
+    right: -1.8rem;
+    animation-delay: -3.5s;
+}
+
+@keyframes hx-float {
+
+    0%,
+    100% {
+        translate: 0 0;
+    }
+
+    50% {
+        translate: 0 -12px;
+    }
+}
+
+@media (max-width: 1180px) {
+    .hx-hero-visual {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hx-console-body div,
+    .hx-float-chip {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+/* ----------------------------------------------------------------- buttons */
+
+.hx-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.95rem 1.9rem;
+    border-radius: 100px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease, background-position 0.5s ease,
+        border-color 0.3s ease, color 0.3s ease;
+    will-change: transform;
+}
+
+.hx-btn i {
+    font-size: 0.8em;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hx-btn:hover i {
+    transform: translateX(4px);
+}
+
+.hx-btn-primary {
+    color: #fff;
+    background: linear-gradient(110deg, var(--hx-red) 0%, #d03223 55%, #ff7a30 120%);
+    background-size: 150% 100%;
+    background-position: 0% 50%;
+    box-shadow: 0 12px 34px -10px rgba(233, 63, 46, 0.55);
+}
+
+.hx-btn-primary:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 18px 44px -12px rgba(233, 63, 46, 0.65);
+}
+
+.hx-btn-ghost {
+    color: var(--title-color);
+    border: 1px solid var(--hx-hairline);
+    background: color-mix(in srgb, var(--container-color) 40%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.hx-btn-ghost:hover {
+    border-color: var(--hx-red);
+    color: var(--hx-red);
+}
+
+/* ------------------------------------------------------------------- cards */
+
+/* One card language for the whole page: hairline surface, soft lift, and a
+   conic highlight that sweeps the border on hover. */
+.hx-card {
+    position: relative;
+    display: block;
+    padding: 2.1rem 1.9rem 2.2rem;
+    border-radius: var(--hx-r-md);
+    background: var(--container-color);
+    border: 1px solid var(--hx-hairline);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.hx-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--hx-angle, 210deg),
+            transparent 0deg,
+            rgba(233, 63, 46, 0.65) 55deg,
+            transparent 130deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.hx-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--hx-shadow-lift);
+    border-color: rgba(233, 63, 46, 0.30);
+}
+
+.hx-card:hover::before {
+    opacity: 1;
+}
+
+.hx-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--hx-r-sm);
+    font-size: 1.25rem;
+    color: var(--hx-red);
+    background: var(--hx-red-soft);
+    margin-bottom: 1.5rem;
+    transition: background 0.35s ease, color 0.35s ease, transform 0.35s ease;
+}
+
+.hx-card:hover .hx-card-icon {
+    background: var(--hx-red);
+    color: #fff;
+    transform: scale(1.06) rotate(-3deg);
+}
+
+.hx-card-title {
+    font-family: var(--title-font);
+    font-size: var(--hx-h3);
+    color: var(--title-color);
+    margin: 0 0 0.6rem;
+}
+
+.hx-card-desc {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.hx-card-arrow {
+    position: absolute;
+    top: 1.7rem;
+    right: 1.7rem;
+    font-size: 0.8rem;
+    color: var(--text-color-light);
+    opacity: 0;
+    transform: translate(-6px, 6px);
+    transition: opacity 0.35s ease, transform 0.35s ease, color 0.35s ease;
+}
+
+.hx-card:hover .hx-card-arrow {
+    opacity: 1;
+    transform: none;
+    color: var(--hx-red);
+}
+
+.hx-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hx-s3);
+}
+
+/* ---------------------------------------------------------------- approach */
+
+.hx-approach-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) 1.3fr;
+    gap: var(--hx-s5);
+    align-items: start;
+}
+
+.hx-step {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    gap: var(--hx-s3);
+    padding: var(--hx-s3) 0;
+    border-top: 1px solid var(--hx-hairline);
+}
+
+.hx-step:last-child {
+    border-bottom: 1px solid var(--hx-hairline);
+}
+
+.hx-step-num {
+    font-family: var(--title-font);
+    font-size: 1.6rem;
+    color: var(--hx-red);
+    line-height: 1.1;
+}
+
+.hx-step-title {
+    font-family: var(--title-font);
+    font-size: 1.25rem;
+    color: var(--title-color);
+    margin: 0 0 0.4rem;
+}
+
+.hx-step-desc {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* compact value chips under the approach copy */
+.hx-values {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hx-s2);
+    margin-top: var(--hx-s4);
+}
+
+.hx-value {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.95rem 1.1rem;
+    border: 1px solid var(--hx-hairline);
+    border-radius: var(--hx-r-sm);
+    background: color-mix(in srgb, var(--container-color) 60%, transparent);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--title-color);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.hx-value i {
+    color: var(--hx-red);
+    font-size: 0.95rem;
+}
+
+.hx-value:hover {
+    border-color: rgba(233, 63, 46, 0.35);
+    transform: translateY(-2px);
+}
+
+/* -------------------------------------------------------------- industries */
+
+.hx-industries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hx-s2);
+    margin-top: var(--hx-s4);
+}
+
+.hx-industry {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1.4rem;
+    border: 1px solid var(--hx-hairline);
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease,
+        transform 0.3s ease;
+}
+
+.hx-industry:hover {
+    color: var(--hx-red);
+    border-color: rgba(233, 63, 46, 0.4);
+    background: var(--hx-red-soft);
+    transform: translateY(-2px);
+}
+
+/* ------------------------------------------------------------ testimonials */
+
+.hx-quote {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 2.2rem 2rem;
+    margin: 0;
+    border: 1px solid var(--hx-hairline);
+    border-radius: var(--hx-r-md);
+    background: color-mix(in srgb, var(--container-color) 72%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hx-quote:hover {
+    transform: translateY(-6px);
+    border-color: rgba(233, 63, 46, 0.3);
+    box-shadow: var(--hx-shadow-soft);
+}
+
+.hx-quote-mark {
+    font-family: var(--title-font);
+    font-size: 3.2rem;
+    line-height: 0.6;
+    color: var(--hx-red);
+    opacity: 0.85;
+    margin-bottom: 1.1rem;
+}
+
+.hx-quote blockquote {
+    flex-grow: 1;
+    margin: 0 0 1.7rem;
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-color);
+}
+
+.hx-quote figcaption {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.hx-quote-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--hx-red), #ff7a30);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.hx-quote-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--title-color);
+}
+
+.hx-quote-role {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-color-light);
+    margin-top: 0.1rem;
+}
+
+/* --------------------------------------------------------------------- cta */
+
+.hx-cta {
+    padding: var(--hx-s6) 0;
+}
+
+.hx-cta-panel {
+    position: relative;
+    overflow: clip;
+    border-radius: var(--hx-r-lg);
+    padding: clamp(3rem, 7vw, 5.5rem) clamp(1.75rem, 5vw, 4.5rem);
+    text-align: center;
+    color: #fff;
+    background:
+        radial-gradient(120% 160% at 50% 115%, rgba(255, 122, 48, 0.45) 0%, transparent 55%),
+        linear-gradient(120deg, #d03223 0%, var(--hx-red) 45%, #a3220f 100%);
+    box-shadow: var(--hx-shadow-lift);
+}
+
+.hx-cta-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.14) 0 2px, transparent 3px),
+        radial-gradient(circle at 78% 68%, rgba(255, 255, 255, 0.10) 0 2px, transparent 3px);
+    background-size: 260px 220px, 300px 260px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.hx-cta-title {
+    font-family: var(--title-font);
+    font-size: clamp(2rem, 4.6vw, 3.2rem);
+    line-height: 1.12;
+    margin: 0 auto 1rem;
+    max-width: 18ch;
+    color: #fff;
+}
+
+.hx-cta-sub {
+    font-size: 1.02rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 48ch;
+    margin: 0 auto 2.4rem;
+}
+
+.hx-cta .hx-btn-light {
+    background: #fff;
+    color: var(--hx-red);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.35);
+}
+
+.hx-cta .hx-btn-light:hover {
+    box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.45);
+}
+
+/* -------------------------------------------------------------- responsive */
+
+@media (max-width: 1024px) {
+    .hx-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hx-approach-grid {
+        grid-template-columns: 1fr;
+        gap: var(--hx-s4);
+    }
+}
+
+@media (max-width: 640px) {
+    :root {
+        --hx-s6: 4.5rem;
+    }
+
+    .hx-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .hx-values {
+        grid-template-columns: 1fr;
+    }
+
+    .hx-section-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hx-hero {
+        padding-top: 6.5rem;
+    }
+
+    .hx-hero-stats {
+        gap: var(--hx-s3);
+        justify-content: space-between;
+    }
+
+    .hx-stat dt {
+        font-size: 1.7rem;
+    }
+
+    .hx-btn {
+        padding: 0.85rem 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal .hx-rise {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

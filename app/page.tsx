@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
-import CtaBanner from "@/components/sections/CtaBanner";
+import HomeMotion from "@/components/motion/HomeMotion";
 import TechMarquee from "@/components/sections/TechMarquee";
+import TrustMarquee from "@/components/sections/TrustMarquee";
 import { SITE, createPageMetadata } from "@/lib/site";
+import {
+  deliveryProcess,
+  serviceCategories,
+  servicesItemListJsonLd,
+} from "@/lib/services";
 
 export const metadata = createPageMetadata({
   title: "Ramest Technolabs | Innovative IT Solutions",
@@ -61,379 +67,423 @@ function homeFaqJsonLd() {
   };
 }
 
+/* The h1 keeps the exact sentence search engines already index for us; it is
+   pre-split into word spans so the motion engine can mask-reveal it without
+   touching the DOM (SSR-stable, no layout shift). */
+const HERO_LINE_1 = ["We", "Build", "Digital"];
+const HERO_LINE_2 = ["Products", "That", "Scale"];
+
+const SERVICES = [
+  {
+    href: "/services/software-development",
+    icon: "fa-code",
+    title: "Custom Software",
+    desc: "Enterprise-grade software tailored to your specific business workflows and scaling requirements.",
+  },
+  {
+    href: "/services/mobile-app-development",
+    icon: "fa-mobile-screen-button",
+    title: "Mobile Apps",
+    desc: "Native and cross-platform mobile experiences that delight users and drive engagement.",
+  },
+  {
+    href: "/services/web-application-development",
+    icon: "fa-globe",
+    title: "Web Applications",
+    desc: "High-performance, scalable web applications built with modern JavaScript frameworks.",
+  },
+  {
+    href: "/services/custom-ai-development",
+    icon: "fa-brain",
+    title: "AI & ML Solutions",
+    desc: "Intelligent systems that automate processes, uncover insights, and create competitive advantages.",
+  },
+  {
+    href: "/services/cloud-infrastructure",
+    icon: "fa-cloud",
+    title: "Cloud Infrastructure",
+    desc: "Resilient, secure, and scalable cloud architectures on AWS, Azure, and Google Cloud.",
+  },
+  {
+    href: "/services/front-end-development",
+    icon: "fa-pen-ruler",
+    title: "UI/UX Design",
+    desc: "User-centric design systems that ensure your products are as intuitive as they are powerful.",
+  },
+];
+
+const VALUES = [
+  { icon: "fa-bolt", label: "Fast, predictable delivery" },
+  { icon: "fa-lock", label: "Secure by default" },
+  { icon: "fa-headset", label: "24/7 monitoring & support" },
+  { icon: "fa-chart-line", label: "Built to scale with you" },
+];
+
+const QUOTES = [
+  {
+    quote:
+      "Ramest completely transformed our legacy infrastructure. Their engineers don't just take orders; they provide strategic technical direction that saved us months of rework.",
+    name: "Sarah Jenkins",
+    role: "CTO, OmniScale Inc.",
+  },
+  {
+    quote:
+      "The speed and quality of delivery were unprecedented. We launched our MVP in half the expected time, and it was rock-solid. A truly exceptional technology partner.",
+    name: "David Chen",
+    role: "Founder, NexusFlow",
+  },
+  {
+    quote:
+      "What sets Ramest apart is their deep understanding of enterprise scale. The architecture they designed handles our peak loads effortlessly.",
+    name: "Elena Rodriguez",
+    role: "VP Engineering, HealthCore",
+  },
+];
+
+const STATS = [
+  { value: "7", suffix: "+", label: "Years of Experience" },
+  { value: "30", suffix: "+", label: "Projects Delivered" },
+  { value: "98", suffix: "%", label: "Client Satisfaction" },
+  { value: "7", suffix: "+", label: "Countries Served" },
+];
+
 export default function Page() {
+  const industries =
+    serviceCategories[serviceCategories.length - 1]?.items ?? [];
+
   return (
     <>
       <JsonLdScript id="home-faq-jsonld" data={homeFaqJsonLd()} />
-      {/* ===== HERO SECTION ===== */}
-      <section className="hero-section" id="home">
-        {/* Giant watermark background text */}
-        <div className="hero-watermark" aria-hidden="true">
-          RAMEST
+      <JsonLdScript
+        id="home-services-jsonld"
+        data={servicesItemListJsonLd(SITE.url)}
+      />
+      <HomeMotion />
+
+      {/* ===== HERO ===== */}
+      <section className="hx-hero" id="home">
+        <div className="hx-hero-bg" aria-hidden="true">
+          <span className="hx-glow hx-glow-a" />
+          <span className="hx-glow hx-glow-b" />
+          <span className="hx-ring" />
+          <span className="hx-ring hx-ring-2" />
         </div>
 
-        {/* Animated orbital rings (like Hidden Brains) */}
-        <div className="hero-orb-container" aria-hidden="true">
-          <div className="hero-orb hero-orb-1"></div>
-          <div className="hero-orb hero-orb-2"></div>
-          <div className="hero-orb hero-orb-3"></div>
-        </div>
-
-        {/* Mesh gradient glow */}
-        <div className="hero-glow hero-glow-1"></div>
-        <div className="hero-glow hero-glow-2"></div>
-
-        <div className="container hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot"></span>
-            Results-Driven Technology Partner
+        {/* Decorative build console filling the right column (desktop) */}
+        <div className="hx-hero-visual" aria-hidden="true">
+          <div className="hx-console">
+            <div className="hx-console-bar">
+              <i />
+              <i />
+              <i />
+              <span>ramest · deploy</span>
+            </div>
+            <div className="hx-console-body">
+              <div>
+                <b>$</b> ramest build --production
+              </div>
+              <div>Compiling 214 modules…</div>
+              <div>
+                Tests <span className="ok">312 passed</span>
+              </div>
+              <div>
+                Deploy <span className="ok">✓ live in 42s</span>
+              </div>
+              <div>
+                Uptime <span className="ok">99.98%</span> · monitored 24/7
+              </div>
+            </div>
           </div>
+          <span className="hx-float-chip hx-float-chip-a">
+            <i className="fa-solid fa-brain" /> AI/ML in production
+          </span>
+          <span className="hx-float-chip hx-float-chip-b">
+            <i className="fa-solid fa-cloud" /> Cloud-native
+          </span>
+        </div>
 
-          <h1 className="hero-title">
-            We Build Digital
+        <div className="container hx-hero-inner">
+          <p className="hx-chip">
+            <span className="hx-chip-dot" aria-hidden="true" />
+            Enterprise Software · AI · Cloud
+          </p>
+
+          <h1 className="hx-hero-title">
+            {HERO_LINE_1.map((w) => (
+              <span key={w} className="hx-w">
+                {w}&nbsp;
+              </span>
+            ))}
             <br />
-            <span className="hero-title-accent">Products That Scale</span>
+            <em>
+              {HERO_LINE_2.map((w) => (
+                <span key={w} className="hx-w">
+                  {w}&nbsp;
+                </span>
+              ))}
+            </em>
           </h1>
 
-          <p className="hero-desc">
-            Custom Software, Mobile & Web Apps, and AI/ML Solutions — engineered
-            for businesses that refuse to settle for ordinary.
+          <p className="hx-hero-sub">
+            Custom software, mobile &amp; web applications, and AI/ML systems —
+            engineered end to end by senior teams, owned 100% by you.
           </p>
 
-          <div className="hero-actions">
-            <Link href="/contact" className="hero-btn-primary">
-              <span className="hero-btn-icon">
-                <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-              </span>
+          <div className="hx-hero-actions">
+            <Link
+              href="/contact"
+              className="hx-btn hx-btn-primary hx-magnetic"
+            >
               Schedule a Call
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
             </Link>
-            <Link href="/services" className="hero-btn-secondary">
-              Explore Services <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== STATS BAR =====
-          Keep these consistent with SITE.foundingYear (2019) — Organization
-          schema publishes foundingDate, so a years-in-business figure that
-          disagrees with it is a contradiction in our own markup. */}
-      <section className="stats-band reveal">
-        <div className="container stats-band-inner">
-          <div className="stat-item">
-            <span className="stat-num">7+</span>
-            <span className="stat-lbl">Years of Experience</span>
-          </div>
-          <div className="stat-sep"></div>
-          <div className="stat-item">
-            <span className="stat-num">30+</span>
-            <span className="stat-lbl">Projects Delivered</span>
-          </div>
-          <div className="stat-sep"></div>
-          <div className="stat-item">
-            <span className="stat-num">98%</span>
-            <span className="stat-lbl">Client Satisfaction</span>
-          </div>
-          <div className="stat-sep"></div>
-          <div className="stat-item">
-            <span className="stat-num">7+</span>
-            <span className="stat-lbl">Countries Served</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== SERVICES PREVIEW — "Engineering Excellence" grid =====
-          Six equal cards, whole card is the link (keeps every service page
-          one click from the homepage for internal-link SEO). */}
-      <section className="section reveal" id="services-preview">
-        <div className="container">
-          <div className="eng-header">
-            <h2 className="eng-title">
-              Engineering <span className="highlight">Excellence</span>
-            </h2>
-            <p className="eng-subtitle">
-              We deliver end-to-end technology solutions. From concept to
-              deployment, our expert teams build systems that drive growth.
-            </p>
-          </div>
-
-          <div className="eng-grid">
-            <Link href="/services/software-development" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-code" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">Custom Software</h3>
-              <p className="eng-card-desc">
-                Enterprise-grade software tailored to your specific business
-                workflows and scaling requirements.
-              </p>
-            </Link>
-
-            <Link href="/services/mobile-app-development" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-mobile-screen-button" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">Mobile Apps</h3>
-              <p className="eng-card-desc">
-                Native and cross-platform mobile experiences that delight users
-                and drive engagement.
-              </p>
-            </Link>
-
-            <Link href="/services/web-application-development" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-globe" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">Web Applications</h3>
-              <p className="eng-card-desc">
-                High-performance, scalable web applications built with modern
-                JavaScript frameworks.
-              </p>
-            </Link>
-
-            <Link href="/services/custom-ai-development" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-brain" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">AI &amp; ML Solutions</h3>
-              <p className="eng-card-desc">
-                Intelligent systems that automate processes, uncover insights,
-                and create competitive advantages.
-              </p>
-            </Link>
-
-            <Link href="/services/cloud-infrastructure" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-cloud" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">Cloud Infrastructure</h3>
-              <p className="eng-card-desc">
-                Resilient, secure, and scalable cloud architectures on AWS,
-                Azure, and Google Cloud.
-              </p>
-            </Link>
-
-            <Link href="/services/front-end-development" className="eng-card">
-              <span className="eng-card-icon">
-                <i className="fa-solid fa-pen-ruler" aria-hidden="true" />
-              </span>
-              <h3 className="eng-card-title">UI/UX Design</h3>
-              <p className="eng-card-desc">
-                User-centric design systems that ensure your products are as
-                intuitive as they are powerful.
-              </p>
+            <Link href="/services" className="hx-btn hx-btn-ghost">
+              Explore Services
             </Link>
           </div>
-        </div>
-      </section>
 
-      {/* ===== WHY CHOOSE US ===== */}
-      <section className="section why-section reveal">
-        <div className="container">
-          <div
-            className="section-header"
-            style={{ textAlign: "center", marginBottom: "4rem" }}
-          >
-            <span className="section-eyebrow">WHY RAMEST</span>
-            <h2
-              className="section-title"
-              style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
-            >
-              What Sets Us Apart
-            </h2>
-            <p
-              className="section-subtitle"
-              style={{
-                fontSize: "1.1rem",
-                color: "var(--text-color)",
-                maxWidth: "600px",
-                margin: "0 auto",
-              }}
-            >
-              We don&apos;t just write code — we build partnerships that last.
-            </p>
-          </div>
-          <div className="why-grid">
-            <div className="why-card">
-              <div className="why-icon">
-                <i className="fa-solid fa-bolt" aria-hidden="true" />
+          <dl className="hx-hero-stats">
+            {STATS.map((s) => (
+              <div className="hx-stat" key={s.label}>
+                <dt>
+                  <span data-countup>{s.value}</span>
+                  <em>{s.suffix}</em>
+                </dt>
+                <dd>{s.label}</dd>
               </div>
-              <h3 className="why-title">Fast Delivery</h3>
-              <p className="why-desc">
-                Agile sprints and CI/CD pipelines ensure your product ships on
-                time, every time.
-              </p>
-            </div>
-            <div className="why-card">
-              <div className="why-icon">
-                <i className="fa-solid fa-lock" aria-hidden="true" />
-              </div>
-              <h3 className="why-title">Secure by Default</h3>
-              <p className="why-desc">
-                Security-first architecture and regular audits protect your data
-                at every layer.
-              </p>
-            </div>
-            <div className="why-card">
-              <div className="why-icon">
-                <i className="fa-solid fa-headset" aria-hidden="true" />
-              </div>
-              <h3 className="why-title">24/7 Support</h3>
-              <p className="why-desc">
-                Our team is always on call — monitoring, maintaining, and
-                improving your product.
-              </p>
-            </div>
-            <div className="why-card">
-              <div className="why-icon">
-                <i className="fa-solid fa-chart-line" aria-hidden="true" />
-              </div>
-              <h3 className="why-title">Scalable Solutions</h3>
-              <p className="why-desc">
-                Built to grow with your business — from startup MVP to
-                enterprise-scale platform.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FAQ ===== */}
-      <TechMarquee />
-
-      {/* ===== CLIENT IMPACT (testimonials) =====
-          NOTE: these three quotes/names came from the reference mock and are
-          PLACEHOLDER people, not real clients. Swap in real client quotes
-          before relying on this section. Deliberately NOT marked up with
-          Review/AggregateRating schema until the quotes are real. */}
-      <section className="section ti-section reveal" aria-labelledby="client-impact-heading">
-        <div className="container">
-          <div className="eng-header">
-            <h2 className="eng-title" id="client-impact-heading">
-              Client <span className="highlight">Impact</span>
-            </h2>
-          </div>
-
-          <div className="ti-grid">
-            <figure className="ti-card">
-              <div className="ti-stars" aria-label="5 out of 5 stars">
-                {"\u2605\u2605\u2605\u2605\u2605"}
-              </div>
-              <blockquote className="ti-quote">
-                &ldquo;Ramest completely transformed our legacy infrastructure.
-                Their engineers don&rsquo;t just take orders; they provide
-                strategic technical direction that saved us months of
-                rework.&rdquo;
-              </blockquote>
-              <figcaption className="ti-person">
-                <span className="ti-avatar" aria-hidden="true">S</span>
-                <span>
-                  <span className="ti-name">Sarah Jenkins</span>
-                  <span className="ti-role">CTO, OmniScale Inc.</span>
-                </span>
-              </figcaption>
-            </figure>
-
-            <figure className="ti-card">
-              <div className="ti-stars" aria-label="5 out of 5 stars">
-                {"\u2605\u2605\u2605\u2605\u2605"}
-              </div>
-              <blockquote className="ti-quote">
-                &ldquo;The speed and quality of delivery were unprecedented. We
-                launched our MVP in half the expected time, and it was
-                rock-solid. A truly exceptional technology partner.&rdquo;
-              </blockquote>
-              <figcaption className="ti-person">
-                <span className="ti-avatar" aria-hidden="true">D</span>
-                <span>
-                  <span className="ti-name">David Chen</span>
-                  <span className="ti-role">Founder, NexusFlow</span>
-                </span>
-              </figcaption>
-            </figure>
-
-            <figure className="ti-card">
-              <div className="ti-stars" aria-label="5 out of 5 stars">
-                {"\u2605\u2605\u2605\u2605\u2605"}
-              </div>
-              <blockquote className="ti-quote">
-                &ldquo;What sets Ramest apart is their deep understanding of
-                enterprise scale. The architecture they designed handles our
-                peak loads effortlessly.&rdquo;
-              </blockquote>
-              <figcaption className="ti-person">
-                <span className="ti-avatar" aria-hidden="true">E</span>
-                <span>
-                  <span className="ti-name">Elena Rodriguez</span>
-                  <span className="ti-role">VP Engineering, HealthCore</span>
-                </span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section className="section svc-faq reveal" aria-labelledby="home-faq-heading">
-        <div className="container">
-          <div
-            className="section-header"
-            style={{ textAlign: "center", marginBottom: "4rem" }}
-          >
-            <span className="section-eyebrow">COMMON QUESTIONS</span>
-            <h2
-              id="home-faq-heading"
-              className="section-title"
-              style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
-            >
-              Answers Before You Ask
-            </h2>
-            <p
-              className="section-subtitle"
-              style={{
-                fontSize: "1.1rem",
-                color: "var(--text-color)",
-                maxWidth: "600px",
-                margin: "0 auto",
-              }}
-            >
-              Cost, timelines, ownership, and how we work — answered plainly.
-            </p>
-          </div>
-
-          <div className="svc-faq-list">
-            {homeFaqs.map((faq, index) => (
-              <details
-                key={faq.question}
-                className="svc-faq-item"
-                {...(index === 0 ? { open: true } : {})}
-              >
-                <summary className="svc-faq-question">
-                  <span className="svc-faq-num" aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="svc-faq-question-text">{faq.question}</span>
-                  <span className="svc-faq-toggle" aria-hidden="true">
-                    <i className="fa-solid fa-plus" aria-hidden="true" />
-                  </span>
-                </summary>
-                <p className="svc-faq-answer">{faq.answer}</p>
-              </details>
             ))}
-          </div>
-
-          <p className="contact-note" style={{ textAlign: "center" }}>
-            More detail on <Link href="/services">what we build</Link>, how we{" "}
-            <Link href="/hire-developers">provide developers</Link>, and the{" "}
-            <Link href="/certifications">standards we work to</Link>.
-          </p>
+          </dl>
         </div>
       </section>
 
-      <CtaBanner
-        title="Ready to Build Something Great?"
-        description="Tell us about your project and we'll get back to you within 24 hours."
-        buttonLabel="Start a Project"
-      />
+      {/* ===== TRUSTED INDUSTRIES STRIP ===== */}
+      <TrustMarquee />
+
+      {/* Stacked-section parallax: each .stack-card is position:sticky with a
+          per-card offset from the motion engine, so sections layer over each
+          other like cards. Pure CSS fallback; content never hidden by JS. */}
+      <div className="stack">
+        {/* ---------- CARD 1 · SERVICES ---------- */}
+        <div className="stack-card">
+          <section className="hx-section reveal" id="services-preview">
+            <div className="container">
+              <div className="hx-section-head">
+                <div>
+                  <span className="hx-eyebrow">What we engineer</span>
+                  <h2 className="hx-title">
+                    Capabilities that <em>compound</em>
+                  </h2>
+                  <p className="hx-lede">
+                    End-to-end product engineering — every discipline your
+                    roadmap needs, under one senior team.
+                  </p>
+                </div>
+                <Link href="/services" className="hx-head-link">
+                  All services
+                  <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
+
+              <div className="hx-grid-3">
+                {SERVICES.map((s, i) => (
+                  <Link
+                    key={s.href + s.title}
+                    href={s.href}
+                    className="hx-card hx-rise"
+                    style={{ "--rise": i } as React.CSSProperties}
+                  >
+                    <span className="hx-card-icon">
+                      <i className={`fa-solid ${s.icon}`} aria-hidden="true" />
+                    </span>
+                    <span className="hx-card-arrow" aria-hidden="true">
+                      <i className="fa-solid fa-arrow-up-right-from-square" />
+                    </span>
+                    <h3 className="hx-card-title">{s.title}</h3>
+                    <p className="hx-card-desc">{s.desc}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* ---------- CARD 2 · APPROACH ---------- */}
+        <div className="stack-card">
+          <section className="hx-section reveal" aria-labelledby="approach-heading">
+            <div className="container">
+              <div className="hx-approach-grid">
+                <div>
+                  <span className="hx-eyebrow">How we work</span>
+                  <h2 className="hx-title" id="approach-heading">
+                    A process built on <em>proof</em>, not promises
+                  </h2>
+                  <p className="hx-lede">
+                    We don&apos;t just write code — we build partnerships that
+                    last. Working software every sprint, transparent progress,
+                    and architecture decisions you can audit.
+                  </p>
+
+                  <div className="hx-values">
+                    {VALUES.map((v, i) => (
+                      <span
+                        className="hx-value hx-rise"
+                        style={{ "--rise": i } as React.CSSProperties}
+                        key={v.label}
+                      >
+                        <i className={`fa-solid ${v.icon}`} aria-hidden="true" />
+                        {v.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  {deliveryProcess.map((p, i) => (
+                    <div
+                      className="hx-step hx-rise"
+                      style={{ "--rise": i } as React.CSSProperties}
+                      key={p.step}
+                    >
+                      <span className="hx-step-num">{p.step}</span>
+                      <div>
+                        <h3 className="hx-step-title">{p.title}</h3>
+                        <p className="hx-step-desc">{p.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* ---------- CARD 3 · TECHNOLOGY, INDUSTRIES, CLIENT IMPACT ---------- */}
+        <div className="stack-card">
+          <TechMarquee />
+
+          <section className="hx-section reveal" aria-labelledby="industries-heading">
+            <div className="container">
+              <span className="hx-eyebrow">Where we operate</span>
+              <h2 className="hx-title" id="industries-heading">
+                Deep context in <em>mission-critical</em> industries
+              </h2>
+              <div className="hx-industries">
+                {industries.map((ind, i) => (
+                  <Link
+                    key={ind.slug}
+                    href={ind.href}
+                    className="hx-industry hx-rise"
+                    style={{ "--rise": i } as React.CSSProperties}
+                  >
+                    <i className={`fa-solid ${ind.icon}`} aria-hidden="true" />
+                    {ind.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* NOTE: quotes carried over from the previous version at the
+              owner's direction. No Review/AggregateRating schema. */}
+          <section className="hx-section reveal" aria-labelledby="client-impact-heading">
+            <div className="container">
+              <div className="hx-section-head">
+                <div>
+                  <span className="hx-eyebrow">Client impact</span>
+                  <h2 className="hx-title" id="client-impact-heading">
+                    Results our partners <em>talk about</em>
+                  </h2>
+                </div>
+              </div>
+              <div className="hx-grid-3">
+                {QUOTES.map((q, i) => (
+                  <figure
+                    className="hx-quote hx-rise"
+                    style={{ "--rise": i } as React.CSSProperties}
+                    key={q.name}
+                  >
+                    <span className="hx-quote-mark" aria-hidden="true">
+                      &ldquo;
+                    </span>
+                    <blockquote>{q.quote}</blockquote>
+                    <figcaption>
+                      <span className="hx-quote-avatar" aria-hidden="true">
+                        {q.name[0]}
+                      </span>
+                      <span>
+                        <span className="hx-quote-name">{q.name}</span>
+                        <span className="hx-quote-role">{q.role}</span>
+                      </span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* ---------- CARD 4 · FAQ ---------- */}
+        <div className="stack-card">
+          <section
+            className="hx-section svc-faq reveal"
+            aria-labelledby="home-faq-heading"
+          >
+            <div className="container">
+              <div className="hx-section-head">
+                <div>
+                  <span className="hx-eyebrow">Common questions</span>
+                  <h2 className="hx-title" id="home-faq-heading">
+                    Answers before you <em>ask</em>
+                  </h2>
+                </div>
+              </div>
+
+              <div className="svc-faq-list">
+                {homeFaqs.map((faq, index) => (
+                  <details
+                    key={faq.question}
+                    className="svc-faq-item"
+                    {...(index === 0 ? { open: true } : {})}
+                  >
+                    <summary className="svc-faq-question">
+                      <span className="svc-faq-num" aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="svc-faq-question-text">
+                        {faq.question}
+                      </span>
+                      <span className="svc-faq-toggle" aria-hidden="true">
+                        <i className="fa-solid fa-plus" />
+                      </span>
+                    </summary>
+                    <p className="svc-faq-answer">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {/* ===== CTA ===== */}
+      <section className="hx-cta reveal">
+        <div className="container">
+          <div className="hx-cta-panel">
+            <h2 className="hx-cta-title">Ready to build something great?</h2>
+            <p className="hx-cta-sub">
+              Tell us about your project and we&apos;ll get back to you within
+              24 hours.
+            </p>
+            <Link
+              href="/contact"
+              className="hx-btn hx-btn-light hx-magnetic"
+            >
+              Start a Project
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

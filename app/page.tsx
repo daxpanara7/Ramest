@@ -301,6 +301,78 @@ export default function Page() {
       {/* ===== FAQ ===== */}
       <TechMarquee />
 
+      {/* ===== CLIENT IMPACT (testimonials) =====
+          NOTE: these three quotes/names came from the reference mock and are
+          PLACEHOLDER people, not real clients. Swap in real client quotes
+          before relying on this section. Deliberately NOT marked up with
+          Review/AggregateRating schema until the quotes are real. */}
+      <section className="section ti-section reveal" aria-labelledby="client-impact-heading">
+        <div className="container">
+          <div className="eng-header">
+            <h2 className="eng-title" id="client-impact-heading">
+              Client <span className="highlight">Impact</span>
+            </h2>
+          </div>
+
+          <div className="ti-grid">
+            <figure className="ti-card">
+              <div className="ti-stars" aria-label="5 out of 5 stars">
+                {"\u2605\u2605\u2605\u2605\u2605"}
+              </div>
+              <blockquote className="ti-quote">
+                &ldquo;Ramest completely transformed our legacy infrastructure.
+                Their engineers don&rsquo;t just take orders; they provide
+                strategic technical direction that saved us months of
+                rework.&rdquo;
+              </blockquote>
+              <figcaption className="ti-person">
+                <span className="ti-avatar" aria-hidden="true">S</span>
+                <span>
+                  <span className="ti-name">Sarah Jenkins</span>
+                  <span className="ti-role">CTO, OmniScale Inc.</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure className="ti-card">
+              <div className="ti-stars" aria-label="5 out of 5 stars">
+                {"\u2605\u2605\u2605\u2605\u2605"}
+              </div>
+              <blockquote className="ti-quote">
+                &ldquo;The speed and quality of delivery were unprecedented. We
+                launched our MVP in half the expected time, and it was
+                rock-solid. A truly exceptional technology partner.&rdquo;
+              </blockquote>
+              <figcaption className="ti-person">
+                <span className="ti-avatar" aria-hidden="true">D</span>
+                <span>
+                  <span className="ti-name">David Chen</span>
+                  <span className="ti-role">Founder, NexusFlow</span>
+                </span>
+              </figcaption>
+            </figure>
+
+            <figure className="ti-card">
+              <div className="ti-stars" aria-label="5 out of 5 stars">
+                {"\u2605\u2605\u2605\u2605\u2605"}
+              </div>
+              <blockquote className="ti-quote">
+                &ldquo;What sets Ramest apart is their deep understanding of
+                enterprise scale. The architecture they designed handles our
+                peak loads effortlessly.&rdquo;
+              </blockquote>
+              <figcaption className="ti-person">
+                <span className="ti-avatar" aria-hidden="true">E</span>
+                <span>
+                  <span className="ti-name">Elena Rodriguez</span>
+                  <span className="ti-role">VP Engineering, HealthCore</span>
+                </span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
       <section className="section svc-faq reveal" aria-labelledby="home-faq-heading">
         <div className="container">
           <div

@@ -1045,14 +1045,23 @@ img {
 }
 
 /* ==================== WHY / VALUES GRID ==================== */
+/* No hard border lines or flat colour block — the section carries a faint
+   tint that fades to transparent at both edges, so there is no visible
+   boundary against the sections around it (same treatment as .tech-band). */
 .why-section {
-    background-color: var(--container-color);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(127, 127, 127, 0.05) 18%,
+            rgba(127, 127, 127, 0.05) 82%,
+            transparent 100%);
 }
 
 [data-theme="dark"] .why-section {
-    background-color: rgba(255, 255, 255, 0.02);
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.02) 18%,
+            rgba(255, 255, 255, 0.02) 82%,
+            transparent 100%);
 }
 
 .why-grid {

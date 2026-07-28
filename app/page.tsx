@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
+import CtaBanner from "@/components/sections/CtaBanner";
 import HomeMotion from "@/components/motion/HomeMotion";
 import TechMarquee from "@/components/sections/TechMarquee";
 import TrustMarquee from "@/components/sections/TrustMarquee";
@@ -66,12 +67,6 @@ function homeFaqJsonLd() {
     })),
   };
 }
-
-/* The h1 keeps the exact sentence search engines already index for us; it is
-   pre-split into word spans so the motion engine can mask-reveal it without
-   touching the DOM (SSR-stable, no layout shift). */
-const HERO_LINE_1 = ["We", "Build", "Digital"];
-const HERO_LINE_2 = ["Products", "That", "Scale"];
 
 const SERVICES = [
   {
@@ -160,91 +155,52 @@ export default function Page() {
       />
       <HomeMotion />
 
-      {/* ===== HERO ===== */}
-      <section className="hx-hero" id="home">
-        <div className="hx-hero-bg" aria-hidden="true">
-          <span className="hx-glow hx-glow-a" />
-          <span className="hx-glow hx-glow-b" />
-          <span className="hx-ring" />
-          <span className="hx-ring hx-ring-2" />
+      {/* ===== HERO — deep-indigo aurora canvas, centered =====
+          H1 is plain server-rendered text (instant LCP); entrances are pure
+          CSS so content can never be left hidden by JS. All background art is
+          CSS gradients — zero image/video bytes. */}
+      <section className="nv-hero" id="home">
+        <div className="nv-bg" aria-hidden="true">
+          <span className="nv-aurora nv-aurora-a" />
+          <span className="nv-aurora nv-aurora-b" />
+          <span className="nv-aurora nv-aurora-c" />
+          <span className="nv-grid" />
+          <span className="nv-spotlight" />
         </div>
 
-        {/* Decorative build console filling the right column (desktop) */}
-        <div className="hx-hero-visual" aria-hidden="true">
-          <div className="hx-console">
-            <div className="hx-console-bar">
-              <i />
-              <i />
-              <i />
-              <span>ramest · deploy</span>
-            </div>
-            <div className="hx-console-body">
-              <div>
-                <b>$</b> ramest build --production
-              </div>
-              <div>Compiling 214 modules…</div>
-              <div>
-                Tests <span className="ok">312 passed</span>
-              </div>
-              <div>
-                Deploy <span className="ok">✓ live in 42s</span>
-              </div>
-              <div>
-                Uptime <span className="ok">99.98%</span> · monitored 24/7
-              </div>
-            </div>
-          </div>
-          <span className="hx-float-chip hx-float-chip-a">
-            <i className="fa-solid fa-brain" /> AI/ML in production
-          </span>
-          <span className="hx-float-chip hx-float-chip-b">
-            <i className="fa-solid fa-cloud" /> Cloud-native
-          </span>
-        </div>
-
-        <div className="container hx-hero-inner">
-          <p className="hx-chip">
-            <span className="hx-chip-dot" aria-hidden="true" />
-            Enterprise Software · AI · Cloud
+        <div className="container nv-inner">
+          <p className="nv-chip">
+            Custom Software · AI &amp; Cloud Engineering
           </p>
 
-          <h1 className="hx-hero-title">
-            {HERO_LINE_1.map((w) => (
-              <span key={w} className="hx-w">
-                {w}&nbsp;
-              </span>
-            ))}
+          <h1 className="nv-title">
+            We Build Digital
             <br />
-            <em>
-              {HERO_LINE_2.map((w) => (
-                <span key={w} className="hx-w">
-                  {w}&nbsp;
-                </span>
-              ))}
-            </em>
+            <em>Products That Scale</em>
           </h1>
 
-          <p className="hx-hero-sub">
-            Custom software, mobile &amp; web applications, and AI/ML systems —
+          <p className="nv-sub">
+            Custom software, web &amp; mobile applications, and AI/ML systems —
             engineered end to end by senior teams, owned 100% by you.
           </p>
 
-          <div className="hx-hero-actions">
-            <Link
-              href="/contact"
-              className="hx-btn hx-btn-primary hx-magnetic"
-            >
+          <div className="nv-actions">
+            <Link href="/contact" className="nv-btn-primary">
               Schedule a Call
               <i className="fa-solid fa-arrow-right" aria-hidden="true" />
             </Link>
-            <Link href="/services" className="hx-btn hx-btn-ghost">
+            <Link href="/services" className="nv-btn-ghost">
               Explore Services
             </Link>
           </div>
 
-          <dl className="hx-hero-stats">
+          <p className="nv-avail">
+            Free consultation — clear scope and a fixed quote within 24 hours
+          </p>
+
+          <dl className="nv-stats">
             {STATS.map((s) => (
-              <div className="hx-stat" key={s.label}>
+              <div className="nv-stat" key={s.label}>
                 <dt>
                   <span data-countup>{s.value}</span>
                   <em>{s.suffix}</em>
@@ -465,25 +421,13 @@ export default function Page() {
         </div>
       </div>
 
-      {/* ===== CTA ===== */}
-      <section className="hx-cta reveal">
-        <div className="container">
-          <div className="hx-cta-panel">
-            <h2 className="hx-cta-title">Ready to build something great?</h2>
-            <p className="hx-cta-sub">
-              Tell us about your project and we&apos;ll get back to you within
-              24 hours.
-            </p>
-            <Link
-              href="/contact"
-              className="hx-btn hx-btn-light hx-magnetic"
-            >
-              Start a Project
-              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ===== CTA — same shared banner as every other page ===== */}
+      <CtaBanner
+        title="Ready to Build Something Great?"
+        description="Tell us about your project and we'll get back to you within 24 hours."
+        buttonLabel="Start a Project"
+      />
+
     </>
   );
 }

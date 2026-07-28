@@ -19,8 +19,12 @@ const htmlRedirects = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Image optimization ON: Next/Vercel serves each <Image> as an optimized
+  // responsive srcset (right size per device, modern formats) — required for
+  // the responsive-images audit and crisp retina rendering at once.
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+    qualities: [75, 85],
   },
   // Hide the Next.js "N" badge — only appears in development
   devIndicators: false,

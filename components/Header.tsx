@@ -33,8 +33,6 @@ export default function Header() {
   const activePage = getNavPageFromPath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>(null);
-  // First visit defaults to light; a stored choice wins (applied in the effect).
-  const [isDark, setIsDark] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const navMenuRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -113,10 +111,6 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("selected-theme");
-    const dark = saved === "dark";
-    setIsDark(dark);
-    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     placeNavMenu();
     window.addEventListener("resize", placeNavMenu);
     return () => window.removeEventListener("resize", placeNavMenu);
@@ -147,6 +141,46 @@ export default function Header() {
     if (!menuOpen) setMobilePanel(null);
   }, [menuOpen]);
 
+  /* Point each dropdown's diamond caret at its own trigger. The panels are
+     capsule-centred, so a static left:50% caret lands on whatever sits mid
+     capsule (it pointed at "Hire Developers"). Measured after the capsule
+     expansion transition (0.45s) settles, and on resize. */
+  useEffect(() => {
+    if (!isDesktop) return;
+    const position = () => {
+      document
+        .querySelectorAll<HTMLElement>(".nav-item.has-dropdown")
+        .forEach((li) => {
+          const trigger = li.querySelector<HTMLElement>(".dropdown-toggle");
+          const panel = li.querySelector<HTMLElement>(
+            ".mega-menu, .dropdown-panel",
+          );
+          if (!trigger || !panel) return;
+          const t = trigger.getBoundingClientRect();
+          const p = panel.getBoundingClientRect();
+          if (!t.width || !p.width) return;
+          panel.style.setProperty(
+            "--caret-x",
+            `${t.left + t.width / 2 - p.left}px`,
+          );
+        });
+    };
+    /* Immediately when a dropdown opens (capsule already expanded by then),
+       and again after the 0.45s capsule expansion transition settles. */
+    position();
+    const timer = window.setTimeout(position, 520);
+    window.addEventListener("resize", position, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", position);
+    };
+  }, [
+    isDesktop,
+    capsuleHover.isHovered,
+    servicesHover.isHovered,
+    companyHover.isHovered,
+  ]);
+
   useEffect(() => {
     const onScroll = () => {
       const header = headerRef.current;
@@ -157,13 +191,6 @@ export default function Header() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    localStorage.setItem("selected-theme", next ? "dark" : "light");
-  };
 
   const openMenu = (e: React.MouseEvent) => {
     if (!isMobile()) return;
@@ -206,13 +233,17 @@ export default function Header() {
     >
       <div className="container nav-container" ref={navContainerRef}>
         <Link href="/" className="logo">
+          {/* Transparent white lettering on the permanent navy capsule.
+              unoptimized: the optimizer's AVIF pass smears thin serif
+              strokes — served byte-exact. */}
           <Image
-            src="/assets/logo_final.webp"
+            src="/assets/logo_mark_light.webp"
             alt="Ramest Technolabs — IT consulting and software development"
             className="logo-img"
-            width={687}
-            height={267}
+            width={528}
+            height={206}
             priority
+            unoptimized
           />
         </Link>
 
@@ -343,19 +374,6 @@ export default function Header() {
         </nav>
 
         <div className="nav-btns" ref={navBtnsRef}>
-          <button
-            className="theme-toggle"
-            id="theme-toggle"
-            aria-label="Toggle Theme"
-            type="button"
-            onClick={toggleTheme}
-          >
-            <i
-              className={`fa-solid ${isDark ? "fa-sun" : "fa-moon"}`}
-              id="theme-icon"
-              aria-hidden="true"
-            />
-          </button>
           <button
             type="button"
             className="nav-toggle"

@@ -1,21 +1,23 @@
 /* ==================== VARIABLES ==================== */
 :root {
     /* Colors - Light Mode (Default but overriden by script if dark preferred) */
-    --hue: 9;
-    /* Approx hue for #E93F2E */
-    --sat: 83%;
-    --lig: 55%;
+    --hue: 209;
+    /* Approx hue for #0357A8 */
+    --sat: 55%;
+    --lig: 28%;
 
-    --first-color: #E93F2E;
-    /* User defined brand color */
-    --first-color-alt: #d03223;
+    /* Brand blue family — synced with the capsule/footer artwork
+       (#00409A → #038DE4). */
+    --first-color: #0357A8;
+    --first-color-alt: #003E8C;
     /* Slightly darker for hover */
-    --first-color-light: #fdeceb;
+    --first-color-light: #E3F0FC;
     /* Very light version */
-    --title-color: hsl(var(--hue), 8%, 15%);
+    /* Deep footer blue: headings read as blue, still AA on white. */
+    --title-color: #002B66;
     --text-color: hsl(var(--hue), 8%, 45%);
     --text-color-light: hsl(var(--hue), 8%, 65%);
-    --body-color: hsl(var(--hue), 60%, 99%);
+    --body-color: #FBFCFE;
     --container-color: #fff;
     --border-color: rgba(0, 0, 0, 0.1);
 
@@ -24,7 +26,7 @@
     --glass-border: rgba(255, 255, 255, 0.5);
 
     /* Gradients */
-    --gradient-text: linear-gradient(90deg, var(--first-color), #ff0080);
+    --gradient-text: linear-gradient(90deg, var(--first-color), #3898EC);
 
     /* Typography */
     --body-font: 'Inter', sans-serif;
@@ -42,22 +44,11 @@
 
     /* Spacing */
     --header-height: 4.5rem;
+    /* Nav ink is white everywhere: the capsule is permanently dark navy. */
+    --nav-ink: #ffffff;
 }
 
 /* ==================== DARK THEME ==================== */
-[data-theme="dark"] {
-    --first-color: #E93F2E;
-    --first-color-alt: #E93F2E;
-    --title-color: hsl(var(--hue), 8%, 95%);
-    --text-color: hsl(var(--hue), 8%, 75%);
-    --body-color: #191716;
-    --container-color: hsl(var(--hue), 29%, 16%);
-    --border-color: rgba(255, 255, 255, 0.1);
-
-    --glass-bg: rgba(25, 25, 45, 0.4);
-    /* Thinner glass for more transparency */
-    --glass-border: rgba(255, 255, 255, 0.08);
-}
 
 /* ==================== MESH & GRID UTILITIES ==================== */
 .bg-grid {
@@ -91,7 +82,7 @@
     top: -25%;
     left: -25%;
     background:
-        radial-gradient(circle at 20% 30%, rgba(233, 63, 46, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 20% 30%, rgba(3, 87, 168, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 80% 70%, rgba(255, 0, 128, 0.1) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(var(--hue), 60%, 55%, 0.05) 0%, transparent 50%);
     filter: blur(80px);
@@ -133,8 +124,8 @@ h2,
 h3 {
     font-family: var(--title-font);
     color: var(--title-color);
-    font-weight: 400;
-    /* Serif fonts often look better at 400 */
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 ul {
@@ -251,15 +242,22 @@ img {
     width: max-content;
     min-width: 140px;
     max-width: 95%;
-    background-color: var(--first-color);
+    /* Footer-synced blue glass (footer artwork runs #00409A → #038DE4).
+       The logo is transparent white lettering, so nothing can mismatch. */
+    background: linear-gradient(120deg, rgba(0, 58, 140, 0.95) 0%, rgba(6, 96, 188, 0.92) 100%);
+    /* -webkit- FIRST: the minifier collapses duplicate logical properties
+       keeping the last — unprefixed must survive for Firefox. */
+    -webkit-backdrop-filter: blur(22px) saturate(1.7);
+    backdrop-filter: blur(22px) saturate(1.7);
     z-index: 1000;
     height: 4.5rem;
     border-radius: 5rem;
-    padding-inline: 0.75rem 1.5rem;
+    /* Symmetric: the collapsed capsule shows only the logo, dead centre. */
+    padding-inline: 1.25rem;
     display: flex;
     align-items: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 34px rgba(10, 18, 45, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     transition:
         width 0.45s ease-out,
         min-width 0.45s ease-out,
@@ -274,14 +272,9 @@ img {
     overflow: visible;
 }
 
-[data-theme="dark"] .header {
-    background-color: var(--first-color);
-}
-
 .header.scrolled {
     top: 1rem;
-    background-color: var(--first-color);
-    backdrop-filter: none;
+    background: linear-gradient(120deg, rgba(0, 48, 118, 0.97) 0%, rgba(4, 82, 164, 0.96) 100%);
 }
 
 .nav-container {
@@ -344,10 +337,6 @@ img {
     transition: .3s;
 }
 
-[data-theme="dark"] .team-card {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
 .team-card:hover {
     border-color: var(--first-color);
     transform: translateY(-5px);
@@ -375,7 +364,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--first-color), #ff0080);
+    background: linear-gradient(135deg, var(--first-color), #3898EC);
     color: #fff;
     font-family: var(--title-font);
     font-size: 2.25rem;
@@ -407,25 +396,9 @@ img {
     }
 }
 
-
-.theme-toggle {
-    font-size: 1.25rem;
-    color: #fff;
-    /* White icons on red header */
-    display: flex;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: .3s;
-}
-
-.theme-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
 .nav-toggle {
     font-size: 1.25rem;
-    color: #fff;
-    /* White icons on red header */
+    color: var(--nav-ink, #002B66);
     cursor: pointer;
     display: none;
 }
@@ -456,7 +429,11 @@ img {
         max-width: 1000px;
         opacity: 1;
         margin-left: 1.5rem;
-        transform: translateX(0);
+        /* none, not translateX(0): a transformed nav-menu becomes the
+           containing block for the absolute Company panel, which must center
+           on the capsule (.header) instead. Transitions from the collapsed
+           translateX(-6px) still animate (none = identity). */
+        transform: none;
         pointer-events: auto;
         overflow: visible;
     }
@@ -478,10 +455,8 @@ img {
 }
 
 .nav-link {
-    /* Reverted from .f-link to .nav-link */
     font-weight: 500;
-    color: #fff;
-    /* White text on red header */
+    color: var(--nav-ink, #002B66);
     transition: .3s;
     position: relative;
 }
@@ -518,6 +493,13 @@ img {
     width: 100%;
 }
 
+/* Keep the trigger underlined the whole time its dropdown is open, so it is
+   obvious which menu the panel belongs to. */
+.has-dropdown.is-hovered .dropdown-toggle::after,
+.has-dropdown.open .dropdown-toggle::after {
+    width: 100%;
+}
+
 .nav-close {
     display: none;
 }
@@ -543,18 +525,21 @@ img {
     opacity: 0;
     visibility: hidden;
     position: absolute;
-    /* Matches the mega menu — enough clearance to not touch the capsule. */
-    top: calc(100% + 26px);
+    /* Tucked close under the capsule; the diamond caret bridges the gap. */
+    top: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1.5rem;
+    /* Same solid surface as the Services mega menu — the old 0.95 white with
+       white borders read as see-through over the hero. */
+    background-color: rgba(255, 255, 255, 0.98);
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 1.35rem;
     padding: 2rem;
     min-width: 600px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 28px 60px rgba(25, 23, 22, 0.12),
+        0 0 0 1px rgba(3, 87, 168, 0.06);
     z-index: 200;
     transition:
         opacity 0.35s ease-out,
@@ -571,31 +556,28 @@ img {
     pointer-events: auto;
 }
 
-[data-theme="dark"] .dropdown-panel {
-    background-color: rgba(22, 22, 22, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(233, 63, 46, 0.1);
-    backdrop-filter: blur(20px);
+/* Desktop: both dropdown panels center under the whole capsule and hang the
+   same distance below it. position:static makes the absolute panels (and
+   their hover bridges) resolve against the fixed .header instead of the li. */
+@media (min-width: 769px) {
+    .nav-item.has-dropdown {
+        position: static;
+    }
 }
 
 .dropdown-panel::before {
     content: '';
     position: absolute;
     top: -7px;
-    left: 50%;
+    /* Points at the trigger (Company), not the panel centre — the panel is
+       capsule-centred now. Header.tsx measures and sets --caret-x. */
+    left: var(--caret-x, 50%);
     transform: translateX(-50%) rotate(45deg);
     width: 14px;
     height: 14px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-left: 1px solid rgba(255, 255, 255, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-[data-theme="dark"] .dropdown-panel::before {
-    background-color: rgba(22, 22, 22, 0.85);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.98);
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .dropdown-header {
@@ -621,14 +603,15 @@ img {
     gap: 1rem;
     padding: 1.25rem 1rem;
     border-radius: 1rem;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     cursor: pointer;
     border: 1px solid transparent;
 }
 
 .dropdown-item:hover {
-    background-color: rgba(233, 63, 46, 0.08);
-    border-color: rgba(233, 63, 46, 0.2);
+    background-color: rgba(3, 87, 168, 0.08);
+    border-color: rgba(3, 87, 168, 0.2);
     transform: translateY(-3px);
 }
 
@@ -823,46 +806,48 @@ img {
 }
 
 .service-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 3.5rem 2.5rem;
-    border-radius: var(--radius-large);
-    border: 1px solid var(--glass-border);
-    box-shadow:
-        0 15px 35px -12px rgba(0, 0, 0, 0.4),
-        inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    overflow: hidden;
-    cursor: pointer;
+    background: var(--container-color);
+    padding: 2.5rem 2rem 2.75rem;
+    border-radius: var(--radius-medium);
+    border: 1px solid var(--border-color);
+    /* transform/shadow/border ONLY — never `all`, and never backdrop-filter:
+       blurring the backdrop under an animating transform re-samples the whole
+       area every frame and shimmers the entire screen. */
+    transition:
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
 }
 
-.service-card::after {
-    content: '';
+/* conic highlight sweeping the border on hover (same language as homepage) */
+.service-card::before {
+    content: "";
     position: absolute;
-    top: 10%;
-    left: 10%;
-    width: 80%;
-    height: 80%;
-    background: radial-gradient(circle at center, var(--first-color) 0%, transparent 70%);
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from 210deg,
+            transparent 0deg,
+            rgba(3, 87, 168, 0.6) 55deg,
+            transparent 130deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
     opacity: 0;
-    filter: blur(40px);
+    transition: opacity 0.4s ease;
     pointer-events: none;
-    transition: opacity 0.6s ease;
-    z-index: 0;
 }
 
 .service-card:hover {
-    transform: translateY(-15px) scale(1.03);
-    border-color: rgba(233, 63, 46, 0.5);
-    box-shadow:
-        0 40px 80px -20px rgba(0, 0, 0, 0.5),
-        inset 0 0 30px rgba(233, 63, 46, 0.1);
+    transform: translateY(-6px);
+    border-color: rgba(3, 87, 168, 0.3);
+    box-shadow: 0 18px 40px -14px rgba(3, 87, 168, 0.22);
 }
 
-.service-card:hover::after {
-    opacity: 0.15;
+.service-card:hover::before {
+    opacity: 1;
 }
 
 .service-card>* {
@@ -870,14 +855,24 @@ img {
     z-index: 1;
 }
 
-[data-theme="dark"] .service-card {
-    background: rgba(255, 255, 255, 0.02);
+.service-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-small);
+    font-size: 1.4rem;
+    color: var(--first-color);
+    background: var(--first-color-light);
+    margin-bottom: 1.5rem;
+    transition: background 0.35s ease, color 0.35s ease, transform 0.35s ease;
 }
 
-.service-icon {
-    font-size: 2.5rem;
-    color: var(--first-color);
-    margin-bottom: 1.5rem;
+.service-card:hover .service-icon {
+    background: var(--first-color);
+    color: #fff;
+    transform: scale(1.06) rotate(-3deg);
 }
 
 .service-title {
@@ -916,9 +911,9 @@ img {
     font-weight: 600;
     padding: 0.25rem 0.75rem;
     border-radius: 100px;
-    background-color: rgba(233, 63, 46, 0.12);
+    background-color: rgba(3, 87, 168, 0.12);
     color: var(--first-color);
-    border: 1px solid rgba(233, 63, 46, 0.25);
+    border: 1px solid rgba(3, 87, 168, 0.25);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -934,10 +929,6 @@ img {
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
     padding: 2.5rem 0;
-}
-
-[data-theme="dark"] .stats-section {
-    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .stats-container {
@@ -1022,8 +1013,8 @@ img {
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--first-color);
-    background-color: rgba(233, 63, 46, 0.1);
-    border: 1px solid rgba(233, 63, 46, 0.25);
+    background-color: rgba(3, 87, 168, 0.1);
+    border: 1px solid rgba(3, 87, 168, 0.25);
     padding: 0.3rem 1rem;
     border-radius: 100px;
     margin-bottom: 1.25rem;
@@ -1056,14 +1047,6 @@ img {
             transparent 100%);
 }
 
-[data-theme="dark"] .why-section {
-    background: linear-gradient(180deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.02) 18%,
-            rgba(255, 255, 255, 0.02) 82%,
-            transparent 100%);
-}
-
 .why-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1074,17 +1057,22 @@ img {
 .why-card {
     padding: 3rem 2rem;
     border-radius: var(--radius-medium);
-    border: 1px solid var(--glass-border);
-    background: var(--glass-bg);
-    backdrop-filter: blur(8px);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    background: var(--container-color);
+    /* no backdrop-filter + no `all` transition: blurring the backdrop while
+       a transform animates re-samples the whole area per frame and shimmers
+       the entire screen (same bug as .service-card). */
+    transition:
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
+    box-shadow: none;
 }
 
 .why-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
-    border-color: var(--first-color);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px -14px rgba(3, 87, 168, 0.22);
+    border-color: rgba(3, 87, 168, 0.3);
 }
 
 .why-icon {
@@ -1094,7 +1082,7 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 0.75rem;
-    background-color: rgba(233, 63, 46, 0.12);
+    background-color: rgba(3, 87, 168, 0.12);
     color: var(--first-color);
     font-size: 1.25rem;
     margin-bottom: 1.25rem;
@@ -1120,7 +1108,7 @@ img {
 
 /* ==================== CTA BANNER ==================== */
 .cta-section {
-    background: linear-gradient(135deg, #E93F2E 0%, #B02C1E 100%);
+    background: linear-gradient(135deg, #0357A8 0%, #B02C1E 100%);
     padding: 5rem 0;
 }
 
@@ -1146,7 +1134,7 @@ img {
 
 .button-cta {
     background-color: #fff;
-    color: #E93F2E;
+    color: #0357A8;
     min-height: 3.25rem;
     padding: 0.85rem 2rem;
     border-radius: 0.5rem;
@@ -1190,7 +1178,7 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 0.75rem;
-    background-color: rgba(233, 63, 46, 0.12);
+    background-color: rgba(3, 87, 168, 0.12);
     color: var(--first-color);
     font-size: 1.3rem;
     margin-bottom: 1.25rem;
@@ -1246,7 +1234,6 @@ img {
     animation-delay: 2s;
 }
 
-
 /* ==================== CONTACT ==================== */
 .contact-container {
     max-width: 600px;
@@ -1255,10 +1242,6 @@ img {
     padding: 3rem;
     border-radius: 1rem;
     border: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .contact-container {
-    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .form-group {
@@ -1301,7 +1284,7 @@ img {
     background: linear-gradient(90deg, transparent, var(--first-color), transparent);
 }
 
-[data-theme="light"] .footer {
+.footer {
     background-color: #111114;
 }
 
@@ -1317,7 +1300,8 @@ img {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.4);
+    /* 0.7, not 0.4: WCAG AA contrast on the dark footer */
+    color: rgba(255,255,255,0.7);
     margin-bottom: 1.5rem;
     font-family: var(--body-font);
 }
@@ -1345,7 +1329,8 @@ img {
 }
 
 .footer-text {
-    color: rgba(255,255,255,0.45);
+    /* 0.72, not 0.45: WCAG AA contrast on the near-black footer */
+    color: rgba(255,255,255,0.72);
     font-size: 0.9rem;
     line-height: 1.7;
     max-width: 280px;
@@ -1410,7 +1395,8 @@ img {
     padding: 1.5rem;
     text-align: center;
     font-size: 0.82rem;
-    color: rgba(255,255,255,0.3);
+    /* 0.65, not 0.3: WCAG AA contrast */
+    color: rgba(255,255,255,0.65);
 }
 
 /* 4-col footer */
@@ -1562,8 +1548,8 @@ img {
     width: 100%;
     aspect-ratio: 4/5;
     border-radius: var(--radius-large);
-    background: linear-gradient(135deg, rgba(233,63,46,0.15) 0%, rgba(233,63,46,0.05) 100%);
-    border: 1px solid rgba(233,63,46,0.2);
+    background: linear-gradient(135deg, rgba(3, 87, 168,0.15) 0%, rgba(3, 87, 168,0.05) 100%);
+    border: 1px solid rgba(3, 87, 168,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1582,7 +1568,7 @@ img {
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(233,63,46,0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(3, 87, 168,0.3) 0%, transparent 70%);
     filter: blur(40px);
     animation: glowDriftAbout 6s ease-in-out infinite alternate;
 }
@@ -1642,20 +1628,20 @@ img {
     text-align: center;
     padding: 1.25rem 0.5rem;
     border-radius: var(--radius-small);
-    background: rgba(233,63,46,0.06);
-    border: 1px solid rgba(233,63,46,0.15);
+    background: rgba(3, 87, 168,0.06);
+    border: 1px solid rgba(3, 87, 168,0.15);
     transition: transform 0.3s, border-color 0.3s;
 }
 
 .about-stats .stat-item:hover {
     transform: translateY(-4px);
-    border-color: rgba(233,63,46,0.4);
+    border-color: rgba(3, 87, 168,0.4);
 }
 
 .about-stats .stat-number {
     display: block;
     font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--first-color), #ff7a30);
+    background: linear-gradient(135deg, var(--first-color), #3898EC);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1695,11 +1681,30 @@ img {
 
 /* ==================== MOBILE RESPONSIVE FIXES ==================== */
 
-/* Prevent horizontal overflow on all screens */
-html, body {
+/* Prevent horizontal overflow on all screens.
+
+   NOTE: overflow:clip on <body> also clips position:fixed descendants, which
+   silently broke the pinned footer reveal (the footer was in the DOM and
+   hit-testable but never painted). The clip now lives on .main — that is what
+   actually holds the overflowing decorative elements — leaving the fixed
+   header and footer unclipped. */
+html {
     overflow-x: clip;
     width: 100%;
     max-width: 100%;
+    /* Hard scroll lock at the document ends: no elastic rubber-banding past
+       the fully-revealed footer (or above the top). */
+    overscroll-behavior-y: none;
+}
+
+body {
+    width: 100%;
+    max-width: 100%;
+    overscroll-behavior-y: none;
+}
+
+.main {
+    overflow-x: clip;
 }
 
 body.menu-open {
@@ -1751,7 +1756,7 @@ body.menu-open {
         max-width: none !important;
         height: 100% !important;
         margin: 0 !important;
-        background: linear-gradient(135deg, #0f0503 0%, #1c0806 60%, #0f0503 100%) !important;
+        background: linear-gradient(135deg, #002B66 0%, #0857A8 60%, #002B66 100%) !important;
         padding: 0 !important;
         transform: translate3d(100%, 0, 0) !important;
         transition: transform 0.25s ease-out !important;
@@ -1797,7 +1802,7 @@ body.menu-open {
         content: '';
         display: block !important;
         height: 4px !important;
-        background: linear-gradient(90deg, var(--first-color), #ff7a30, var(--first-color)) !important;
+        background: linear-gradient(90deg, var(--first-color), #3898EC, var(--first-color)) !important;
         flex-shrink: 0 !important;
     }
 
@@ -1825,7 +1830,7 @@ body.menu-open {
         line-height: 1.2 !important;
         letter-spacing: -0.01em !important;
         transition: none !important;
-        -webkit-tap-highlight-color: rgba(233, 63, 46, 0.2);
+        -webkit-tap-highlight-color: rgba(3, 87, 168, 0.2);
     }
 
     .nav-link:hover,
@@ -1834,8 +1839,9 @@ body.menu-open {
         transform: none !important;
     }
 
+    /* Bright blue: navy --first-color is invisible on the navy overlay */
     .nav-link.active {
-        color: var(--first-color) !important;
+        color: #6EB6FF !important;
     }
 
     /* Dropdown on mobile — clean list, no panel */
@@ -1906,7 +1912,7 @@ body.menu-open {
     }
 
     .has-dropdown.open .dropdown-item:hover .dropdown-item-title {
-        color: var(--first-color) !important;
+        color: #6EB6FF !important;
     }
 
     .nav-toggle {
@@ -1989,7 +1995,7 @@ body.menu-open {
         max-width: 100% !important;
         overflow: hidden !important;
         opacity: 0.25 !important;
-        -webkit-text-stroke: 1px rgba(233, 63, 46, 0.04) !important;
+        -webkit-text-stroke: 1px rgba(3, 87, 168, 0.04) !important;
         animation: none !important;
     }
 
@@ -2237,3 +2243,110 @@ body.menu-open {
     color: inherit;
     cursor: pointer;
 }
+
+/* ---------------------------------------------------------------------------
+   Footer reveal (parallax card)
+
+   The footer is pinned to the viewport bottom *behind* the page. The scrolling
+   content sits on an opaque shell above it, so the last section slides up like
+   a card and uncovers the footer at the end of the page.
+
+   --footer-reveal is measured from the real footer in SiteFrame, because its
+   height changes with the viewport.
+   --------------------------------------------------------------------------- */
+
+.footer-reveal {
+    /* Fallback until the measurement lands, so the reveal is never unreachable. */
+    --footer-reveal: 420px;
+}
+
+@media screen and (min-width: 769px) {
+
+    .footer-reveal {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 1;
+        /* Sits behind the shell — pointer events only once uncovered. */
+        /* SiteFrame drives a translateY on this while it is being uncovered
+           (the reveal parallax), so keep it on its own compositor layer. */
+        will-change: transform;
+    }
+
+    /* The same footer artwork continues UPWARD behind the page card for the
+       whole reveal. The card's rounded corners expose whatever is behind the
+       shell - without this, mid-scroll they showed the white page canvas as
+       square notches. Now every peek lands on footer blue, at any scroll
+       position, on every page. */
+    .footer-reveal::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        height: 120vh;
+        background:
+            url("/assets/footer-bg.svg") center bottom / cover no-repeat,
+            linear-gradient(180deg, #00409A 0%, #0B6ACB 100%);
+        pointer-events: none;
+    }
+
+    .page-shell {
+        position: relative;
+        z-index: 2;
+        background-color: var(--body-color);
+        /* Room to scroll past the content and expose the footer. */
+        /* 64px less than the footer height: the footer's top tucks UNDER
+           the card, so the rounded corners always sit on footer blue (no
+           white slivers from measurement drift) and scrolling stops at the
+           clean resting frame. Keep in sync with FOOTER_OVERLAP in
+           SiteFrame.tsx. */
+        margin-bottom: calc(var(--footer-reveal, 420px) - 64px);
+        /* Card edge: rounded lip as it slides over the footer. The old black
+           0.45 shadow rendered as a GRAY BAND across the blue footer — the
+           "white line" flagged in review. A deep-blue tint reads as depth on
+           the blue underneath instead of dirt. */
+        /* Pronounced curve so the card lip reads clearly rounded when the
+           scroll rests at the fully-revealed footer. */
+        border-bottom-left-radius: 3.5rem;
+        border-bottom-right-radius: 3.5rem;
+        /* Children paint square corners over the radius unless clipped —
+           this is THE single page curve; through it the footer artwork
+           shows. clip (not hidden): sticky children and the fixed header
+           keep working. */
+        overflow: clip;
+        box-shadow: 0 24px 50px -12px rgba(2, 25, 70, 0.35);
+    }
+
+    /* The grid lives inside the shell now; keep it above the shell background
+       but behind the content. */
+    .page-shell .bg-grid {
+        z-index: 0;
+    }
+
+    /* :not(.header) is load-bearing: this rule's specificity beats
+       .header's, and position:relative would yank the FIXED header into
+       flow — a 72px empty band above the hero. */
+    .page-shell>*:not(.bg-grid):not(.header) {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* The header is fixed, so it must clear the shell's stacking context. */
+    .page-shell .header {
+        z-index: 1000;
+    }
+}
+
+/* Reduced motion / small screens: plain stacked footer, no pinning. */
+@media screen and (max-width: 768px) {
+    .footer-reveal {
+        position: static;
+    }
+
+    .page-shell {
+        margin-bottom: 0;
+    }
+}
+
+/* Single logo: transparent white lettering on the permanent navy capsule. */
+

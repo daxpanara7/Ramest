@@ -1,0 +1,582 @@
+/* ===========================================================================
+   CTA card + blue footer
+
+   Recreated from the sdipresence.com reference. Design tokens were read off
+   the live site rather than eyeballed:
+     button gradient  linear-gradient(90deg,#65ACFF,#3866F1 56%,#16224E)
+     pill radius      40px, padding 10px 40px
+     button shadow    0 10px 15px rgba(0,84,177,.10)
+     link colour      #B5D7FF, radius 9.6px, padding 6.4px
+     input surface    rgba(255,255,255,.40), radius 40px
+     CTA heading      gradient text #000 -> #16224E, Poppins 500, 1.1 leading
+
+   Everything is namespaced under .cta-section / .site-footer so the blue
+   theme cannot leak into the rest of the (still red) site.
+   =========================================================================== */
+
+.site-footer,
+.cta-section {
+    --blue-050: #EAF3FF;
+    --blue-200: #B5D7FF;
+    --blue-300: #8FC0FF;
+    --blue-400: #65ACFF;
+    --blue-500: #3866F1;
+    --blue-700: #0F55BE;
+    --blue-800: #1A2759;
+    --blue-900: #16224E;
+    --blue-ink: #041E4D;
+
+    --footer-pill: 40px;
+    --cta-radius: 44px;
+}
+
+/* ===========================  CTA CARD  ================================== */
+
+/* The section behind the white card is the SAME blue the footer starts with,
+   so the card's big rounded bottom corners are filled solid blue and the shell
+   hands off to the fixed footer with no visible seam — exactly the reference's
+   corner treatment. */
+.cta-section {
+    position: relative;
+    padding: 0;
+    margin-top: 4.5rem;
+}
+
+/* Full-bleed white card with a LARGE organic bottom curve into the footer. */
+.cta-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #fff;
+    padding: 4rem 0 4.5rem;
+    text-align: center;
+}
+
+.cta-card-inner {
+    position: relative;
+    z-index: 1;
+}
+
+/* Wide blue bloom across the base: near-white at the edges, saturated in the
+   centre, fading up. This is the dominant visual in the reference. */
+.cta-card::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 62%;
+    z-index: -2;
+    background:
+        radial-gradient(84% 132% at 50% 112%,
+            rgba(35, 84, 230, 0.98) 0%,
+            rgba(56, 152, 236, 0.86) 22%,
+            rgba(104, 158, 255, 0.58) 42%,
+            rgba(158, 197, 255, 0.28) 62%,
+            rgba(214, 232, 255, 0.10) 76%,
+            rgba(255, 255, 255, 0) 88%);
+}
+
+/* Soft speckle over the bloom.
+
+   NOTE: this was previously repeating-linear-gradients, which drew a visible
+   GRID — not what the reference has (scattered digits) and clearly wrong on
+   screen. Replaced with a low-opacity radial speckle that reads as texture
+   rather than ruled lines. */
+.cta-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 58%;
+    z-index: -1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='170'%3E%3Cg font-family='monospace' font-size='14' fill='white' opacity='0.55'%3E%3Ctext x='14' y='28'%3E01%3C/text%3E%3Ctext x='150' y='62'%3E00%3C/text%3E%3Ctext x='70' y='104'%3E10%3C/text%3E%3Ctext x='180' y='140'%3E11%3C/text%3E%3C/g%3E%3C/svg%3E");
+    background-size: 220px 170px;
+    -webkit-mask-image: radial-gradient(60% 100% at 50% 100%, #000 6%, transparent 70%);
+    mask-image: radial-gradient(60% 100% at 50% 100%, #000 6%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Thin curved strokes sweeping in from both sides toward the centre. */
+.cta-lines {
+    position: absolute;
+    inset: auto 0 28% 0;
+    height: 300px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+    background-repeat: no-repeat, no-repeat;
+    background-position: left center, right center;
+    background-size: 52% 100%, 52% 100%;
+    background-image:
+        radial-gradient(130% 62% at 0% 50%, transparent 57.6%, rgba(90, 132, 220, 0.34) 58%, transparent 58.6%),
+        radial-gradient(130% 62% at 100% 50%, transparent 57.6%, rgba(90, 132, 220, 0.34) 58%, transparent 58.6%);
+}
+
+.cta-title {
+    font-family: var(--font-body-face), "Inter", var(--body-font);
+    font-weight: 500;
+    font-size: clamp(2rem, 4.6vw, 2.8rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin: 0 auto 1.1rem;
+    max-width: 16ch;
+    color: #002B66;
+}
+
+.cta-title em {
+    font-style: normal;
+    color: #1D5FD6;
+}
+
+.cta-desc {
+    font-family: var(--font-title-face), var(--body-font);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4B5B72;
+    margin: 0 auto 2.5rem;
+    max-width: 52ch;
+}
+
+/* Pill button — gradient, lift on hover */
+.cta-button,
+.footer-news-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    font-family: var(--font-title-face), var(--body-font);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    padding: 0.85rem 2.6rem;
+    border: none;
+    border-radius: var(--footer-pill);
+    background: linear-gradient(90deg, var(--blue-400) 0%, var(--blue-500) 56%, var(--blue-900) 100%);
+    box-shadow: 0 10px 15px rgba(0, 84, 177, 0.10);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.cta-button {
+    min-width: 272px;
+}
+
+.cta-button:hover,
+.footer-news-btn:hover {
+    box-shadow: 0 18px 30px rgba(0, 84, 177, 0.26);
+}
+
+.cta-button i {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cta-button:hover i {
+    transform: translateX(4px);
+}
+
+/* ============================  FOOTER  =================================== */
+
+.site-footer {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    font-family: var(--font-title-face), var(--body-font);
+    color: #fff;
+    /* Decorative circle-field artwork with a gradient fallback beneath it */
+    background:
+        url("/assets/footer-bg.svg") center / cover no-repeat,
+        linear-gradient(180deg, #0B6ACB 0%, var(--blue-700) 46%, var(--blue-800) 100%);
+    padding: 7.5rem 0 2rem;
+}
+
+/* Full-screen footer: the content spans the whole viewport (with fluid
+   side padding) instead of the site's 1140px container — brand hard left,
+   contact hard right. */
+.site-footer .container {
+    max-width: none;
+    padding-inline: clamp(1.5rem, 4vw, 4.5rem);
+}
+
+.site-footer-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 2.6fr;
+    gap: 3.5rem 4rem;
+}
+
+/* The whole link-columns block hugs the right edge, clearing the artwork's
+   circle patterns in the middle-left of the background. */
+.site-footer-inner>div:last-child {
+    justify-self: end;
+    width: 100%;
+    max-width: 860px;
+}
+
+/* ---- left: brand + newsletter ---- */
+/* Text branding, per the brief: "Ramest" white, "Technolabs" in the accent. */
+.footer-brand {
+    display: inline-block;
+    font-family: var(--font-body-face), "Inter", var(--body-font);
+    font-weight: 600;
+    font-size: 2rem;
+    letter-spacing: -0.01em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 2.75rem;
+    text-decoration: none;
+}
+
+.footer-brand em {
+    font-style: normal;
+    background-image: linear-gradient(95deg, #A9D4FF 0%, #E8F3FF 55%, #5FA8F5 110%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.footer-connect-title {
+    font-family: var(--font-body-face), "Inter", var(--body-font);
+    font-weight: 500;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: #fff;
+    margin: 0 0 1.5rem;
+}
+
+.footer-news-form,
+.footer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    max-width: 340px;
+}
+
+.footer-ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    font-family: var(--font-title-face), var(--body-font);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    padding: 0.85rem 2.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: var(--footer-pill);
+    text-decoration: none;
+    transition: background-color 0.25s ease, border-color 0.25s ease,
+        transform 0.3s ease;
+}
+
+.footer-ghost-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #fff;
+}
+
+.footer-news-input {
+    width: 100%;
+    font: inherit;
+    font-size: 0.9rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--footer-pill);
+    padding: 0.8rem 1.5rem;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.footer-news-input::placeholder {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.footer-news-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.52);
+    border-color: #fff;
+}
+
+.footer-news-btn {
+    width: 100%;
+}
+
+.footer-news-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+    transform: none;
+}
+
+.footer-news-msg {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--blue-050);
+    margin: 0;
+}
+
+.footer-news-msg.is-error {
+    color: #FFD9D4;
+}
+
+/* ---- right: link columns ---- */
+.footer-columns {
+    display: grid;
+    /* last (Contact) column wider: the address settles into two lines */
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 2.1fr;
+    gap: 2.5rem 2.25rem;
+}
+
+.footer-col-title {
+    font-family: var(--font-body-face), "Inter", var(--body-font);
+    font-weight: 500;
+    font-size: 1.25rem;
+    color: #fff;
+    margin: 0 0 1.4rem;
+}
+
+.footer-col-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.footer-col-list a {
+    display: inline-block;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--blue-200);
+    text-decoration: none;
+    padding: 0.4rem 0.5rem;
+    margin-left: -0.5rem;
+    border-radius: 9.6px;
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+
+.footer-col-list a:hover,
+.footer-col-list a:focus-visible {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- social ---- */
+.footer-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.75rem;
+    margin-top: 2.25rem;
+}
+
+.footer-social a {
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease, opacity 0.25s ease;
+}
+
+.footer-social a:hover {
+    border-bottom-color: #fff;
+}
+
+/* ---- bottom line: plain text, styled like the rest of the footer ---- */
+.footer-bottom-bar {
+    position: relative;
+    margin-top: 4rem;
+    padding: 1.05rem 0 1.6rem;
+    justify-content: center;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 2rem;
+    /* Identical to the footer link columns: same face, size, and tint. */
+    font-family: var(--font-title-face), var(--body-font);
+    font-size: 0.9rem;
+    color: var(--blue-200);
+}
+
+.footer-bottom-bar a {
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.footer-bottom-bar a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* ==========================  RESPONSIVE  ================================= */
+
+@media screen and (max-width: 1024px) {
+    .site-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .footer-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .cta-section {
+        margin-top: 3.5rem;
+    }
+
+    .cta-card {
+        padding: 3rem 1.35rem 3rem;
+    }
+
+    .cta-button {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .site-footer {
+        padding: 3.25rem 0 1.5rem;
+    }
+
+    .footer-news-form {
+        max-width: none;
+    }
+
+    .footer-bottom-bar {
+        margin-top: 2.5rem;
+        border-radius: 24px;
+        padding: 1rem 1.35rem;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 520px) {
+    .footer-columns {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .footer-col-list a:hover,
+    .footer-social a:hover,
+    .cta-button:hover,
+    .footer-news-btn:hover {
+        transform: none;
+    }
+}
+
+/* ===========================================================================
+   REFERENCE-MATCH LAYER — static, no entrance/spring animations (removed at
+   the user's request). Big soft light circles, hover micro-interactions and
+   the glass bottom bar; motion is hover-only.
+   =========================================================================== */
+
+/* Links keep only the pill highlight on hover — no movement. */
+
+/* ---- Button: gradient sweep + scale + glow on hover ---- */
+.cta-button,
+.footer-news-btn {
+    background-size: 160% 100%;
+    background-position: 0% 50%;
+    /* glossy bevel: bright top edge, deep lower inset, soft drop */
+    box-shadow:
+        inset 0 2px 1px rgba(255, 255, 255, 0.55),
+        inset 0 -4px 8px rgba(2, 32, 90, 0.28),
+        0 12px 24px rgba(9, 64, 160, 0.35);
+    transition:
+        transform .35s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .35s ease,
+        background-position .55s ease;
+}
+
+.cta-button:hover,
+.footer-news-btn:hover {
+    box-shadow:
+        inset 0 2px 1px rgba(255, 255, 255, 0.6),
+        inset 0 -4px 8px rgba(2, 32, 90, 0.3),
+        0 18px 34px rgba(9, 64, 160, 0.45);
+}
+
+.cta-button:hover,
+.footer-news-btn:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 18px 34px rgba(0, 84, 177, .34);
+}
+
+/* ---- Input: border glow + focus ring ---- */
+.footer-news-input {
+    transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+.footer-news-input:hover {
+    border-color: rgba(255, 255, 255, .6);
+}
+
+.footer-news-input:focus {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, .18), 0 0 22px rgba(140, 190, 255, .35);
+}
+
+/* ---- Social: glow only, no movement ---- */
+.footer-social a {
+    display: inline-block;
+    transition: text-shadow .3s ease, border-color .25s ease;
+}
+
+.footer-social a:hover {
+    text-shadow: 0 0 18px rgba(255, 255, 255, .55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .footer-col-list a:hover,
+    .footer-social a:hover,
+    .cta-button:hover,
+    .footer-news-btn:hover {
+        transform: none;
+    }
+}
+
+/* ===========================================================================
+   REVEAL PARALLAX — --fr-shift is written by SiteFrame while the page card
+   uncovers the footer (footer-height*0.35 -> 0). Only the inner content and
+   the light circles move; the fixed blue surface never shifts, so no gap can
+   open between the card and the footer. .site-footer has overflow:hidden, so
+   the shifted content clips inside the blue instead of spilling out.
+   =========================================================================== */
+
+.site-footer .site-footer-inner,
+.site-footer>.container:last-child {
+    transform: translate3d(0, var(--fr-shift, 0px), 0);
+    will-change: transform;
+}
+
+/* contact column: icon + text rows — same type as the link lists */
+.footer-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+}
+
+.footer-contact-item a,
+.footer-contact-item span {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--blue-200);
+    padding: 0;
+    margin: 0;
+}
+
+.footer-contact-item i {
+    color: var(--blue-200);
+    font-size: 0.85rem;
+    margin-top: 0.5em;
+    flex-shrink: 0;
+}
+

@@ -13,10 +13,6 @@
     transition: .3s;
 }
 
-[data-theme="dark"] .cert-card {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
 .cert-card:hover {
     border-color: var(--first-color);
     transform: translateY(-5px);

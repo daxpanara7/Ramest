@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Serif_Display, Inter } from "next/font/google";
-import Script from "next/script";
+import { Inter, Space_Grotesk } from "next/font/google";
 import ClientEffects from "@/components/ClientEffects";
 import JsonLd from "@/components/JsonLd";
 import SiteFrame from "@/components/SiteFrame";
@@ -9,14 +8,13 @@ import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body-face",
   display: "swap",
 });
 
-const dmSerif = DM_Serif_Display({
-  weight: "400",
+const grotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-dm-serif",
+  variable: "--font-title-face",
   display: "swap",
 });
 
@@ -69,7 +67,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#191716",
+  themeColor: "#0357A8",
 };
 
 export default function RootLayout({
@@ -80,8 +78,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="light"
-      className={`${inter.variable} ${dmSerif.variable}`}
+      className={`${inter.variable} ${grotesk.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -90,19 +87,36 @@ export default function RootLayout({
           content="black-translucent"
         />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="" />
+        {/* Preload the only icon font actually used (fa-solid) so it isn't
+            discovered late through the injected stylesheet. */}
         <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2"
         />
+        {/* Font Awesome loads NON-render-blocking: the stylesheet is
+            script-injected (script-inserted styles never block first paint)
+            and lives outside React's tree, so there is no hydration diff.
+            <noscript> keeps icons working without JS. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';document.head.appendChild(l);var s=document.createElement('style');s.textContent='@font-face{font-family:\\'Font Awesome 6 Free\\';font-style:normal;font-weight:900;font-display:swap;src:url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2) format(\\'woff2\\')}';document.head.appendChild(s);})();",
+          }}
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          />
+        </noscript>
       </head>
       <body className={inter.className}>
-        <div className="bg-grid" />
         <SiteFrame>{children}</SiteFrame>
         <ClientEffects />
         <JsonLd />
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var t=localStorage.getItem('selected-theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`}
-        </Script>
       </body>
     </html>
   );

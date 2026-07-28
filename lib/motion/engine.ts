@@ -50,53 +50,56 @@ export function initHomeMotion(): () => void {
   const header = document.querySelector(".header");
   if (header) navbarReveal(header);
 
-  /* ---- hero: mask word reveal + entrance timeline. Load-time, not
-     scroll-dependent, and OUTSIDE the sticky stack — safe to hide/show. */
-  const hero = document.querySelector(".hx-hero");
+  /* ---- hero: depth layers only. The entrance is pure CSS (homepage.css)
+     so the H1 is painted with the first frame — better LCP, and GSAP can
+     never leave hero content hidden. */
+  const hero = document.querySelector(".nv-hero");
   if (hero) {
-    const words = hero.querySelectorAll(".hx-hero-title .hx-w");
-    const chrome = hero.querySelectorAll(
-      ".hx-chip, .hx-hero-sub, .hx-hero-actions, .hx-hero-stats",
-    );
-    if (words.length) {
-      const tl = gsap.timeline({ delay: 0.05 });
-      tl.from(words, {
-        yPercent: 115,
-        autoAlpha: 0,
-        duration: 0.7,
-        ease: "power3.out",
-        stagger: 0.045,
-      }).from(
-        chrome,
-        {
-          y: 26,
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          stagger: 0.09,
-        },
-        "-=0.45",
-      );
-    }
-
-    /* depth layers: scroll parallax + mouse drift. None of these elements
-       carry CSS transform animations, so GSAP owns their transforms. */
-    const glowA = hero.querySelector(".hx-glow-a");
-    const glowB = hero.querySelector(".hx-glow-b");
-    const rings = hero.querySelectorAll(".hx-ring");
+    /* depth layers: scroll parallax + mouse drift. Aurora c animates via
+       CSS, so GSAP only ever touches a and b — no transform fights. */
+    const glowA = hero.querySelector(".nv-aurora-a");
+    const glowB = hero.querySelector(".nv-aurora-b");
     if (glowA) parallax(glowA, { speed: 0.35, trigger: hero });
     if (glowB) parallax(glowB, { speed: -0.25, trigger: hero });
-    rings.forEach((r, i) =>
-      parallax(r, { speed: 0.18 + i * 0.1, trigger: hero }),
-    );
 
     if (window.matchMedia("(pointer: fine)").matches) {
       const layers = [
         glowA && { el: glowA, depth: 1 },
         glowB && { el: glowB, depth: -0.7 },
-        ...[...rings].map((el, i) => ({ el, depth: 0.35 + i * 0.2 })),
       ].filter(Boolean) as { el: Element; depth: number }[];
       if (layers.length) cleanups.push(mouseParallax(hero, layers, 16));
+
+      /* cursor spotlight: a fixed-size disc moved with transforms only.
+         Hero rect is cached and refreshed on resize — no layout reads in the
+         pointermove path. */
+      const spotlight = hero.querySelector(".nv-spotlight");
+      if (spotlight) {
+        const sx = gsap.quickTo(spotlight, "x", {
+          duration: 0.55,
+          ease: "power2.out",
+        });
+        const sy = gsap.quickTo(spotlight, "y", {
+          duration: 0.55,
+          ease: "power2.out",
+        });
+        let rect = hero.getBoundingClientRect();
+        const onResize = () => {
+          rect = hero.getBoundingClientRect();
+        };
+        const onSpot = (e: PointerEvent) => {
+          hero.classList.add("hx-spot-on");
+          sx(e.clientX - rect.left);
+          sy(e.clientY - rect.top);
+        };
+        window.addEventListener("resize", onResize, { passive: true });
+        hero.addEventListener("pointermove", onSpot as EventListener, {
+          passive: true,
+        });
+        cleanups.push(() => {
+          window.removeEventListener("resize", onResize);
+          hero.removeEventListener("pointermove", onSpot as EventListener);
+        });
+      }
     }
   }
 

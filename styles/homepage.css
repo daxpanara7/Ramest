@@ -28,12 +28,12 @@
     --hx-r-md: 20px;
     --hx-r-lg: 30px;
     --hx-shadow-soft: 0 20px 60px -20px rgba(10, 8, 8, 0.18);
-    --hx-shadow-lift: 0 30px 70px -24px rgba(233, 63, 46, 0.22);
+    --hx-shadow-lift: 0 30px 70px -24px rgba(3, 87, 168, 0.22);
 
     /* light */
     --hx-hairline: var(--border-color);
     --hx-red: var(--first-color);
-    --hx-red-soft: rgba(233, 63, 46, 0.08);
+    --hx-red-soft: rgba(3, 87, 168, 0.08);
 }
 
 /* ------------------------------------------------------------------ shared */
@@ -160,7 +160,7 @@
     max-height: 640px;
     top: -12%;
     right: -8%;
-    background: radial-gradient(circle, rgba(233, 63, 46, 0.16) 0%, transparent 68%);
+    background: radial-gradient(circle, rgba(3, 87, 168, 0.16) 0%, transparent 68%);
 }
 
 .hx-glow-b {
@@ -170,7 +170,7 @@
     max-height: 520px;
     bottom: -14%;
     left: -6%;
-    background: radial-gradient(circle, rgba(255, 122, 48, 0.10) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56, 152, 236, 0.10) 0%, transparent 70%);
 }
 
 /* Concentric hairline rings, off-centre — quiet engineering motif. */
@@ -183,7 +183,7 @@
     max-width: 860px;
     max-height: 860px;
     transform: translateY(-50%);
-    border: 1px solid rgba(233, 63, 46, 0.14);
+    border: 1px solid rgba(3, 87, 168, 0.14);
     border-radius: 50%;
 }
 
@@ -192,7 +192,7 @@
     height: 40vw;
     max-width: 620px;
     max-height: 620px;
-    border-color: rgba(233, 63, 46, 0.08);
+    border-color: rgba(3, 87, 168, 0.08);
 }
 
 .hx-hero-inner {
@@ -224,7 +224,7 @@
     height: 7px;
     border-radius: 50%;
     background: var(--hx-red);
-    box-shadow: 0 0 10px 2px rgba(233, 63, 46, 0.55);
+    box-shadow: 0 0 10px 2px rgba(3, 87, 168, 0.55);
 }
 
 .hx-hero-title {
@@ -294,7 +294,60 @@
     font-size: 0.78rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text-color-light);
+    /* --text-color, not --text-color-light: the lighter token fails WCAG AA
+       contrast on the page background (Lighthouse a11y flag). */
+    color: var(--text-color);
+}
+
+/* Hero entrance — pure CSS, no JS: the previous GSAP word reveal hid the
+   H1 until the first animation frame, which hurt LCP and once left the
+   second line invisible. CSS animations start with the first paint. */
+@keyframes hx-enter {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.hx-chip {
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+.hx-hero-title {
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+.hx-hero-sub {
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.hx-hero-actions {
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both;
+}
+
+.hx-hero-stats {
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both;
+}
+
+.hx-hero-visual {
+    animation: hx-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hx-chip,
+    .hx-hero-title,
+    .hx-hero-sub,
+    .hx-hero-actions,
+    .hx-hero-stats,
+    .hx-hero-visual {
+        animation: none;
+    }
 }
 
 /* ---- hero visual: glass build-console + floating chips (decorative) ---- */
@@ -363,10 +416,11 @@
     font-weight: 600;
 }
 
-/* Typed-line effect: lines appear one after another (pure CSS). */
+/* Live deploy cycle: lines type in one after another, hold, clear, and the
+   whole "deploy" reruns forever — the card is alive, not a screenshot. */
 .hx-console-body div {
     opacity: 0;
-    animation: hx-line-in 0.5s ease-out forwards;
+    animation: hx-line-cycle 11s ease-out infinite;
 }
 
 .hx-console-body div:nth-child(1) { animation-delay: 0.9s; }
@@ -375,14 +429,22 @@
 .hx-console-body div:nth-child(4) { animation-delay: 2.7s; }
 .hx-console-body div:nth-child(5) { animation-delay: 3.3s; }
 
-@keyframes hx-line-in {
-    from {
+@keyframes hx-line-cycle {
+
+    0% {
         opacity: 0;
         transform: translateY(6px);
     }
 
-    to {
+    4%,
+    82% {
         opacity: 1;
+        transform: none;
+    }
+
+    88%,
+    100% {
+        opacity: 0;
         transform: none;
     }
 }
@@ -475,15 +537,15 @@
 
 .hx-btn-primary {
     color: #fff;
-    background: linear-gradient(110deg, var(--hx-red) 0%, #d03223 55%, #ff7a30 120%);
+    background: linear-gradient(110deg, #0357A8 0%, #0B6ACB 55%, #3898EC 130%);
     background-size: 150% 100%;
     background-position: 0% 50%;
-    box-shadow: 0 12px 34px -10px rgba(233, 63, 46, 0.55);
+    box-shadow: 0 12px 34px -10px rgba(3, 87, 168, 0.55);
 }
 
 .hx-btn-primary:hover {
     background-position: 100% 50%;
-    box-shadow: 0 18px 44px -12px rgba(233, 63, 46, 0.65);
+    box-shadow: 0 18px 44px -12px rgba(3, 87, 168, 0.65);
 }
 
 .hx-btn-ghost {
@@ -522,7 +584,7 @@
     padding: 1px;
     background: conic-gradient(from var(--hx-angle, 210deg),
             transparent 0deg,
-            rgba(233, 63, 46, 0.65) 55deg,
+            rgba(3, 87, 168, 0.65) 55deg,
             transparent 130deg);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
@@ -536,7 +598,7 @@
 .hx-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--hx-shadow-lift);
-    border-color: rgba(233, 63, 46, 0.30);
+    border-color: rgba(3, 87, 168, 0.30);
 }
 
 .hx-card:hover::before {
@@ -670,7 +732,7 @@
 }
 
 .hx-value:hover {
-    border-color: rgba(233, 63, 46, 0.35);
+    border-color: rgba(3, 87, 168, 0.35);
     transform: translateY(-2px);
 }
 
@@ -699,7 +761,7 @@
 
 .hx-industry:hover {
     color: var(--hx-red);
-    border-color: rgba(233, 63, 46, 0.4);
+    border-color: rgba(3, 87, 168, 0.4);
     background: var(--hx-red-soft);
     transform: translateY(-2px);
 }
@@ -723,7 +785,7 @@
 
 .hx-quote:hover {
     transform: translateY(-6px);
-    border-color: rgba(233, 63, 46, 0.3);
+    border-color: rgba(3, 87, 168, 0.3);
     box-shadow: var(--hx-shadow-soft);
 }
 
@@ -758,7 +820,7 @@
     height: 42px;
     border-radius: 50%;
     flex-shrink: 0;
-    background: linear-gradient(135deg, var(--hx-red), #ff7a30);
+    background: linear-gradient(135deg, var(--hx-red), #3898EC);
     color: #fff;
     font-weight: 700;
     font-size: 0.95rem;
@@ -792,8 +854,8 @@
     text-align: center;
     color: #fff;
     background:
-        radial-gradient(120% 160% at 50% 115%, rgba(255, 122, 48, 0.45) 0%, transparent 55%),
-        linear-gradient(120deg, #d03223 0%, var(--hx-red) 45%, #a3220f 100%);
+        radial-gradient(120% 160% at 50% 115%, rgba(56, 152, 236, 0.45) 0%, transparent 55%),
+        linear-gradient(120deg, #1A2759 0%, var(--hx-red) 45%, #16224E 100%);
     box-shadow: var(--hx-shadow-lift);
 }
 
@@ -891,5 +953,980 @@
         opacity: 1;
         transform: none;
         transition: none;
+    }
+}
+
+/* ===========================================================================
+   MOBILE POLISH (<=640px) — measured fixes from a 375x812 audit:
+   the hero ran 1071px tall because the four stats stacked in ONE column
+   (311px) and the chip wrapped to two lines. Everything here tightens the
+   phone rhythm without touching desktop.
+   =========================================================================== */
+@media (max-width: 640px) {
+
+    /* hero: fits the first screen far better */
+    .hx-hero {
+        padding: 6.25rem 0 2.5rem;
+    }
+
+    /* No entrance animation on the H1 for phones: it's the LCP element, and
+       an opacity-0 start delays LCP by the animation delay+fade under mobile
+       throttling (~0.5s measured). It paints instantly; the rest still
+       animates. */
+    .hx-hero-title {
+        animation: none;
+    }
+
+    .hx-chip {
+        font-size: 0.66rem;
+        letter-spacing: 0.12em;
+        padding: 0.42rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    .hx-hero-sub {
+        margin: 1.25rem 0 1.75rem;
+        font-size: 0.98rem;
+    }
+
+    /* buttons: full-width stack — bigger tap targets, no awkward wrap */
+    .hx-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+    }
+
+    .hx-hero-actions .hx-btn {
+        justify-content: center;
+        padding-block: 1rem;
+    }
+
+    /* stats: 2x2 grid instead of a 311px single column */
+    .hx-hero-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.4rem 1rem;
+        margin-top: 2.25rem;
+        padding-top: 1.6rem;
+    }
+
+    .hx-stat dt {
+        font-size: 1.55rem;
+    }
+
+    .hx-stat dd {
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        margin-top: 0.3rem;
+    }
+
+    /* lighter paint: one glow + one ring is enough on a phone */
+    .hx-glow-b,
+    .hx-ring-2 {
+        display: none;
+    }
+
+    .hx-glow {
+        filter: blur(60px);
+    }
+
+    /* cards + rows: tighter padding, same language */
+    .hx-card {
+        padding: 1.6rem 1.4rem 1.8rem;
+    }
+
+    .hx-card-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.1rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .hx-section-head {
+        margin-bottom: 2rem;
+    }
+
+    .hx-lede {
+        font-size: 0.96rem;
+    }
+
+    .hx-step {
+        grid-template-columns: 2.9rem 1fr;
+        gap: 1rem;
+        padding: 1.3rem 0;
+    }
+
+    .hx-step-num {
+        font-size: 1.25rem;
+    }
+
+    .hx-values {
+        gap: 0.6rem;
+        margin-top: 1.9rem;
+    }
+
+    .hx-value {
+        padding: 0.8rem 0.95rem;
+        font-size: 0.84rem;
+    }
+
+    .hx-industries {
+        gap: 0.6rem;
+        margin-top: 1.9rem;
+    }
+
+    .hx-industry {
+        padding: 0.65rem 1.1rem;
+        font-size: 0.85rem;
+    }
+
+    .hx-quote {
+        padding: 1.7rem 1.4rem;
+    }
+
+    .hx-quote-mark {
+        font-size: 2.6rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .hx-cta-panel {
+        border-radius: 22px;
+    }
+}
+
+/* ===========================================================================
+   HERO ELEVATION — editorial details for the first screen. Everything is
+   transform/opacity (or a one-shot stroke draw), so the 100/100 Lighthouse
+   scores are untouched; pointer-driven pieces are desktop-only.
+   =========================================================================== */
+
+/* red dot orbiting the outer ring (pure CSS, own layer, no GSAP conflict) */
+.hx-orbit {
+    position: absolute;
+    top: 50%;
+    right: -12%;
+    width: 56vw;
+    height: 56vw;
+    max-width: 860px;
+    max-height: 860px;
+    margin-top: calc(min(56vw, 860px) / -2);
+    border-radius: 50%;
+    animation: hx-spin 32s linear infinite;
+    pointer-events: none;
+}
+
+.hx-orbit i {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--hx-red);
+    box-shadow: 0 0 12px 3px rgba(3, 87, 168, 0.5);
+}
+
+@keyframes hx-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Intent glow: hovering the primary CTA warms the whole hero — a soft
+   bloom fades in behind everything (pure opacity, GPU-only). */
+.hx-hero::after {
+    content: "";
+    position: absolute;
+    inset: -10%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(55% 60% at 32% 62%,
+            rgba(3, 87, 168, 0.10) 0%,
+            rgba(56, 152, 236, 0.06) 45%,
+            transparent 75%);
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.hx-hero:has(.hx-btn-primary:hover)::after {
+    opacity: 1;
+}
+
+/* cursor spotlight — a soft warm disc moved via transform by the engine */
+.hx-spotlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 720px;
+    height: 720px;
+    margin: -360px 0 0 -360px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+            rgba(3, 87, 168, 0.07) 0%,
+            rgba(56, 152, 236, 0.04) 35%,
+            transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease 0.6s;
+}
+
+.hx-hero.hx-spot-on .hx-spotlight {
+    opacity: 1;
+}
+
+/* availability line under the CTAs */
+.hx-avail {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1.1rem 0 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.hx-avail-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1e9e5a;
+    box-shadow: 0 0 0 0 rgba(30, 158, 90, 0.5);
+    animation: hx-pulse 2.4s ease-out infinite;
+}
+
+@keyframes hx-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(30, 158, 90, 0.45);
+    }
+
+    70% {
+        box-shadow: 0 0 0 9px rgba(30, 158, 90, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(30, 158, 90, 0);
+    }
+}
+
+/* scroll cue at the hero's bottom centre */
+.hx-scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 1.4rem;
+    transform: translateX(-50%);
+    z-index: 1;
+    padding: 0.4rem;
+}
+
+.hx-scroll-hint span {
+    display: block;
+    width: 1px;
+    height: 42px;
+    background: linear-gradient(to bottom, var(--hx-red), transparent);
+    animation: hx-drop 2.2s ease-in-out infinite;
+}
+
+@keyframes hx-drop {
+    0% {
+        transform: scaleY(0);
+        transform-origin: top;
+    }
+
+    45% {
+        transform: scaleY(1);
+        transform-origin: top;
+    }
+
+    55% {
+        transform: scaleY(1);
+        transform-origin: bottom;
+    }
+
+    100% {
+        transform: scaleY(0);
+        transform-origin: bottom;
+    }
+}
+
+/* console gets depth: engine tilts .hx-console (the visual wrapper keeps its
+   CSS entrance animation, so GSAP must own a DIFFERENT element's transform) */
+.hx-console {
+    will-change: transform;
+}
+
+@media (max-width: 1180px) {
+
+    .hx-spotlight {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .hx-scroll-hint,
+    .hx-orbit {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hx-orbit,
+    .hx-avail-dot,
+    .hx-scroll-hint span {
+        animation: none;
+    }
+}
+
+/* ===========================================================================
+   HERO WOW LAYER — aurora background, living gradient headline, capability
+   ticker, film grain. Pure CSS: transforms/opacity + one background-position
+   animation on clipped text (safe — no GSAP transforms touch that element,
+   which is what broke gradient text before).
+   =========================================================================== */
+
+/* ---- aurora: three light fields breathing at different tempos ---- */
+.hx-aurora {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    will-change: transform, opacity;
+}
+
+.hx-aurora-1 {
+    width: 60vw;
+    height: 60vw;
+    max-width: 760px;
+    max-height: 760px;
+    top: -18%;
+    right: -14%;
+    background: radial-gradient(circle, rgba(3, 87, 168, 0.16) 0%, transparent 65%);
+    animation: hx-aurora-a 13s ease-in-out infinite alternate;
+}
+
+.hx-aurora-2 {
+    width: 46vw;
+    height: 46vw;
+    max-width: 560px;
+    max-height: 560px;
+    bottom: -16%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(56, 152, 236, 0.12) 0%, transparent 66%);
+    animation: hx-aurora-b 17s ease-in-out infinite alternate;
+}
+
+.hx-aurora-3 {
+    width: 34vw;
+    height: 34vw;
+    max-width: 420px;
+    max-height: 420px;
+    top: 34%;
+    left: 38%;
+    background: radial-gradient(circle, rgba(141, 187, 240, 0.12) 0%, transparent 68%);
+    animation: hx-aurora-a 21s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes hx-aurora-a {
+    from {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.85;
+    }
+
+    to {
+        transform: translate3d(-4vw, 3vw, 0) scale(1.18);
+        opacity: 1;
+    }
+}
+
+@keyframes hx-aurora-b {
+    from {
+        transform: translate3d(0, 0, 0) scale(1.1);
+        opacity: 0.7;
+    }
+
+    to {
+        transform: translate3d(3vw, -3vw, 0) scale(0.94);
+        opacity: 1;
+    }
+}
+
+/* ---- film grain: static SVG turbulence, barely-there ---- */
+.hx-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+}
+
+/* ---- living gradient on the italic line ----
+   Safe here: this element has NO transforms and NO word spans, so
+   background-clip:text cannot hit the composited-children Chrome bug that
+   made this line invisible in an earlier iteration. Solid-red fallback for
+   engines without background-clip support. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hx-hero-title em {
+        /* italic overhang: the last glyph paints outside the background box
+           and gets cut by background-clip:text — extend the box, keep layout */
+        padding-right: 0.14em;
+        margin-right: -0.14em;
+        padding-bottom: 0.08em;
+        margin-bottom: -0.08em;
+        background-image: linear-gradient(100deg,
+                #0357A8 0%,
+                #3898EC 30%,
+                #1A2759 55%,
+                #0357A8 80%);
+        background-size: 220% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: hx-gradient-drift 7s ease-in-out infinite;
+    }
+}
+
+@keyframes hx-gradient-drift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ---- capability ticker: vertical word roll with holds ---- */
+.hx-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: -1.4rem 0 2.1rem;
+}
+
+.hx-ticker-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-color-light);
+}
+
+.hx-ticker-window {
+    display: inline-block;
+    height: 1.5rem;
+    overflow: hidden;
+}
+
+.hx-ticker-roll {
+    display: block;
+    animation: hx-roll 9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.hx-ticker-roll i {
+    display: block;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    font-style: normal;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--hx-red);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* four stops with holds; 5th item repeats the 1st for a seamless loop */
+@keyframes hx-roll {
+
+    0%,
+    19% {
+        transform: translateY(0);
+    }
+
+    25%,
+    44% {
+        transform: translateY(-1.5rem);
+    }
+
+    50%,
+    69% {
+        transform: translateY(-3rem);
+    }
+
+    75%,
+    94% {
+        transform: translateY(-4.5rem);
+    }
+
+    100% {
+        transform: translateY(-6rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .hx-ticker {
+        margin: -1rem 0 1.6rem;
+    }
+
+    /* Phones: the radial gradients are already soft — the extra blur filter
+       only burns first-paint time under mobile CPUs (measured +0.9s LCP).
+       Same look, no filter, no extra compositor layers, no grain. */
+    .hx-aurora {
+        filter: none;
+        will-change: auto;
+    }
+
+    .hx-aurora-3,
+    .hx-grain {
+        display: none;
+    }
+
+    /* The living gradient re-rasterizes the clipped glyphs every frame and
+       the H1 is the LCP element — solid red on phones, gradient on desktop. */
+    .hx-hero-title em {
+        background-image: none;
+        animation: none;
+        color: var(--hx-red);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hx-aurora,
+    .hx-ticker-roll {
+        animation: none;
+    }
+
+    .hx-hero-title em {
+        animation: none;
+        background-image: none;
+        color: var(--hx-red);
+    }
+}
+
+/* ---- dark-mode theme tuning (enterprise navy/blue) ---- */
+
+@media (max-width: 768px) {
+}
+
+/* ===========================================================================
+   FINISHING SYSTEM — the details that make a site feel designed end to end:
+   branded text selection, accessible focus rings, a quiet branded scrollbar,
+   crisper font rendering, and a stronger display weight for the hero.
+   =========================================================================== */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+::selection {
+    background: #0357A8;
+    color: #fff;
+}
+
+:focus-visible {
+    outline: 2px solid #3898EC;
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* quiet branded scrollbar (WebKit + Firefox) */
+html {
+    scrollbar-color: rgba(3, 87, 168, 0.35) transparent;
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(3, 87, 168, 0.30);
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(3, 87, 168, 0.5);
+}
+
+/* stronger display presence for the hero headline */
+.hx-hero-title {
+    font-weight: 800;
+    letter-spacing: -0.022em;
+}
+
+.hx-title {
+    font-weight: 700;
+}
+
+/* ===========================================================================
+   NAVY AURORA HERO (nv-) — full-viewport deep-indigo canvas with layered
+   aurora light, a faint engineering grid, and a cursor spotlight. Centered
+   editorial copy over it; glass stat bar beneath. Bookends the blue footer.
+   H1 paints instantly (no JS hiding); entrances are pure CSS; the whole
+   backdrop is gradients — zero image/video bytes.
+   =========================================================================== */
+
+.nv-hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: clip;
+    padding: 8.5rem 0 4rem;
+    /* White at the top (under the navy capsule), settling into a deeper
+       light blue at the bottom edge. */
+    background:
+        linear-gradient(180deg, #FFFFFF 0%, #F0F6FD 34%, #D3E4F7 62%, #8FB9E9 100%);
+}
+
+.nv-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- aurora blobs: GSAP parallax/mouse-drift owns a & b; c drifts via CSS */
+.nv-aurora {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+}
+
+.nv-aurora-a {
+    width: 52vw;
+    height: 52vw;
+    max-width: 760px;
+    max-height: 760px;
+    top: -18%;
+    right: -12%;
+    background: radial-gradient(circle, rgba(56, 152, 236, 0.18) 0%, transparent 65%);
+}
+
+.nv-aurora-b {
+    width: 44vw;
+    height: 44vw;
+    max-width: 620px;
+    max-height: 620px;
+    bottom: -20%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(3, 87, 168, 0.14) 0%, transparent 66%);
+}
+
+.nv-aurora-c {
+    width: 34vw;
+    height: 34vw;
+    max-width: 480px;
+    max-height: 480px;
+    top: 30%;
+    left: 24%;
+    background: radial-gradient(circle, rgba(110, 182, 255, 0.20) 0%, transparent 68%);
+    animation: nv-drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes nv-drift {
+    from {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    to {
+        transform: translate3d(9vw, -6vh, 0) scale(1.18);
+    }
+}
+
+/* --- faint engineering grid, faded out toward the edges */
+.nv-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(3, 87, 168, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(3, 87, 168, 0.055) 1px, transparent 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: radial-gradient(75% 62% at 50% 42%, #000 0%, transparent 100%);
+    mask-image: radial-gradient(75% 62% at 50% 42%, #000 0%, transparent 100%);
+}
+
+/* --- cursor spotlight: engine moves it with transforms only (quickTo) */
+.nv-spotlight {
+    position: absolute;
+    top: -260px;
+    left: -260px;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 152, 236, 0.12) 0%, transparent 62%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    will-change: transform;
+}
+
+.nv-hero.hx-spot-on .nv-spotlight {
+    opacity: 1;
+}
+
+/* ------------------------------------------------------------ centered copy */
+.nv-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.nv-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.15rem;
+    border: 1px solid rgba(3, 87, 168, 0.16);
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.65);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #33415E;
+    margin: 0 0 1.9rem;
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+.nv-title {
+    font-family: var(--title-font);
+    font-size: clamp(2.9rem, 6.4vw, 5.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.024em;
+    font-weight: 700;
+    color: #002B66;
+    max-width: 17ch;
+    margin: 0 0 1.5rem;
+    text-wrap: balance;
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+/* Solid on phones — clip:text rasterization is what pushed mobile LCP to
+   4.3s. The gradient version applies at desktop widths only (below). */
+.nv-title em {
+    font-style: normal;
+    color: #0357A8;
+}
+
+@media (min-width: 768px) {
+    .nv-title em {
+        background: linear-gradient(100deg, #0357A8 0%, #0B6ACB 45%, #3898EC 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}
+
+.nv-sub {
+    font-size: clamp(1rem, 1.4vw, 1.16rem);
+    line-height: 1.8;
+    color: #45536F;
+    max-width: 56ch;
+    margin: 0 0 2.4rem;
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.nv-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
+}
+
+.nv-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 2.1rem;
+    border-radius: 100px;
+    font-size: 0.97rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-decoration: none;
+    background: linear-gradient(110deg, #0357A8 0%, #0B6ACB 55%, #3898EC 130%);
+    background-size: 150% 100%;
+    box-shadow: 0 14px 34px -12px rgba(3, 87, 168, 0.55);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.35s ease, background-position 0.5s ease;
+}
+
+.nv-btn-primary:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 20px 46px -14px rgba(3, 87, 168, 0.65);
+}
+
+.nv-btn-primary i {
+    font-size: 0.8em;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nv-btn-primary:hover i {
+    transform: translateX(4px);
+}
+
+.nv-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.1rem;
+    border-radius: 100px;
+    font-size: 0.97rem;
+    font-weight: 600;
+    color: #0357A8;
+    border: 1px solid rgba(3, 87, 168, 0.28);
+    background: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    transition: border-color 0.3s ease, background-color 0.3s ease,
+        color 0.3s ease, transform 0.3s ease;
+}
+
+.nv-btn-ghost:hover {
+    border-color: #3898EC;
+    color: #2A6FD0;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.nv-avail {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1.5rem 0 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #45536F;
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both;
+}
+
+/* ------------------------------------------------------------ glass stat bar */
+.nv-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(100%, 880px);
+    margin: 3.2rem 0 0;
+    padding: 1.6rem 1rem;
+    border: 1px solid rgba(3, 87, 168, 0.12);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 24px 50px -28px rgba(3, 87, 168, 0.35);
+    animation: hx-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both;
+}
+
+.nv-stat {
+    text-align: center;
+}
+
+.nv-stat+.nv-stat {
+    border-left: 1px solid rgba(3, 87, 168, 0.12);
+}
+
+.nv-stat dt {
+    font-family: var(--title-font);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+    color: #0357A8;
+    line-height: 1;
+}
+
+.nv-stat dt em {
+    font-style: normal;
+    color: #3898EC;
+    font-size: 0.68em;
+}
+
+.nv-stat dd {
+    margin: 0.5rem 0 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #55627D;
+}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 900px) {
+    .nv-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.4rem 0;
+        padding: 1.4rem 0.6rem;
+    }
+
+    /* 2×2: only the second column gets a divider */
+    .nv-stat+.nv-stat {
+        border-left: 0;
+    }
+
+    .nv-stat:nth-child(even) {
+        border-left: 1px solid rgba(3, 87, 168, 0.12);
+    }
+}
+
+@media (max-width: 640px) {
+    .nv-hero {
+        padding: 7rem 0 3rem;
+    }
+
+    /* H1 is the LCP element — paint it instantly on phones */
+    .nv-title {
+        animation: none;
+    }
+
+    .nv-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .nv-btn-primary,
+    .nv-btn-ghost {
+        justify-content: center;
+    }
+
+    /* blur(), the masked grid, and the extra aurora layers are all raster
+       cost phones pay before first paint — the flat gradient carries the
+       look on a small screen. */
+    .nv-aurora {
+        filter: none;
+    }
+
+    .nv-grid,
+    .nv-aurora-c,
+    .nv-spotlight {
+        display: none;
+    }
+
+    .nv-stats {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: #FFFFFF;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .nv-chip,
+    .nv-title,
+    .nv-sub,
+    .nv-actions,
+    .nv-avail,
+    .nv-stats,
+    .nv-aurora-c {
+        animation: none;
     }
 }

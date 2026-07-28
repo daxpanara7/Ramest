@@ -100,6 +100,7 @@ export default function Page() {
                 <div className="team-img-box">
                   {member.image ? (
                     <Image
+                      quality={85}
                       src={member.image}
                       alt={member.alt}
                       className="team-img"

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { SITE } from "@/lib/site";
+import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api-base";
 import { executeRecaptcha } from "@/lib/recaptcha";
 import RecaptchaNotice from "@/components/RecaptchaNotice";
@@ -22,6 +22,7 @@ type FormStatus = "idle" | "sending" | "sent" | "error";
  * a real enquiry is worse than filing a junk one.
  */
 export default function ContactForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -87,10 +88,10 @@ export default function ContactForm() {
         );
       }
 
+      // Redirect to the conversion page — ad platforms count a visit to
+      // /thank-you as a lead, which an inline message can never signal.
       setStatus("sent");
-      setName("");
-      setEmail("");
-      setMessage("");
+      router.push("/thank-you");
     } catch (err) {
       setStatus("error");
       setError(
@@ -157,10 +158,10 @@ export default function ContactForm() {
         </p>
       ) : null}
 
+      {/* Shown only for the instant before the /thank-you navigation lands. */}
       {status === "sent" ? (
         <p role="status" style={{ marginBottom: "1rem", opacity: 0.85 }}>
-          Thanks — we&apos;ve got your message and will reply shortly. Prefer
-          email? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+          Thanks — taking you to your confirmation…
         </p>
       ) : null}
 

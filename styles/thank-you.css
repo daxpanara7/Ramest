@@ -1,0 +1,182 @@
+/* ===========================================================================
+   THANK-YOU PAGE (/thank-you)
+
+   Conversion page the contact form redirects to after a successful submit —
+   its URL is what Google Ads / Analytics count as a lead. Centred single
+   column matching the legal-page hero: soft radial wash, navy display type,
+   pill buttons.
+   =========================================================================== */
+
+.ty-page {
+    position: relative;
+    padding: 10.5rem 0 6rem;
+    text-align: center;
+}
+
+.ty-page::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30rem;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 100% at 50% 0%, rgba(6, 96, 188, 0.09) 0%, rgba(6, 96, 188, 0) 70%);
+}
+
+/* Animated check disc — one subtle pop, then static. */
+.ty-badge {
+    width: 5rem;
+    height: 5rem;
+    margin: 0 auto 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    background: linear-gradient(120deg, #003A8C 0%, #0660BC 100%);
+    box-shadow: 0 18px 40px -18px rgba(3, 87, 168, 0.65);
+    animation: ty-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.ty-badge i {
+    font-size: 2rem;
+}
+
+@keyframes ty-pop {
+    from {
+        transform: scale(0.4);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ty-badge {
+        animation: none;
+    }
+}
+
+.ty-eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--first-color);
+    margin: 0 0 0.9rem;
+}
+
+.ty-title {
+    font-family: var(--title-font);
+    font-size: clamp(2.1rem, 4.6vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--title-color);
+    margin: 0;
+    text-wrap: balance;
+}
+
+.ty-lede {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-color);
+    max-width: 44ch;
+    margin: 1.1rem auto 0;
+    text-wrap: pretty;
+}
+
+/* ------------------------------------------------- what happens next card */
+
+.ty-steps {
+    max-width: 34rem;
+    margin: 2.75rem auto 0;
+    padding: 1.9rem 2rem;
+    text-align: left;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    background: var(--container-color);
+    box-shadow: 0 24px 60px -40px rgba(3, 87, 168, 0.4);
+}
+
+.ty-steps-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--first-color);
+    margin: 0 0 1.1rem;
+}
+
+.ty-steps ol {
+    list-style: none;
+    counter-reset: ty;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.ty-steps li {
+    counter-increment: ty;
+    position: relative;
+    padding-left: 2.4rem;
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.ty-steps li::before {
+    content: counter(ty, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--first-color);
+    opacity: 0.75;
+}
+
+/* ---------------------------------------------------------------- actions */
+
+.ty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+    margin-top: 2.5rem;
+}
+
+.ty-contact {
+    margin: 2.25rem auto 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.ty-contact a {
+    color: var(--first-color);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .ty-page {
+        padding: 8.5rem 0 4rem;
+    }
+
+    .ty-steps {
+        padding: 1.5rem 1.25rem;
+        border-radius: 18px;
+    }
+
+    .ty-actions .button {
+        width: 100%;
+        justify-content: center;
+    }
+}

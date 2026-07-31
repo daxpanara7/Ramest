@@ -5,10 +5,8 @@
 // data until a notifications API exists.
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Plus, Search, Sun, Moon, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Bell, Plus, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -35,13 +33,6 @@ export function AppHeader() {
   const { user, logout } = useAuth();
   // Drop the leading "admin" segment — it's the app root, not a crumb.
   const parts = pathname.split("/").filter(Boolean).slice(1);
-  const [dark, setDark] = useState(true);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("light", !dark);
-    return () => document.documentElement.classList.remove("light");
-  }, [dark]);
-
   const unread = notifications.filter((n) => n.unread).length;
   const firstName = user?.name.split(/\s+/)[0] ?? "";
   const initials = user
@@ -72,17 +63,6 @@ export function AppHeader() {
       </nav>
 
       <div className="ml-auto flex items-center gap-1.5">
-        <div className="relative hidden md:block">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search anything…"
-            className="h-8 w-64 bg-card/60 pl-8 pr-14 text-xs"
-          />
-          <kbd className="pointer-events-none absolute right-2 top-1/2 flex h-5 -translate-y-1/2 items-center gap-0.5 rounded border bg-background px-1.5 text-[10px] text-muted-foreground">
-            ⌘K
-          </kbd>
-        </div>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="sm" className="h-8 gap-1.5">
@@ -99,10 +79,6 @@ export function AppHeader() {
             <DropdownMenuItem asChild><Link href="/admin/users">Invite user</Link></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDark((v) => !v)} aria-label="Toggle theme">
-          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

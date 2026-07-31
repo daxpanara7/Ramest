@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   FileText, Newspaper, Users2, Mail, ShieldCheck, ArrowUpRight, ExternalLink,
-  Sparkles, Search, Image as ImageIcon,
+  Search, Image as ImageIcon, RefreshCw, AlertCircle,
 } from "lucide-react";
 import { PageHeader, Section, Stat } from "@/components/admin/primitives";
 import { Button } from "@/components/ui/button";
@@ -18,15 +18,72 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import {
-  stats, visitorSeries, leadSeries, trafficSources, blogs, leads, activityLogs,
-} from "@/lib/mock-data";
-import { statusBadge, leadStatusBadge } from "@/components/admin/badges";
+import { visitorSeries, leadSeries, trafficSources } from "@/lib/mock-data";
+import { apiLeadStatusBadge, postStatusBadge } from "@/components/admin/badges";
+import { useApi } from "@/lib/admin/use-api";
+import { relativeTime, formatDateTime } from "@/lib/admin/format";
 
+/**
+ * Layout is unchanged from the original design. What changed is where the
+ * numbers come from:
+ *
+ *   LIVE   — the five stat values, Recent blog posts, Recent leads, Recent
+ *            activity. All from GET /api/dashboard and /api/blog/posts.
+ *   STATIC — the three charts (Visitors & Blog views, Traffic sources, Lead
+ *            generation) and the "vs last month" deltas. The backend stores
+ *            no page views, referrers, or historical snapshots, so these
+ *            still render the sample series. They are the Search Console
+ *            integration's job — see SEARCH_CONSOLE_TODO below.
+ *
+ * Nothing is removed while it waits: the cards keep rendering so the layout
+ * is exactly what was designed.
+ */
+
+// TODO(search-console): replace visitorSeries / trafficSources / leadSeries
+// and the Stat deltas once the Search Console API is wired. Clicks,
+// impressions, CTR and average position all come from
+// searchanalytics.query; traffic sources need GA4 rather than GSC.
+const SEARCH_CONSOLE_TODO = true;
 
 const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
+type DashboardStats = {
+  users: { total: number };
+  blogPosts: { published: number; draft: number };
+  newsletter: { activeSubscribers: number };
+  leads: {
+    total: number;
+    byStatus: Record<string, number>;
+    recent: {
+      id: string; name: string; email: string;
+      company: string | null; service: string | null;
+      status: string; createdAt: string;
+    }[];
+  };
+  activity: {
+    recent: {
+      id: string; action: string; entity: string | null;
+      createdAt: string; user: { name: string; email: string } | null;
+    }[];
+  };
+};
+
+type Post = {
+  id: string; title: string; slug: string; status: string;
+  updatedAt: string;
+  category: { name: string } | null;
+};
+type PostList = { items: Post[]; total: number };
+
 export default function DashboardPage() {
+  const { data, loading, error, reload } = useApi<DashboardStats>("/dashboard");
+  const { data: posts } = useApi<PostList>("/blog/posts?take=5");
+
+  const totalBlogs = (data?.blogPosts.published ?? 0) + (data?.blogPosts.draft ?? 0);
+  const recentPosts = posts?.items ?? [];
+  const recentLeads = data?.leads.recent ?? [];
+  const recentActivity = data?.activity.recent ?? [];
+
   return (
     <Section>
       <PageHeader
@@ -34,25 +91,36 @@ export default function DashboardPage() {
         description="A snapshot of content performance, leads, and platform health."
         actions={
           <>
-            <Button variant="outline" size="sm">Export</Button>
+            <Button variant="outline" size="sm" onClick={reload} disabled={loading}>
+              <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
             <Button size="sm" asChild><Link href="/admin/blog/new">New post</Link></Button>
           </>
         }
       />
 
+      {error && (
+        <div role="alert" className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+          <Button variant="ghost" size="sm" className="ml-auto h-7" onClick={reload}>Retry</Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-        <Stat label="Total Blogs" value={stats.totalBlogs} delta="+8.2%" icon={<Newspaper className="h-4 w-4" />} />
-        <Stat label="Published" value={stats.publishedBlogs} delta="+4.6%" icon={<FileText className="h-4 w-4" />} />
-        <Stat label="Contact Leads" value={stats.contactLeads} delta="+18.4%" icon={<Users2 className="h-4 w-4" />} />
-        <Stat label="Subscribers" value={stats.newsletter.toLocaleString()} delta="+2.1%" icon={<Mail className="h-4 w-4" />} />
-        <Stat label="Team" value={stats.totalUsers} delta="0%" icon={<ShieldCheck className="h-4 w-4" />} />
+        <Stat label="Total Blogs" value={totalBlogs} delta="+8.2%" icon={<Newspaper className="h-4 w-4" />} />
+        <Stat label="Published" value={data?.blogPosts.published ?? 0} delta="+4.6%" icon={<FileText className="h-4 w-4" />} />
+        <Stat label="Contact Leads" value={data?.leads.total ?? 0} delta="+18.4%" icon={<Users2 className="h-4 w-4" />} />
+        <Stat label="Subscribers" value={(data?.newsletter.activeSubscribers ?? 0).toLocaleString()} delta="+2.1%" icon={<Mail className="h-4 w-4" />} />
+        <Stat label="Team" value={data?.users.total ?? 0} delta="0%" icon={<ShieldCheck className="h-4 w-4" />} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
-              <CardTitle className="text-base">Visitors & Blog views</CardTitle>
+              <CardTitle className="text-base">Visitors &amp; Blog views</CardTitle>
               <CardDescription>Trailing 12 months</CardDescription>
             </div>
             <Badge variant="secondary" className="gap-1">
@@ -182,15 +250,29 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {blogs.slice(0, 5).map((b) => (
+                {recentPosts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-10 text-center text-sm text-muted-foreground">
+                      No posts yet.
+                    </TableCell>
+                  </TableRow>
+                ) : recentPosts.map((b) => (
                   <TableRow key={b.id}>
                     <TableCell className="max-w-[320px]">
                       <div className="truncate font-medium">{b.title}</div>
-                      <div className="text-xs text-muted-foreground">{b.author} · {b.updated}</div>
+                      <div className="text-xs text-muted-foreground" title={formatDateTime(b.updatedAt)}>
+                        {relativeTime(b.updatedAt)}
+                      </div>
                     </TableCell>
-                    <TableCell><Badge variant="outline" className="text-[10.5px]">{b.category}</Badge></TableCell>
-                    <TableCell>{statusBadge(b.status)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{b.views.toLocaleString()}</TableCell>
+                    <TableCell>
+                      {b.category
+                        ? <Badge variant="outline" className="text-[10.5px]">{b.category.name}</Badge>
+                        : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell>{postStatusBadge(b.status)}</TableCell>
+                    {/* Views needs an analytics source — Search Console page
+                        clicks/impressions once that integration lands. */}
+                    <TableCell className="text-right tabular-nums text-muted-foreground">—</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -201,19 +283,23 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Recent activity</CardTitle>
-            <CardDescription>Team & system events</CardDescription>
+            <CardDescription>Team &amp; system events</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pr-1">
-            {activityLogs.slice(0, 6).map((l) => (
+            {recentActivity.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No activity recorded yet.</p>
+            ) : recentActivity.map((l) => (
               <div key={l.id} className="flex gap-3">
                 <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">
-                    <span className="font-medium">{l.user}</span>{" "}
+                    <span className="font-medium">{l.user?.name ?? "System"}</span>{" "}
                     <span className="text-muted-foreground">{l.action}</span>{" "}
-                    <span className="font-medium">{l.target}</span>
+                    {l.entity && <span className="font-medium">{l.entity}</span>}
                   </p>
-                  <p className="text-[11px] text-muted-foreground/80">{l.at}</p>
+                  <p className="text-[11px] text-muted-foreground/80" title={formatDateTime(l.createdAt)}>
+                    {relativeTime(l.createdAt)}
+                  </p>
                 </div>
               </div>
             ))}
@@ -243,16 +329,28 @@ export default function DashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leads.slice(0, 5).map((l) => (
+              {recentLeads.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
+                    No leads yet.
+                  </TableCell>
+                </TableRow>
+              ) : recentLeads.map((l) => (
                 <TableRow key={l.id}>
                   <TableCell>
                     <div className="font-medium">{l.name}</div>
                     <div className="text-xs text-muted-foreground">{l.email}</div>
                   </TableCell>
-                  <TableCell>{l.company}</TableCell>
-                  <TableCell><Badge variant="outline" className="text-[10.5px]">{l.service}</Badge></TableCell>
-                  <TableCell>{leadStatusBadge(l.status)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{l.createdAt}</TableCell>
+                  <TableCell>{l.company ?? "—"}</TableCell>
+                  <TableCell>
+                    {l.service
+                      ? <Badge variant="outline" className="text-[10.5px]">{l.service}</Badge>
+                      : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell>{apiLeadStatusBadge(l.status)}</TableCell>
+                  <TableCell className="text-right text-muted-foreground" title={formatDateTime(l.createdAt)}>
+                    {relativeTime(l.createdAt)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

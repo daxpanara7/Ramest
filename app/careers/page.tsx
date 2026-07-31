@@ -1,14 +1,80 @@
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
 import PageHero from "@/components/sections/PageHero";
+import RolesBoard, { type Role } from "@/components/careers/RolesBoard";
 import { SITE, breadcrumbJsonLd, createPageMetadata } from "@/lib/site";
 
 export const metadata = createPageMetadata({
   title: "Careers",
   description:
-    "Ramest Technolabs is a small, senior software team in Ahmedabad, India. See how we hire, who we look for, and how to send a speculative application.",
+    "Join Ramest Technolabs — a senior software team in Ahmedabad, India. See how we work, the areas we hire for, our hiring process, and how to apply.",
   path: "/careers",
 });
+
+/** How we work — value cards shown before the roles list. */
+const values = [
+  {
+    icon: "fa-bullseye",
+    title: "Own real outcomes",
+    desc: "You scope the work, build it, and answer for it — from the first discovery call to a production issue at 11pm. Your decisions ship and matter.",
+  },
+  {
+    icon: "fa-comments",
+    title: "Talk to clients directly",
+    desc: "You are in the room, or on the call, when decisions get made — not receiving requirements secondhand through a project manager.",
+  },
+  {
+    icon: "fa-layer-group",
+    title: "More scope than your title",
+    desc: "A backend engineer here reviews infrastructure calls; a front-end engineer sits in on discovery. You own more than a narrow slice.",
+  },
+  {
+    icon: "fa-code-branch",
+    title: "Build things people keep",
+    desc: "We hand systems over to client teams and stay reachable after launch. Code that only its author understands is a liability, not cleverness.",
+  },
+];
+
+/** Areas we recruit for. No specific role is posted today; these accept
+ *  speculative applications, which we genuinely read and keep on file. */
+const roleAreas: Role[] = [
+  {
+    category: "Engineering",
+    title: "Frontend Engineer — React & Next.js",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+  {
+    category: "Engineering",
+    title: "Backend Engineer — Node.js & Python",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+  {
+    category: "AI & Data",
+    title: "AI / ML Engineer — LLMs & Automation",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+  {
+    category: "Design",
+    title: "UI/UX Designer — Product & Design Systems",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+  {
+    category: "Cloud & DevOps",
+    title: "Cloud & DevOps Engineer — AWS",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+  {
+    category: "Quality",
+    title: "QA & Automation Engineer",
+    location: "Ahmedabad · Remote-friendly",
+    type: "Full-time",
+  },
+];
 
 const perks = [
   {
@@ -19,7 +85,7 @@ const perks = [
   {
     icon: "fa-people-group",
     title: "Great Culture",
-    desc: "Collaborative, inclusive team culture where your ideas are heard and recognized.",
+    desc: "Collaborative, inclusive culture where your ideas are heard and recognized.",
   },
   {
     icon: "fa-laptop-house",
@@ -43,7 +109,7 @@ const perks = [
   },
 ];
 
-/** The four stages of our hiring process — reuses the services timeline pattern. */
+/** The four stages of our hiring process — reuses the services timeline. */
 const hiringSteps = [
   {
     step: "01",
@@ -71,35 +137,14 @@ const hiringSteps = [
   },
 ];
 
-const traits = [
-  {
-    icon: "fa-comments",
-    title: "Comfortable close to the client",
-    desc: "You will be in the room, or the call, when decisions get made — not receiving requirements secondhand after the fact.",
-  },
-  {
-    icon: "fa-scale-balanced",
-    title: "Can explain the trade-off, not just the code",
-    desc: "We care as much about whether you can tell a non-technical client why a decision matters as whether the code is correct.",
-  },
-  {
-    icon: "fa-compass",
-    title: "Comfortable with ambiguity",
-    desc: "There is no ten-person hierarchy to route decisions through. Sometimes you decide, ship, and answer for the result.",
-  },
-  {
-    icon: "fa-code-compare",
-    title: "Cares who reads the code next",
-    desc: "We hand systems over to client teams. Code only the author understands is a liability, not a clever solution.",
-  },
-];
-
 export default function Page() {
   const breadcrumbs = breadcrumbJsonLd([
     { name: "Home", path: "/" },
     { name: "Company", path: "/company" },
     { name: "Careers", path: "/careers" },
   ]);
+
+  const applyHref = `mailto:${SITE.email}?subject=Application%20—%20Ramest%20Technolabs`;
 
   return (
     <>
@@ -125,46 +170,84 @@ export default function Page() {
         title={
           <>
             Build software with a{" "}
-            <span className="gradient-text">small, senior team</span>
+            <span className="gradient-text">senior team</span>
           </>
         }
-        description="Ramest Technolabs is five people, not five hundred. Everyone who works here writes code, talks to clients, and owns outcomes — there is no layer of management standing between you and the product."
+        description="We hire selectively for engineers and designers who want to own real products end to end — scoping, building, and standing behind what ships, with direct access to the people they build for."
       />
 
-      <section className="section">
+      {/* ---------- Open roles (first) ---------- */}
+      <section className="section" aria-labelledby="open-roles">
         <div className="container">
-          <h2 className="section-title">What it&apos;s actually like</h2>
-          <p className="about-text">
-            There is no bench, no unnamed delivery pool, and no account
-            manager standing between you and the client. When you join
-            Ramest Technolabs, you are one of a handful of engineers who
-            scope the work, build it, and answer for it — from the first
-            discovery call to a production issue at 11pm. That is
-            deliberate: small teams move faster and take the work more
-            personally when there is nowhere to hide.
-          </p>
-          <p className="about-text" style={{ marginTop: "1rem" }}>
-            You will talk to clients directly, in planning calls and in
-            Slack threads, not through a project manager relaying
-            requirements secondhand. You will also own more than your job
-            title suggests — a backend engineer here reviews infrastructure
-            decisions, a front-end engineer sits in on discovery. If you
-            want a narrowly scoped role inside a large organization, this is
-            not that. If you want to see your decisions ship and matter, it
-            might be.
-          </p>
+          <div className="careers-head">
+            <span className="careers-eyebrow">Open positions</span>
+            <h2 className="section-title" id="open-roles">
+              Open roles right now
+            </h2>
+            <p className="careers-head-lead">
+              We hire selectively, so there is not always a specific role
+              posted — and honestly, there is not one open today. But we are
+              always reviewing strong speculative applications in the areas
+              below. Send us your work and we will keep it on file for when a
+              role opens, or reach out sooner if it is a clear fit.
+            </p>
+          </div>
+
+          <RolesBoard roles={roleAreas} applyHref={applyHref} />
+
+          <div className="careers-cta">
+            <a href={applyHref} className="button button-primary">
+              Email your resume{" "}
+              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </section>
 
-      <section className="section">
+      {/* ---------- How we work (after open roles) ---------- */}
+      <section className="section" aria-labelledby="how-we-work">
         <div className="container">
-          <h2 className="section-title">What you get</h2>
-          <p className="careers-intro">
-            At Ramest Technolabs, we believe great people build great
-            products. We&apos;re looking for engineers who want to make an
-            impact and value creativity, collaboration, and continuous
-            learning.
-          </p>
+          <div className="careers-head">
+            <span className="careers-eyebrow">Life at Ramest</span>
+            <h2 className="section-title" id="how-we-work">
+              How we work
+            </h2>
+            <p className="careers-head-lead">
+              If you want a narrowly scoped seat inside a large organization,
+              this is not that. If you want your work to reach real users and
+              your decisions to carry weight, read on.
+            </p>
+          </div>
+          <div className="careers-values">
+            {values.map((v) => (
+              <div className="value-card" key={v.title}>
+                <span className="value-icon" aria-hidden="true">
+                  <i className={`fa-solid ${v.icon}`} />
+                </span>
+                <div>
+                  <h3 className="value-title">{v.title}</h3>
+                  <p className="value-desc">{v.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- What you get ---------- */}
+      <section className="section" aria-labelledby="what-you-get">
+        <div className="container">
+          <div className="careers-head">
+            <span className="careers-eyebrow">Benefits</span>
+            <h2 className="section-title" id="what-you-get">
+              What you get
+            </h2>
+            <p className="careers-head-lead">
+              Great people build great products. Alongside interesting work, we
+              back you with the support, flexibility, and growth to do your
+              best.
+            </p>
+          </div>
           <div className="perks-grid">
             {perks.map((perk) => (
               <div className="perk-card" key={perk.title}>
@@ -179,16 +262,23 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="section">
+      {/* ---------- How we hire ---------- */}
+      <section className="section" aria-labelledby="how-we-hire">
         <div className="container">
-          <h2 className="section-title">How we hire</h2>
-          <p className="about-text">
-            Four stages, usually finished within two to three weeks — we try
-            not to let a good candidate sit in limbo.
-          </p>
+          <div className="careers-head">
+            <span className="careers-eyebrow">Process</span>
+            <h2 className="section-title" id="how-we-hire">
+              How we hire
+            </h2>
+            <p className="careers-head-lead">
+              Four stages, usually finished within two to three weeks — we try
+              not to let a good candidate sit in limbo.
+            </p>
+          </div>
           <ol
-            className="svc-timeline svc-timeline--four"
-            style={{ marginTop: "2.5rem" }}
+            className="svc-timeline"
+            data-steps={hiringSteps.length}
+            style={{ marginTop: "1rem" }}
           >
             {hiringSteps.map((step) => (
               <li key={step.step} className="svc-timeline-step">
@@ -200,52 +290,16 @@ export default function Page() {
               </li>
             ))}
           </ol>
-        </div>
-      </section>
 
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title">Who we look for</h2>
-          <div className="why-grid">
-            {traits.map((trait) => (
-              <div className="why-card" key={trait.title}>
-                <div className="why-icon">
-                  <i className={`fa-solid ${trait.icon}`} aria-hidden="true" />
-                </div>
-                <h3 className="why-title">{trait.title}</h3>
-                <p className="why-desc">{trait.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title">Open roles right now</h2>
-          <p className="about-text">
-            Honestly — we do not have an open position listed today. We are
-            a small team and we hire rarely, only when the work genuinely
-            requires another person. When that changes, we will list the
-            role here. If you think you would be a strong fit for a future
-            engineering position at Ramest Technolabs, send your resume and
-            a short note about something you have built to{" "}
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. We do read
-            speculative applications, and we keep them on file for when a
-            role opens.
-          </p>
-          <div className="careers-cta">
-            <a href={`mailto:${SITE.email}`} className="button button-primary">
-              Email your resume <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </a>
-          </div>
-
-          <p className="contact-note">
+          <p
+            className="contact-note"
+            style={{ marginTop: "2.5rem", textAlign: "center" }}
+          >
             Curious who you would be working with? Meet{" "}
             <Link href="/team">the team</Link>, see{" "}
-            <Link href="/services">the kind of work we do</Link>, or learn
-            more <Link href="/company">about the company</Link> before you
-            write to us.
+            <Link href="/services">the kind of work we do</Link>, or learn more{" "}
+            <Link href="/company">about the company</Link> before you write to
+            us.
           </p>
         </div>
       </section>

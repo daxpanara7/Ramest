@@ -31,3 +31,43 @@ export function userStatusBadge(status: "Active" | "Invited" | "Suspended") {
   } as const;
   return <Badge className={cn(cls, map[status])}>{status}</Badge>;
 }
+
+/**
+ * Lead status straight from the API's Prisma enum (UPPERCASE, and including
+ * SPAM, which the legacy Title-case helper above has no entry for).
+ */
+export function apiLeadStatusBadge(status: string) {
+  const map: Record<string, string> = {
+    NEW: "bg-primary/12 text-primary ring-1 ring-inset ring-primary/25",
+    CONTACTED: "bg-sky-500/12 text-sky-600 ring-1 ring-inset ring-sky-500/20",
+    QUALIFIED: "bg-amber-500/12 text-amber-600 ring-1 ring-inset ring-amber-500/20",
+    WON: "bg-emerald-500/12 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+    LOST: "bg-destructive/12 text-destructive ring-1 ring-inset ring-destructive/25",
+    SPAM: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+  };
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
+  return <Badge className={cn(cls, map[status] ?? map.NEW)}>{label}</Badge>;
+}
+
+/** Newsletter subscriber status: PENDING | ACTIVE | UNSUBSCRIBED. */
+export function subscriberStatusBadge(status: string) {
+  const map: Record<string, string> = {
+    ACTIVE: "bg-emerald-500/12 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+    PENDING: "bg-amber-500/12 text-amber-600 ring-1 ring-inset ring-amber-500/20",
+    UNSUBSCRIBED: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+  };
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
+  return <Badge className={cn(cls, map[status] ?? map.PENDING)}>{label}</Badge>;
+}
+
+/** Blog post status from the API enum: DRAFT | SCHEDULED | PUBLISHED | ARCHIVED. */
+export function postStatusBadge(status: string) {
+  const map: Record<string, string> = {
+    PUBLISHED: "bg-emerald-500/12 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+    DRAFT: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+    SCHEDULED: "bg-amber-500/12 text-amber-600 ring-1 ring-inset ring-amber-500/20",
+    ARCHIVED: "bg-destructive/12 text-destructive ring-1 ring-inset ring-destructive/25",
+  };
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
+  return <Badge className={cn(cls, map[status] ?? map.DRAFT)}>{label}</Badge>;
+}

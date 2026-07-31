@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip,
   XAxis, YAxis,
@@ -7,13 +8,42 @@ import {
 import { PageHeader, Section } from "@/components/admin/primitives";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { seoScores, keywordSeries } from "@/lib/mock-data";
-import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, AlertCircle } from "lucide-react";
+import { useApi } from "@/lib/admin/use-api";
 
+/**
+ * Original layout. Data now comes from two real sources:
+ *
+ *   LIVE  — organic traffic, position trend, and the SEO score ring, all from
+ *           Google Search Console via /api/seo/search-console/*.
+ *         — metadata & schema coverage, computed from published posts.
+ *   TODO  — Core Web Vitals needs CrUX / PageSpeed Insights; the GEO and AEO
+ *           rings need the AI-citation tracker on /admin/ai-search. Those
+ *           cards stay in place showing "—" rather than inventing numbers.
+ */
 
-function ScoreRing({ label, value, hint }: { label: string; value: number; hint: string }) {
+type Totals = { clicks: number; impressions: number; ctr: number; position: number };
+type GscSummary = {
+  enabled: boolean;
+  current?: Totals;
+  previous?: Totals;
+  deltaPct?: { clicks: number | null; impressions: number | null };
+  series?: { date: string; clicks: number; impressions: number; ctr: number; position: number }[];
+};
+type Coverage = {
+  totalPublished: number;
+  summary: {
+    missingMetaTitle: number; missingMetaDescription: number;
+    missingCanonical: number; missingOgImage: number; fullyComplete: number;
+  };
+};
+
+function ScoreRing({ label, value, hint }: { label: string; value: number | null; hint: string }) {
   const r = 36, c = 2 * Math.PI * r;
-  const off = c - (value / 100) * c;
+  const shown = value ?? 0;
+  const off = c - (shown / 100) * c;
   return (
     <Card>
       <CardContent className="flex items-center gap-4 p-5">
@@ -24,7 +54,7 @@ function ScoreRing({ label, value, hint }: { label: string; value: number; hint:
               strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-display text-2xl tracking-tight">{value}</span>
+            <span className="font-display text-2xl tracking-tight">{value ?? "—"}</span>
           </div>
         </div>
         <div>
@@ -37,40 +67,100 @@ function ScoreRing({ label, value, hint }: { label: string; value: number; hint:
 }
 
 export default function SeoPage() {
+  const { data: gsc, loading, error, reload } = useApi<GscSummary>("/seo/search-console/summary?days=90");
+  const { data: cov } = useApi<Coverage>("/seo/metadata-coverage");
+
+  const series = gsc?.series ?? [];
+
+  /**
+   * A visibility score from real signals rather than a vanity number:
+   * CTR (max 40) + average position (max 40) + impression volume (max 20).
+   * Documented here because an unexplained 0-100 score is untrustworthy.
+   */
+  const seoScore = useMemo(() => {
+    const c = gsc?.current;
+    if (!c || c.impressions === 0) return null;
+    const ctrPts = Math.min(c.ctr * 100 * 2, 40);
+    const posPts = Math.max(0, 40 - Math.max(0, c.position - 1) * 1.2);
+    const volPts = Math.min(Math.log10(c.impressions + 1) * 8, 20);
+    return Math.round(ctrPts + posPts + volPts);
+  }, [gsc]);
+
+  const coverageRows = useMemo(() => {
+    if (!cov) return null;
+    const t = cov.totalPublished;
+    const s = cov.summary;
+    const row = (k: string, missing: number) => ({
+      k, v: `${t - missing} / ${t}`, ok: t > 0 && missing === 0,
+    });
+    return [
+      row("Meta titles set", s.missingMetaTitle),
+      row("Meta descriptions set", s.missingMetaDescription),
+      row("Canonical URLs set", s.missingCanonical),
+      row("OpenGraph images", s.missingOgImage),
+      row("Fully complete pages", t - s.fullyComplete),
+    ];
+  }, [cov]);
+
   return (
     <Section>
       <PageHeader
         title="SEO Dashboard"
         description="Search performance, technical health and content coverage."
+        actions={
+          <Button variant="outline" size="sm" onClick={reload} disabled={loading}>
+            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        }
       />
 
+      {error && (
+        <div role="alert" className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+          <Button variant="ghost" size="sm" className="ml-auto h-7" onClick={reload}>Retry</Button>
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <ScoreRing label="SEO Score" value={seoScores.seo} hint="Above target (85+)" />
-        <ScoreRing label="GEO Score" value={seoScores.geo} hint="Improving month-over-month" />
-        <ScoreRing label="AEO Score" value={seoScores.aeo} hint="Answer coverage growing" />
-        <ScoreRing label="Performance" value={seoScores.perf} hint="Core Web Vitals healthy" />
+        <ScoreRing
+          label="SEO Score"
+          value={seoScore}
+          hint={gsc?.current ? `${gsc.current.clicks} clicks · pos ${gsc.current.position.toFixed(1)}` : "Awaiting Search Console"}
+        />
+        <ScoreRing label="GEO Score" value={null} hint="Needs the AI citation tracker" />
+        <ScoreRing label="AEO Score" value={null} hint="Needs the AI citation tracker" />
+        <ScoreRing label="Performance" value={null} hint="Needs PageSpeed Insights" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
-              <CardTitle className="text-base">Keyword growth</CardTitle>
-              <CardDescription>Top-3 and top-10 positions</CardDescription>
+              <CardTitle className="text-base">Average position</CardTitle>
+              <CardDescription>Lower is better · Google Search</CardDescription>
             </div>
-            <Badge variant="secondary" className="text-[10.5px]">Trailing 6 months</Badge>
+            <Badge variant="secondary" className="text-[10.5px]">Trailing 90 days</Badge>
           </CardHeader>
           <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={keywordSeries} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-                <Line type="monotone" dataKey="top3" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="top10" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            {loading && series.length === 0 ? (
+              <Skeleton className="h-full w-full rounded-lg" />
+            ) : series.length === 0 ? (
+              <Empty note="No Search Console data for this window yet." />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={series} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  {/* Inverted: position 1 is best, so the good direction is up. */}
+                  <YAxis reversed stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                  <Line type="monotone" dataKey="position" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 2 }} name="Avg. position" />
+                  <Line type="monotone" dataKey="ctr" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 2 }} name="CTR %" />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -80,20 +170,17 @@ export default function SeoPage() {
             <CardDescription>75th percentile · last 28 days</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[
-              { k: "LCP", v: "1.9s", ok: true },
-              { k: "INP", v: "142ms", ok: true },
-              { k: "CLS", v: "0.03", ok: true },
-              { k: "TTFB", v: "480ms", ok: false },
-            ].map((r) => (
-              <div key={r.k} className="flex items-center justify-between">
+            {/* Field data needs CrUX / PageSpeed Insights — the rows stay so
+                the layout holds, with honest "—" rather than made-up timings. */}
+            {["LCP", "INP", "CLS", "TTFB"].map((k) => (
+              <div key={k} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">{r.k}</p>
-                  <p className="text-xs text-muted-foreground">{r.ok ? "Passing" : "Needs work"}</p>
+                  <p className="text-sm font-medium">{k}</p>
+                  <p className="text-xs text-muted-foreground">Not measured</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm tabular-nums">{r.v}</span>
-                  {r.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <AlertTriangle className="h-4 w-4 text-amber-400" />}
+                  <span className="font-mono text-sm tabular-nums text-muted-foreground">—</span>
+                  <AlertTriangle className="h-4 w-4 text-muted-foreground/50" />
                 </div>
               </div>
             ))}
@@ -103,50 +190,61 @@ export default function SeoPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Organic traffic</CardTitle>
-            <CardDescription>Clicks & impressions</CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div>
+              <CardTitle className="text-base">Organic traffic</CardTitle>
+              <CardDescription>Clicks &amp; impressions · Google Search</CardDescription>
+            </div>
+            {gsc?.deltaPct?.clicks !== null && gsc?.deltaPct?.clicks !== undefined && (
+              <Badge variant="secondary" className="text-[10.5px]">
+                {gsc.deltaPct.clicks > 0 ? "+" : ""}{gsc.deltaPct.clicks}% clicks
+              </Badge>
+            )}
           </CardHeader>
           <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={keywordSeries.map((k, i) => ({ m: k.m, clicks: 800 + i * 220, impressions: 4200 + i * 1100 }))}
-                margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-                <Area type="monotone" dataKey="impressions" stroke="var(--chart-2)" fill="none" strokeWidth={2} />
-                <Area type="monotone" dataKey="clicks" stroke="var(--chart-1)" fill="url(#s1)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
+            {loading && series.length === 0 ? (
+              <Skeleton className="h-full w-full rounded-lg" />
+            ) : series.length === 0 ? (
+              <Empty note="No Search Console data for this window yet." />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={series} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.5} />
+                      <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                  <Area type="monotone" dataKey="impressions" stroke="var(--chart-2)" fill="none" strokeWidth={2} />
+                  <Area type="monotone" dataKey="clicks" stroke="var(--chart-1)" fill="url(#s1)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Metadata & schema</CardTitle>
+            <CardTitle className="text-base">Metadata &amp; schema</CardTitle>
             <CardDescription>Coverage across published pages</CardDescription>
           </CardHeader>
           <CardContent className="divide-y divide-border/60">
-            {[
-              { k: "Meta titles set", v: "112 / 112", ok: true },
-              { k: "Meta descriptions set", v: "108 / 112", ok: true },
-              { k: "OpenGraph images", v: "94 / 112", ok: false },
-              { k: "Article schema", v: "112 / 112", ok: true },
-              { k: "Breadcrumb schema", v: "88 / 112", ok: false },
-              { k: "FAQ schema (AEO)", v: "41 / 112", ok: false },
-            ].map((r) => (
+            {!coverageRows ? (
+              Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="my-3 h-6 w-full" />)
+            ) : cov?.totalPublished === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No published posts yet — publish one and coverage appears here.
+              </p>
+            ) : coverageRows.map((r) => (
               <div key={r.k} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                 <span className="text-sm">{r.k}</span>
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="font-mono text-muted-foreground tabular-nums">{r.v}</span>
-                  {r.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <XCircle className="h-4 w-4 text-destructive" />}
+                  <span className="font-mono tabular-nums text-muted-foreground">{r.v}</span>
+                  {r.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-destructive" />}
                 </div>
               </div>
             ))}
@@ -154,5 +252,13 @@ export default function SeoPage() {
         </Card>
       </div>
     </Section>
+  );
+}
+
+function Empty({ note }: { note: string }) {
+  return (
+    <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">
+      {note}
+    </div>
   );
 }

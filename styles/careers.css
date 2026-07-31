@@ -22,9 +22,79 @@
     transition: .3s;
 }
 
+.perk-card {
+    text-align: left;
+}
+
 .perk-card:hover {
     border-color: var(--first-color);
-    transform: translateY(-5px);
+    box-shadow: 0 18px 44px -28px rgba(3, 87, 168, 0.4);
+}
+
+/* ---------------------------------------------------------------- values */
+
+.careers-lead {
+    max-width: 62ch;
+    margin: 0 0 2.75rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+.careers-values {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.value-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.1rem;
+    align-items: start;
+    padding: 1.6rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    background: var(--container-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-card:hover {
+    border-color: rgba(3, 87, 168, 0.4);
+    box-shadow: 0 18px 44px -28px rgba(3, 87, 168, 0.4);
+}
+
+.value-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 0.85rem;
+    background: rgba(56, 152, 236, 0.12);
+    color: var(--first-color);
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.value-title {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--title-color);
+    margin: 0.15rem 0 0.4rem;
+}
+
+.value-desc {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-color);
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .careers-values {
+        grid-template-columns: 1fr;
+    }
 }
 
 .perk-icon {
@@ -56,5 +126,163 @@
 @media (max-width: 480px) {
     .perks-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ---- centered section headers (careers) ---- */
+.careers-head { text-align: center; max-width: 60ch; margin: 0 auto 3rem; }
+.careers-eyebrow {
+    display: inline-block; margin: 0 0 0.9rem; padding: 0.45rem 1.1rem;
+    border-radius: 100px; background: var(--first-color-light);
+    color: var(--first-color); font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+}
+.careers-head .section-title { text-align: center; margin: 0; }
+.careers-head-lead {
+    margin: 1.1rem auto 0; max-width: 60ch; font-size: 1.05rem;
+    line-height: 1.8; color: var(--text-color);
+}
+.careers-values, .perks-grid, .svc-timeline { max-width: 1000px; margin-inline: auto; }
+
+/* ==================== ROLES BOARD (reference-matched) ==================== */
+
+.roles-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    max-width: 1000px;
+    margin: 0 auto 2rem;
+}
+
+.roles-filter {
+    padding: 0.6rem 1.25rem;
+    border-radius: 100px;
+    border: 1px solid var(--border-color);
+    background: var(--container-color);
+    color: var(--text-color);
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: color .25s ease, border-color .25s ease, background-color .25s ease;
+}
+
+.roles-filter:hover {
+    color: var(--first-color);
+    border-color: rgba(3, 87, 168, .35);
+}
+
+.roles-filter.is-active {
+    color: var(--first-color);
+    border-color: var(--first-color);
+    background: var(--first-color-light);
+}
+
+/* One container; rows separated by hairlines (no gaps, no per-card border) */
+.roles-board {
+    max-width: 1000px;
+    margin: 0 auto 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    background: var(--container-color);
+    overflow: hidden;
+}
+
+.role-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.6rem 1.9rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color .25s ease;
+}
+
+.role-row + .role-row {
+    border-top: 1px solid var(--border-color);
+}
+
+.role-row:hover {
+    background: var(--first-color-light);
+}
+
+.role-main {
+    min-width: 0;
+}
+
+.role-cat {
+    margin: 0 0 .45rem;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--first-color);
+}
+
+.role-title {
+    font-family: var(--title-font);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--title-color);
+    margin: 0 0 .55rem;
+    transition: color .25s ease;
+}
+
+.role-row:hover .role-title {
+    color: var(--first-color);
+}
+
+.role-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.1rem;
+    font-size: .88rem;
+    color: var(--text-color);
+}
+
+.role-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.role-meta i {
+    font-size: .85em;
+    opacity: .75;
+}
+
+.role-apply {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--first-color);
+    white-space: nowrap;
+}
+
+.role-apply i {
+    font-size: .82em;
+    transition: transform .25s ease;
+}
+
+.role-row:hover .role-apply i {
+    transform: translate(2px, -2px);
+}
+
+@media (max-width: 640px) {
+    .role-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.4rem 1.25rem;
+    }
+
+    .role-title {
+        font-size: 1.15rem;
     }
 }

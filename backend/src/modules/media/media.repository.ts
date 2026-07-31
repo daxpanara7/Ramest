@@ -22,7 +22,14 @@ export class MediaRepository {
   async list(params: { skip?: number; take?: number; mimeType?: string }) {
     const where: Prisma.MediaAssetWhereInput = {
       deletedAt: null,
-      ...(params.mimeType ? { mimeType: params.mimeType } : {}),
+      // A trailing slash means "family" (image/, video/) so the admin's
+      // folder rail can filter by type group; anything else stays an exact
+      // match, e.g. application/pdf.
+      ...(params.mimeType
+        ? params.mimeType.endsWith('/')
+          ? { mimeType: { startsWith: params.mimeType } }
+          : { mimeType: params.mimeType }
+        : {}),
     };
     const [items, total] = await Promise.all([
       this.prisma.mediaAsset.findMany({

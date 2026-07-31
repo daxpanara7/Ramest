@@ -23,10 +23,13 @@ const MOBILE_BREAKPOINT = 768;
 
 const CAPSULE_ENTER_DELAY = DEFAULT_ENTER_DELAY;
 const CAPSULE_LEAVE_DELAY = DEFAULT_LEAVE_DELAY;
-const DROPDOWN_ENTER_DELAY = 100;
-const DROPDOWN_LEAVE_DELAY = 200;
+// Dwell before a dropdown opens (short, so it still feels instant) and grace
+// after leaving before it closes (long enough to cross the capsule→panel gap).
+const DROPDOWN_ENTER_DELAY = 80;
+const DROPDOWN_LEAVE_DELAY = 180;
 
 type MobilePanel = "services" | "company" | null;
+type DesktopDropdown = "services" | "company" | null;
 
 export default function Header() {
   const pathname = usePathname();
@@ -56,37 +59,92 @@ export default function Header() {
     enabled: isDesktop && !menuOpen,
   });
 
-  const servicesHover = useDelayedHover({
-    enterDelay: DROPDOWN_ENTER_DELAY,
-    leaveDelay: DROPDOWN_LEAVE_DELAY,
-    enabled: isDesktop && capsuleHover.isHovered && !menuOpen,
-  });
+  /* ---------------------------------------------------------------------
+     DESKTOP DROPDOWN CONTROLLER — single source of truth.
 
-  const companyHover = useDelayedHover({
-    enterDelay: DROPDOWN_ENTER_DELAY,
-    leaveDelay: DROPDOWN_LEAVE_DELAY,
-    enabled: isDesktop && capsuleHover.isHovered && !menuOpen,
-  });
+     Rewritten from scratch: the old design used two independent hover
+     hooks (services + company) that cross-closed each other through
+     effects. That is racy by construction — the pointer, the capsule
+     expansion, and React batching could all land in an order that opened
+     Company for a frame before Services, producing the flash.
 
-  // Only one desktop dropdown open at a time
-  useEffect(() => {
-    if (servicesHover.isHovered) companyHover.setHovered(false);
-  }, [servicesHover.isHovered, companyHover.setHovered]);
+     Here exactly ONE value describes the desktop dropdown state:
+       openDropdown ∈ {"services", "company", null}
+     So "both open" is impossible, and switching between menus is a single
+     atomic state change (no close-then-open gap). Timers live in refs so
+     they never trigger re-renders or stale-closure races.
+     --------------------------------------------------------------------- */
+  const [openDropdown, setOpenDropdown] = useState<DesktopDropdown>(null);
+  const openDropdownRef = useRef<DesktopDropdown>(null);
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (companyHover.isHovered) servicesHover.setHovered(false);
-  }, [companyHover.isHovered, servicesHover.setHovered]);
-
-  useEffect(() => {
-    if (!capsuleHover.isHovered) {
-      servicesHover.setHovered(false);
-      companyHover.setHovered(false);
+  const clearDropdownTimers = useCallback(() => {
+    if (openTimerRef.current !== null) {
+      clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
     }
-  }, [
-    capsuleHover.isHovered,
-    servicesHover.setHovered,
-    companyHover.setHovered,
-  ]);
+    if (closeTimerRef.current !== null) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const applyDropdown = useCallback((next: DesktopDropdown) => {
+    openDropdownRef.current = next;
+    setOpenDropdown(next);
+  }, []);
+
+  // Pointer entered a dropdown trigger (or its panel — same <li> subtree).
+  const enterDropdown = useCallback(
+    (key: Exclude<DesktopDropdown, null>) => {
+      if (!isDesktop) return;
+      clearDropdownTimers();
+      // Already showing this one → nothing to do.
+      if (openDropdownRef.current === key) return;
+      // Another menu is already open → switch instantly (atomic, no flash).
+      if (openDropdownRef.current !== null) {
+        applyDropdown(key);
+        return;
+      }
+      // Nothing open yet → open after a short dwell. If the pointer is only
+      // passing over on its way elsewhere, the leave/enter of the next
+      // trigger clears this timer before it ever fires.
+      openTimerRef.current = setTimeout(() => {
+        openTimerRef.current = null;
+        applyDropdown(key);
+      }, DROPDOWN_ENTER_DELAY);
+    },
+    [isDesktop, clearDropdownTimers, applyDropdown],
+  );
+
+  // Pointer left a dropdown's <li> subtree (trigger + panel + hover bridge).
+  const leaveDropdown = useCallback(() => {
+    if (!isDesktop) return;
+    // Cancel any pending open — we left before it committed.
+    if (openTimerRef.current !== null) {
+      clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
+      applyDropdown(null);
+    }, DROPDOWN_LEAVE_DELAY);
+  }, [isDesktop, applyDropdown]);
+
+  const closeDropdownNow = useCallback(() => {
+    clearDropdownTimers();
+    applyDropdown(null);
+  }, [clearDropdownTimers, applyDropdown]);
+
+  // Leaving the capsule (or going mobile) always closes the dropdown.
+  useEffect(() => {
+    if (!capsuleHover.isHovered || !isDesktop) closeDropdownNow();
+  }, [capsuleHover.isHovered, isDesktop, closeDropdownNow]);
+
+  // Clean up timers on unmount.
+  useEffect(() => () => clearDropdownTimers(), [clearDropdownTimers]);
 
   const placeNavMenu = useCallback(() => {
     const navMenu = navMenuRef.current;
@@ -120,17 +178,12 @@ export default function Header() {
     setMenuOpen(false);
     setMobilePanel(null);
     capsuleHover.setHovered(false);
-    servicesHover.setHovered(false);
-    companyHover.setHovered(false);
+    closeDropdownNow();
     document.body.classList.remove("menu-open");
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-  }, [
-    capsuleHover.setHovered,
-    servicesHover.setHovered,
-    companyHover.setHovered,
-  ]);
+  }, [capsuleHover.setHovered, closeDropdownNow]);
 
   useEffect(() => {
     collapseNav();
@@ -148,10 +201,7 @@ export default function Header() {
      transition (a one-shot measurement briefly parked it under "Home"). */
   useEffect(() => {
     if (!isDesktop) return;
-    const active =
-      capsuleHover.isHovered ||
-      servicesHover.isHovered ||
-      companyHover.isHovered;
+    const active = capsuleHover.isHovered || openDropdown !== null;
     if (!active) return;
     let raf = 0;
     const position = () => {
@@ -175,12 +225,7 @@ export default function Header() {
     };
     raf = requestAnimationFrame(position);
     return () => cancelAnimationFrame(raf);
-  }, [
-    isDesktop,
-    capsuleHover.isHovered,
-    servicesHover.isHovered,
-    companyHover.isHovered,
-  ]);
+  }, [isDesktop, capsuleHover.isHovered, openDropdown]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -221,8 +266,8 @@ export default function Header() {
 
   const companyActive = isCompanyActive(activePage);
   const servicesActive = isServicesActive(activePage);
-  const servicesOpen = servicesHover.isHovered;
-  const companyOpen = companyHover.isHovered || mobilePanel === "company";
+  const servicesOpen = openDropdown === "services";
+  const companyOpen = openDropdown === "company" || mobilePanel === "company";
 
   return (
     <header
@@ -265,8 +310,8 @@ export default function Header() {
             {/* Desktop Services mega-menu */}
             <li
               className={`nav-item has-dropdown has-mega-menu desktop-only-dropdown${servicesOpen ? " open is-hovered" : ""}`}
-              onMouseEnter={servicesHover.onMouseEnter}
-              onMouseLeave={servicesHover.onMouseLeave}
+              onMouseEnter={() => enterDropdown("services")}
+              onMouseLeave={leaveDropdown}
             >
               <Link
                 href="/services"
@@ -302,8 +347,8 @@ export default function Header() {
 
             <li
               className={`nav-item has-dropdown${companyOpen ? " open is-hovered" : ""}`}
-              onMouseEnter={companyHover.onMouseEnter}
-              onMouseLeave={companyHover.onMouseLeave}
+              onMouseEnter={() => enterDropdown("company")}
+              onMouseLeave={leaveDropdown}
             >
               <div className="mobile-accordion-head company-trigger-row">
                 <Link

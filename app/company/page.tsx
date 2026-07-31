@@ -80,10 +80,10 @@ export default function Page() {
             is who you actually talk to. There is no account-management
             layer translating your requirements to a delivery team you never
             meet — the engineers in your kickoff call are the ones who write
-            the code, and they are still reachable after launch. That keeps
-            the team small on purpose: it is easier to stay accountable for
-            a decision when you are the one who made it and will be the one
-            explaining it later.
+            the code, and they are still reachable after launch. That is
+            deliberate: it is easier to stay accountable for a decision when
+            you are the one who made it and will be the one explaining it
+            later.
           </p>
           <p className="about-text" style={{ marginTop: "1rem" }}>
             Most engagements start with a scoping conversation rather than a

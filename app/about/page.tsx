@@ -83,12 +83,11 @@ export default function Page() {
               — for clients across India and worldwide.
             </p>
             <p className="about-text" style={{ marginTop: "1rem" }}>
-              We are deliberately small and senior. The engineers who scope your
-              project are the ones who write the code, which means fewer
-              handovers, faster decisions, and direct accountability for what
-              ships. You can{" "}
-              <Link href="/team">meet the whole team</Link> — there is no
-              anonymous delivery pool behind them.
+              We work senior-first. The engineers who scope your project are the
+              ones who write the code, which means fewer handovers, faster
+              decisions, and direct accountability for what ships. You can{" "}
+              <Link href="/team">meet the team</Link> — there is no anonymous
+              delivery pool behind them.
             </p>
             <p className="about-text" style={{ marginTop: "1rem" }}>
               Our work spans{" "}

@@ -95,7 +95,7 @@ export default function Page() {
               </p>
               <p className="contact-nap-line">
                 <i className="fa-solid fa-clock" aria-hidden="true" />
-                <span>Monday to Saturday, 9:30 AM – 7:00 PM IST</span>
+                <span>Monday to Friday, 10:00 AM – 7:00 PM IST</span>
               </p>
             </address>
 

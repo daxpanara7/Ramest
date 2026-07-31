@@ -2392,3 +2392,65 @@ body.menu-open {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
+
+/* ===========================================================================
+   FORM SUBMIT LOADER
+
+   Used by the contact form while a submission is in flight. The button keeps
+   its exact size so the layout never shifts mid-submit — only its contents
+   swap. A disabled button that merely greys out reads as "broken"; a moving
+   spinner reads as "working".
+   =========================================================================== */
+
+.btn-spinner {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    /* Track + one bright arc: the gap is what makes rotation legible. */
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    animation: btn-spin 0.65s linear infinite;
+}
+
+@keyframes btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Submitting is a deliberate state, not a dead one — keep it near full
+   opacity so it does not read as a failure. */
+.button[disabled] {
+    cursor: progress;
+    opacity: 0.92;
+    transform: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Status line under the form (cold-start explainer). */
+.form-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.95rem;
+    border-radius: 0.6rem;
+    background: var(--first-color-light);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--title-color);
+}
+
+.form-status .btn-spinner {
+    margin-top: 0.15rem;
+    border-color: rgba(3, 87, 168, 0.25);
+    border-top-color: var(--first-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .btn-spinner {
+        animation-duration: 2.4s;
+    }
+}

@@ -82,9 +82,10 @@ export default function ContactForm() {
 
     setStatus("sending");
     setSlow(false);
-    // A cold container can take ~50s. Silence that long reads as "broken",
-    // so explain the wait rather than leaving a spinner with no context.
-    slowTimer.current = setTimeout(() => setSlow(true), 4000);
+    // A warm submit takes ~3s, a cold start ~50s. 8s is past the healthy
+    // case but well inside the cold one, so this copy only appears when
+    // the wait is genuinely unusual.
+    slowTimer.current = setTimeout(() => setSlow(true), 8000);
 
     try {
       const recaptchaToken = await executeRecaptcha("contact");
@@ -191,25 +192,37 @@ export default function ContactForm() {
       {/* Cold-start explainer. The API sleeps when idle and can take ~50s to
           wake; an unexplained wait that long reads as a broken form. */}
       {status === "sending" && slow ? (
-        <p role="status" style={{ marginBottom: "1rem", opacity: 0.85 }}>
-          Still sending — our server is waking up. This can take up to a
-          minute the first time. Please don&apos;t close this page.
+        <p role="status" className="form-status">
+          <span className="btn-spinner" aria-hidden="true" />
+          <span>
+            Still working — our server is waking up. This can take up to a
+            minute the first time. Please don&apos;t close this page.
+          </span>
         </p>
       ) : null}
 
       {/* Shown only for the instant before the /thank-you navigation lands. */}
       {status === "sent" ? (
-        <p role="status" style={{ marginBottom: "1rem", opacity: 0.85 }}>
-          Thanks — taking you to your confirmation…
+        <p role="status" className="form-status">
+          <span className="btn-spinner" aria-hidden="true" />
+          <span>Thanks — taking you to your confirmation…</span>
         </p>
       ) : null}
 
       <button
         type="submit"
         className="button button-primary"
-        disabled={status === "sending"}
+        disabled={status === "sending" || status === "sent"}
+        aria-busy={status === "sending"}
       >
-        {status === "sending" ? (slow ? "Still sending…" : "Sending…") : "Send Message"}
+        {status === "sending" || status === "sent" ? (
+          <>
+            <span className="btn-spinner" aria-hidden="true" />
+            {status === "sent" ? "Redirecting…" : slow ? "Still sending…" : "Sending…"}
+          </>
+        ) : (
+          "Send Message"
+        )}
       </button>
 
       <RecaptchaNotice />

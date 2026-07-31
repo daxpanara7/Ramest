@@ -23,10 +23,14 @@ import { ImportDto } from './dto/import.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser, AuthUser } from '../../common/decorators/current-user.decorator';
+import { RecaptchaService } from '../../common/recaptcha/recaptcha.service';
 
 @Controller('newsletter')
 export class NewsletterController {
-  constructor(private readonly newsletter: NewsletterService) {}
+  constructor(
+    private readonly newsletter: NewsletterService,
+    private readonly recaptcha: RecaptchaService,
+  ) {}
 
   /**
    * Public double opt-in signup. Rate-limited to 5/min per IP. Always returns
@@ -37,6 +41,9 @@ export class NewsletterController {
   @HttpCode(200)
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   async subscribe(@Body() dto: SubscribeDto, @Ip() ip: string) {
+    // Signup triggers an outbound email, so an unprotected endpoint is an
+    // email-bombing tool. Gate before anything is queued.
+    await this.recaptcha.assertHuman(dto.recaptchaToken, ip);
     return this.newsletter.subscribe(dto, { ip });
   }
 

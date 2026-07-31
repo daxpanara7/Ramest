@@ -3,8 +3,8 @@
  * backend code). Base URL comes from NEXT_PUBLIC_API_URL so the same build
  * points at localhost in dev and the Render URL in production.
  */
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:4000/api";
+export { API_BASE } from "../api-base";
+import { API_BASE } from "../api-base";
 
 /** In-memory access token. Never in localStorage (XSS-safe); the refresh token
  * lives in an httpOnly cookie the browser sends automatically. */

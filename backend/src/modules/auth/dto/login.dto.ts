@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class LoginDto {
@@ -11,4 +11,13 @@ export class LoginDto {
   @IsNotEmpty()
   @MaxLength(200)
   password!: string;
+
+  /**
+   * reCAPTCHA v3 token. Optional at the DTO layer so the field can be absent
+   * in local dev where captcha is disabled; the controller is what enforces
+   * it once RECAPTCHA_SECRET_KEY is configured.
+   */
+  @IsOptional()
+  @IsString()
+  recaptchaToken?: string;
 }

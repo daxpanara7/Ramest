@@ -194,11 +194,13 @@ export const serviceCategories: ServiceCategory[] = [
         "fa-cart-shopping",
         ["Storefronts", "Checkout", "Integrations", "Growth"]
       ),
+      /* Slug stays "logistics" — the display name changed, the URL must not
+         (existing links and indexed pages depend on it). */
       item(
         "logistics",
-        "Logistics",
+        "Logistics & Supply Chain",
         "Tracking, routing, and operational clarity.",
-        "Systems for shipment visibility, routing intelligence, and partner coordination — helping logistics teams move faster with fewer exceptions.",
+        "Systems for shipment visibility, routing intelligence, and partner coordination — helping logistics and supply chain teams move faster with fewer exceptions.",
         "fa-truck-fast",
         ["Tracking", "Routing", "TMS", "Visibility"]
       ),
@@ -217,6 +219,22 @@ export const serviceCategories: ServiceCategory[] = [
         "Patient portals, telehealth, and clinical data systems built with the privacy, reliability, and auditability that healthcare demands.",
         "fa-heart-pulse",
         ["Telehealth", "EHR", "Privacy", "Compliance"]
+      ),
+      item(
+        "government",
+        "Government",
+        "Secure digital services for public agencies.",
+        "Citizen-facing portals, case management, and data platforms that help public agencies deliver services reliably, transparently, and at population scale.",
+        "fa-landmark-flag",
+        ["Citizen Portals", "e-Governance", "Security", "Accessibility"]
+      ),
+      item(
+        "real-estate",
+        "Real Estate",
+        "Property, leasing, and PropTech platforms.",
+        "Listing portals, property and lease management systems, and buyer experiences that connect sales, operations, and tenants on one platform.",
+        "fa-building",
+        ["Listings", "CRM", "Lease Management", "PropTech"]
       ),
     ],
   },

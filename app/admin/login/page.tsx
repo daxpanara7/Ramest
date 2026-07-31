@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/admin/auth-context";
 import { ApiError } from "@/lib/admin/api";
+import RecaptchaNotice from "@/components/RecaptchaNotice";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -39,43 +40,43 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
-      {/* Warm glow behind the card */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_50%_0%,rgba(233,63,46,0.16),transparent_65%)]" />
+      {/* Soft blue glow behind the card (matches the marketing frontend) */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_50%_0%,rgba(56,152,236,0.14),transparent_65%)]" />
 
       <div className="relative z-10 flex min-h-screen items-center justify-center p-5">
-        <div className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-border/60 shadow-2xl shadow-black/60 md:grid-cols-2">
-          {/* ---------- Left: brand ---------- */}
-          <div className="flex flex-col justify-between gap-12 border-b border-border/60 bg-[radial-gradient(120%_90%_at_0%_0%,rgba(233,63,46,0.26),transparent_55%),linear-gradient(160deg,#2a1614_0%,#17100f_100%)] p-9 md:border-b-0 md:border-r md:p-10">
+        <div className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-border shadow-2xl shadow-[rgba(2,32,90,0.18)] md:grid-cols-2">
+          {/* ---------- Left: brand (deep-navy panel, like the site capsule) ---------- */}
+          <div className="flex flex-col justify-between gap-12 border-b border-border/60 bg-[radial-gradient(120%_90%_at_0%_0%,rgba(56,152,236,0.22),transparent_55%),linear-gradient(160deg,#0B2E6B_0%,#00204F_100%)] p-9 md:border-b-0 md:border-r md:p-10">
             <Image
-              src="/assets/logo_final.webp"
+              src="/assets/logo_mark_light.webp"
               alt="Ramest Technolabs"
-              width={687}
-              height={267}
+              width={528}
+              height={206}
               priority
-              className="h-14 w-auto self-start"
+              className="h-16 w-auto self-start drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)] md:h-20"
             />
 
             <div>
               <h1 className="font-display text-[2.9rem] leading-[1.06] tracking-tight text-white">
-                Create. <span className="text-primary">Manage.</span>
+                Create. <span className="text-[#9BD0FF]">Manage.</span>
                 <br />
                 Grow.
               </h1>
-              <p className="mt-5 max-w-[34ch] text-[15px] leading-relaxed text-muted-foreground">
+              <p className="mt-5 max-w-[34ch] text-[15px] leading-relaxed text-white/75">
                 One command center for your content, leads, and everything that
                 keeps ramesttechnolabs.com moving forward.
               </p>
             </div>
 
             <div className="text-xs leading-relaxed">
-              <div className="font-medium text-foreground">Ramest Technolabs</div>
-              <div className="text-muted-foreground">© 2026 · All rights reserved.</div>
+              <div className="font-medium text-white">Ramest Technolabs</div>
+              <div className="text-white/65">© 2026 · All rights reserved.</div>
             </div>
           </div>
 
-          {/* ---------- Right: form ---------- */}
-          <div className="flex flex-col justify-center bg-[#171312] p-9 md:p-12">
-            <h2 className="font-display text-[2rem] leading-tight tracking-tight text-white">
+          {/* ---------- Right: form (white surface) ---------- */}
+          <div className="flex flex-col justify-center bg-card p-9 md:p-12">
+            <h2 className="font-display text-[2rem] leading-tight tracking-tight text-foreground">
               Welcome back
             </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
@@ -103,7 +104,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@ramesttechnolabs.com"
-                  className="h-12 rounded-lg bg-background/40"
+                  className="h-12 rounded-lg bg-secondary border-border"
                   required
                 />
               </div>
@@ -120,7 +121,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-12 rounded-lg bg-background/40 pr-11"
+                    className="h-12 rounded-lg bg-secondary border-border pr-11"
                     required
                   />
                   <button
@@ -148,6 +149,8 @@ export default function LoginPage() {
                   "Sign in"
                 )}
               </Button>
+
+              <RecaptchaNotice className="text-center text-[11px] leading-relaxed text-muted-foreground [&_a]:underline [&_a]:underline-offset-2" />
             </form>
           </div>
         </div>

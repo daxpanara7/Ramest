@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { api, setAccessToken, tryRefresh } from "./api";
+import { executeRecaptcha } from "../recaptcha";
 
 export type AdminUser = {
   id: string;
@@ -42,9 +43,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
+    // Unlike the contact form, login is a hard gate server-side: a missing or
+    // failing token is rejected outright, so a bot cannot skip it by simply
+    // omitting the field.
+    const recaptchaToken = await executeRecaptcha("admin_login");
+
     const res = await api<{ user: AdminUser; accessToken: string }>("/auth/login", {
       method: "POST",
-      body: { email, password },
+      body: { email, password, recaptchaToken },
       auth: false,
     });
     setAccessToken(res.accessToken);

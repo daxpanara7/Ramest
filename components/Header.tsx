@@ -143,10 +143,17 @@ export default function Header() {
 
   /* Point each dropdown's diamond caret at its own trigger. The panels are
      capsule-centred, so a static left:50% caret lands on whatever sits mid
-     capsule (it pointed at "Hire Developers"). Measured after the capsule
-     expansion transition (0.45s) settles, and on resize. */
+     capsule. Tracked every frame while the capsule is hovered/open, so the
+     caret stays glued to Services/Company even DURING the expansion
+     transition (a one-shot measurement briefly parked it under "Home"). */
   useEffect(() => {
     if (!isDesktop) return;
+    const active =
+      capsuleHover.isHovered ||
+      servicesHover.isHovered ||
+      companyHover.isHovered;
+    if (!active) return;
+    let raf = 0;
     const position = () => {
       document
         .querySelectorAll<HTMLElement>(".nav-item.has-dropdown")
@@ -164,16 +171,10 @@ export default function Header() {
             `${t.left + t.width / 2 - p.left}px`,
           );
         });
+      raf = requestAnimationFrame(position);
     };
-    /* Immediately when a dropdown opens (capsule already expanded by then),
-       and again after the 0.45s capsule expansion transition settles. */
-    position();
-    const timer = window.setTimeout(position, 520);
-    window.addEventListener("resize", position, { passive: true });
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("resize", position);
-    };
+    raf = requestAnimationFrame(position);
+    return () => cancelAnimationFrame(raf);
   }, [
     isDesktop,
     capsuleHover.isHovered,

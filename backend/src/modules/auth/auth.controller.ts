@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser, AuthUser } from '../../common/decorators/current-user.decorator';
+import { RecaptchaService } from '../../common/recaptcha/recaptcha.service';
 
 const REFRESH_COOKIE = 'ramest_rt';
 
@@ -23,6 +24,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly config: ConfigService,
+    private readonly recaptcha: RecaptchaService,
   ) {}
 
   @Public()
@@ -35,6 +37,10 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // Gate before touching the password hash: a bot that cannot pass captcha
+    // should never reach argon2, which is intentionally expensive.
+    await this.recaptcha.assertHuman(dto.recaptchaToken, ip);
+
     const result = await this.auth.login(dto.email, dto.password, {
       ip,
       userAgent: req.headers['user-agent'],

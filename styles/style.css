@@ -295,9 +295,8 @@ img {
     transition: transform 0.35s ease-out;
 }
 
-.logo:hover {
-    transform: scale(1.04);
-}
+/* No hover scale: the logo growing while the capsule expands read as
+   jitter. */
 
 .logo-img {
     height: 68px;
@@ -438,12 +437,8 @@ img {
         overflow: visible;
     }
 
-    /* Expanded only: keep the theme toggle off the last nav link ("Company"),
-       which otherwise sits right against it. Collapsed capsule is unchanged. */
-    .header.is-hovered .nav-btns,
-    .header.menu-open .nav-btns {
-        margin-left: 1.25rem;
-    }
+    /* .nav-btns holds only the (hidden) hamburger on desktop — no extra
+       margin, so the expanded capsule stays symmetric. */
 }
 
 .nav-list {
@@ -465,16 +460,14 @@ img {
     position: relative;
 }
 
-/* Bridge the 15px gap to the dropdown panel */
-.has-dropdown::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 20px;
-    z-index: 10;
-}
+/* NOTE: the old .has-dropdown::after full-width hover bridge is GONE on
+   purpose. Once the li went position:static (capsule-centred panels), both
+   dropdowns' bridges stretched across the whole capsule and stacked — the
+   last one in the DOM (Company) won every hit-test below the capsule, so
+   Company kept lighting up/opening and had to close before Services could
+   open (the reported glitch). The gap is now bridged by each PANEL itself
+   (.mega-menu::before / .dropdown-panel::after below), which only accepts
+   pointer events while that panel is open. */
 
 .nav-link::after {
     content: '';
@@ -578,6 +571,21 @@ img {
     background-color: rgba(255, 255, 255, 0.98);
     border-left: 1px solid rgba(0, 0, 0, 0.08);
     border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Invisible hover bridge across the capsule→panel gap. Panel-scoped, so it
+   can never intercept the other trigger's hovers: closed panels are
+   visibility:hidden + pointer-events:none, so the bridge only exists while
+   THIS panel is open. Desktop only — mobile panels are static accordions. */
+@media (min-width: 769px) {
+    .dropdown-panel::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -12px;
+        height: 12px;
+    }
 }
 
 .dropdown-header {
@@ -1107,8 +1115,9 @@ img {
 }
 
 /* ==================== CTA BANNER ==================== */
+/* Surface/spacing live in footer.css — no background here (the old gradient
+   was a red-theme leftover). */
 .cta-section {
-    background: linear-gradient(135deg, #0357A8 0%, #B02C1E 100%);
     padding: 5rem 0;
 }
 
@@ -1821,7 +1830,7 @@ body.menu-open {
     }
 
     .nav-link {
-        color: rgba(255,255,255,0.55) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
         font-size: clamp(1.6rem, 7vw, 2.2rem) !important;
         font-family: var(--title-font) !important;
         font-weight: 400 !important;
@@ -1907,7 +1916,7 @@ body.menu-open {
         font-size: clamp(1.6rem, 7vw, 2.2rem) !important;
         font-family: var(--title-font) !important;
         font-weight: 400 !important;
-        color: rgba(255,255,255,0.45) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
         transition: color 0.2s !important;
     }
 
@@ -2314,7 +2323,14 @@ body.menu-open {
            shows. clip (not hidden): sticky children and the fixed header
            keep working. */
         overflow: clip;
-        box-shadow: 0 24px 50px -12px rgba(2, 25, 70, 0.35);
+        /* Reference-exact edge (read off sdipresence.com's .is-bg-white):
+           deep blue glow below, faint crisp white line, white glow above,
+           and a 5px translucent white ring tracing the curve. */
+        box-shadow:
+            rgba(0, 27, 102, 0.45) 0 80px 80px,
+            rgba(255, 255, 255, 0.2) 0 2px 5px,
+            rgba(255, 255, 255, 0.7) 0 -60px 60px,
+            rgba(255, 255, 255, 0.5) 0 0 0 5px;
     }
 
     /* The grid lives inside the shell now; keep it above the shell background
@@ -2350,3 +2366,29 @@ body.menu-open {
 
 /* Single logo: transparent white lettering on the permanent navy capsule. */
 
+
+/* ===========================================================================
+   reCAPTCHA v3
+
+   The floating badge is hidden, which Google permits only when the
+   attribution notice is shown instead — see components/RecaptchaNotice.tsx,
+   rendered by every form that calls executeRecaptcha().
+   =========================================================================== */
+
+.grecaptcha-badge {
+    visibility: hidden;
+}
+
+.recaptcha-notice {
+    margin: 1rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.recaptcha-notice a {
+    color: var(--first-color);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}

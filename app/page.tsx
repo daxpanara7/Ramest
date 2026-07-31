@@ -318,24 +318,33 @@ export default function Page() {
           <TechMarquee />
 
           <section className="hx-section reveal" aria-labelledby="industries-heading">
-            <div className="container">
-              <span className="hx-eyebrow">Where we operate</span>
-              <h2 className="hx-title" id="industries-heading">
+            <div className="container ind-band">
+              <p className="ind-pill">Industries we serve</p>
+              <h2 className="hx-title ind-title" id="industries-heading">
                 Deep context in <em>mission-critical</em> industries
               </h2>
-              <div className="hx-industries">
+              <p className="ind-lede">
+                We work with organizations across regulated and
+                operations-heavy sectors, building software that addresses
+                sector-specific constraints, compliance, and scale.
+              </p>
+
+              <ul className="ind-grid">
                 {industries.map((ind, i) => (
-                  <Link
-                    key={ind.slug}
-                    href={ind.href}
-                    className="hx-industry hx-rise"
-                    style={{ "--rise": i } as React.CSSProperties}
-                  >
-                    <i className={`fa-solid ${ind.icon}`} aria-hidden="true" />
-                    {ind.title}
-                  </Link>
+                  <li key={ind.slug}>
+                    <Link
+                      href={ind.href}
+                      className="ind-item hx-rise"
+                      style={{ "--rise": i } as React.CSSProperties}
+                    >
+                      <span className="ind-icon" aria-hidden="true">
+                        <i className={`fa-solid ${ind.icon}`} />
+                      </span>
+                      <span className="ind-name">{ind.title}</span>
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </section>
 

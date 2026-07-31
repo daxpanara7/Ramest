@@ -24,4 +24,12 @@ export class SubscribeDto {
   @IsString()
   @MaxLength(60)
   source?: string;
+
+  /**
+   * reCAPTCHA v3 token. Optional here so local dev works without keys; the
+   * controller enforces it once RECAPTCHA_SECRET_KEY is set.
+   */
+  @IsOptional()
+  @IsString()
+  recaptchaToken?: string;
 }

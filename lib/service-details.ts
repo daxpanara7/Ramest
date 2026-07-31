@@ -3173,6 +3173,346 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
   },
+
+  /* ------------------------------------------------------------------ */
+  /* Government                                                          */
+  /* ------------------------------------------------------------------ */
+  "government": {
+    heroTagline:
+      "Digital services for public agencies — secure, accessible, and built to serve every citizen reliably at population scale.",
+    heroHighlights: [
+      "Accessible by design (WCAG 2.2 AA)",
+      "Security & audit trails built in",
+      "Full source code ownership",
+    ],
+    overviewTitle: "Helping government work smarter for the people it serves",
+    intro: [
+      "Public agencies carry an obligation private companies do not: the service has to work for everyone, on any device, often on a slow connection, and it has to keep working under scrutiny. Yet many departments still run on paper forms, disconnected legacy databases, and portals that were last updated a decade ago. Citizens end up visiting an office for something a form could handle, and staff spend their day re-keying data between systems that were never designed to talk to each other.",
+      "We build the digital layer that closes that gap. Citizen-facing portals that are genuinely usable and accessible, case and workflow systems that give officers a single queue instead of five inboxes, and integration work that lets existing departmental systems exchange data safely. Every engagement is designed around auditability, data residency, and long-term maintainability — because a public system has to outlast the vendor that built it, and you own the source code and documentation from day one.",
+    ],
+    offeringsTitle: "What we build for public agencies",
+    offeringsSubtitle:
+      "Digital services, internal platforms, and integrations designed for public-sector accountability.",
+    offerings: [
+      {
+        icon: "fa-people-roof",
+        title: "Citizen Service Portals",
+        description:
+          "Public-facing portals for applications, licences, permits, and grievance redressal — with clear multi-step forms, saved progress, status tracking, and mobile-first layouts that work on low-end devices and patchy connections.",
+      },
+      {
+        icon: "fa-folder-open",
+        title: "Case & Workflow Management",
+        description:
+          "Internal systems that route applications through review, approval, and escalation with full timestamped history, so officers work one prioritized queue and every decision has a defensible audit trail.",
+      },
+      {
+        icon: "fa-arrows-turn-to-dots",
+        title: "Legacy Modernization & Integration",
+        description:
+          "Careful migration off ageing departmental systems, plus secure API layers that let existing databases, payment gateways, and identity services exchange data without a disruptive big-bang replacement.",
+      },
+      {
+        icon: "fa-chart-pie",
+        title: "Data Platforms & Public Dashboards",
+        description:
+          "Reporting systems that turn departmental data into service metrics for administrators, and open dashboards that publish performance figures to the public in a form journalists and citizens can actually read.",
+      },
+      {
+        icon: "fa-universal-access",
+        title: "Accessibility & Inclusive Design",
+        description:
+          "Interfaces built and tested against WCAG 2.2 AA — keyboard navigation, screen-reader semantics, contrast, and plain-language content — so services are usable by people with disabilities and by first-time internet users.",
+      },
+      {
+        icon: "fa-shield-halved",
+        title: "Security & Compliance Engineering",
+        description:
+          "Role-based access, encryption in transit and at rest, tamper-evident logging, and controlled data residency, with architecture documentation prepared for departmental security review and third-party audit.",
+      },
+    ],
+    benefitsTitle: "Why public agencies build with Ramest",
+    benefits: [
+      {
+        icon: "fa-clock",
+        title: "Shorter queues, fewer office visits",
+        description:
+          "Services that can genuinely be completed online reduce counter footfall and phone volume, letting staff spend time on the complex cases that actually need a human decision.",
+      },
+      {
+        icon: "fa-file-shield",
+        title: "Decisions you can defend",
+        description:
+          "Every application, approval, and rejection carries a timestamped record of who did what and when, which turns RTI requests, audits, and appeals into a lookup rather than an investigation.",
+      },
+      {
+        icon: "fa-key",
+        title: "No vendor lock-in",
+        description:
+          "You own the source code, the data, and the infrastructure accounts, with documented architecture and runbooks so another team can take over the system without starting again.",
+      },
+      {
+        icon: "fa-users",
+        title: "Built for everyone, not the average user",
+        description:
+          "Accessibility, plain language, and low-bandwidth performance are treated as requirements rather than a final-week checklist, so the service works for the citizens who need it most.",
+      },
+    ],
+    processTitle: "From service review to public rollout",
+    processSubtitle:
+      "A delivery approach shaped around procurement realities, security review, and phased public launch.",
+    process: [
+      {
+        step: "01",
+        title: "Service & Systems Review",
+        description:
+          "Mapping the existing citizen journey and the departmental systems behind it — including the paper steps — to agree scope, data flows, integration points, and measurable service outcomes.",
+      },
+      {
+        step: "02",
+        title: "Architecture & Security Design",
+        description:
+          "Designing the data model, access controls, hosting, and residency approach, documented in the form your security and IT review teams need before build approval.",
+      },
+      {
+        step: "03",
+        title: "Agile Build & Accessibility Testing",
+        description:
+          "Two-week sprints with working software each cycle, accessibility and security testing run continuously rather than at the end, and demos your stakeholders can try themselves.",
+      },
+      {
+        step: "04",
+        title: "Pilot, Rollout & Handover",
+        description:
+          "A limited pilot with real users and staff, then phased public rollout with monitoring, training material, and documented handover so your team can operate the service independently.",
+      },
+    ],
+    stackTitle: "Our public-sector engineering stack",
+    stackSubtitle:
+      "Mature, well-supported technologies chosen for longevity, security, and auditability.",
+    techStack: [
+      {
+        category: "Frontend & Accessibility",
+        items: ["React", "Next.js", "TypeScript", "WCAG 2.2 AA", "Progressive enhancement"],
+      },
+      {
+        category: "Backend & APIs",
+        items: ["Node.js", "Python", ".NET", "REST APIs", "Role-based access control"],
+      },
+      {
+        category: "Data & Reporting",
+        items: ["PostgreSQL", "Audit logging", "Data warehousing", "Dashboarding"],
+      },
+      {
+        category: "Infrastructure & Security",
+        items: ["Sovereign / on-prem hosting", "AWS", "Azure", "Encryption at rest & in transit", "CI/CD with approvals"],
+      },
+    ],
+    faqSubtitle:
+      "What public-sector teams ask before starting a digital services project.",
+    faqs: [
+      {
+        question: "How much does a government software project cost?",
+        answer:
+          "Cost depends on scope — the number of services being digitized, integrations with existing departmental systems, and the security and accessibility requirements attached. We scope every project in a consultation and agree a fixed quote before work begins. A single citizen-facing form or dashboard sits well below a multi-department case management platform, and smaller focused projects are genuinely welcome.",
+      },
+      {
+        question: "How long does a citizen-facing service take to build?",
+        answer:
+          "A focused service — one application flow with status tracking — typically ships in 10–14 weeks including accessibility testing. A multi-service portal with case management and legacy integrations usually runs 5–9 months, delivered in phases so a pilot service is live with real users long before full rollout.",
+      },
+      {
+        question: "Can the system be hosted on government or on-premise infrastructure?",
+        answer:
+          "Yes. We build to be hosting-agnostic and regularly deploy to departmental data centres, sovereign cloud regions, or a public cloud account owned by the agency. Data residency, network isolation, and backup requirements are agreed during architecture design rather than retrofitted, and we hand over infrastructure-as-code so the deployment is reproducible.",
+      },
+      {
+        question: "Will the service meet accessibility requirements?",
+        answer:
+          "We build to WCAG 2.2 AA — semantic markup, keyboard navigation, screen-reader support, contrast, and plain-language content — and test with automated tooling plus manual keyboard and screen-reader passes. Where a formal accessibility audit or a specific national standard applies to your department, we recommend an independent audit before launch and fix against its findings.",
+      },
+      {
+        question: "Can you integrate with our existing departmental systems?",
+        answer:
+          "Usually yes. We integrate with existing databases, payment gateways, SMS and email providers, and identity or authentication services through APIs, and build adapters where a legacy system only exposes files or a portal. Where a system genuinely cannot be integrated, we will say so early rather than promise a connection that will not hold up.",
+      },
+      {
+        question: "What happens after the service goes live?",
+        answer:
+          "You own the source code, data, and infrastructure outright, with architecture documentation and runbooks handed over. We offer support retainers covering monitoring, security patching, and enhancements, and most agencies keep the same engineering team so knowledge of the service is not lost between phases.",
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ */
+  /* Real Estate                                                         */
+  /* ------------------------------------------------------------------ */
+  "real-estate": {
+    heroTagline:
+      "PropTech platforms that connect listings, sales, leasing, and tenants — so property teams run on one system instead of six spreadsheets.",
+    heroHighlights: [
+      "Listings, CRM & leasing in one place",
+      "Portal, agent & tenant apps",
+      "Built for portfolio scale",
+    ],
+    overviewTitle: "Software for how property businesses actually operate",
+    intro: [
+      "Property businesses lose deals in the gaps between systems. Listings live on portals, enquiries land in an inbox, site visits get tracked on WhatsApp, agreements sit in a drive folder, and rent collection happens in a spreadsheet someone updates on Fridays. When a buyer asks about availability or a tenant reports a maintenance issue, the answer depends on which person you reach — not on what the system knows.",
+      "We build platforms that close those gaps: listing and search experiences that make inventory genuinely findable, CRM and sales pipelines built for how property deals actually progress, and leasing and property management systems that track agreements, renewals, rent, and maintenance in one place. Owners and tenants get portals that answer their own questions, agents get mobile-ready tools that work on site, and management gets accurate occupancy and revenue numbers without someone rebuilding a spreadsheet every month.",
+    ],
+    offeringsTitle: "What we build for real estate businesses",
+    offeringsSubtitle:
+      "Platforms for developers, brokerages, and property managers — from first enquiry to renewal.",
+    offerings: [
+      {
+        icon: "fa-magnifying-glass-location",
+        title: "Property Portals & Listing Platforms",
+        description:
+          "Search experiences with map-based discovery, rich media galleries, saved searches, and filters that match how buyers actually shop — engineered for fast page loads and strong search visibility.",
+      },
+      {
+        icon: "fa-handshake",
+        title: "Sales CRM & Lead Management",
+        description:
+          "Pipelines built for property cycles — enquiry capture from portals and campaigns, site-visit scheduling, follow-up automation, and booking-to-payment tracking, with clear attribution of which channels produce closures.",
+      },
+      {
+        icon: "fa-file-signature",
+        title: "Lease & Property Management",
+        description:
+          "Systems that hold agreements, renewal dates, escalation clauses, rent schedules, and deposits, with automated reminders so renewals and collections stop depending on someone's memory.",
+      },
+      {
+        icon: "fa-house-user",
+        title: "Tenant & Owner Portals",
+        description:
+          "Self-service portals for raising maintenance requests, tracking ticket status, downloading invoices and statements, and paying rent online — cutting the phone-call volume that fills a property manager's day.",
+      },
+      {
+        icon: "fa-screwdriver-wrench",
+        title: "Maintenance & Facility Workflows",
+        description:
+          "Ticketing that routes requests to the right vendor or technician with SLAs, photo evidence, and closure sign-off, giving management a record of response times across the whole portfolio.",
+      },
+      {
+        icon: "fa-chart-column",
+        title: "Portfolio Analytics & Reporting",
+        description:
+          "Dashboards covering occupancy, collection efficiency, arrears, lead conversion, and asset-level performance, so ownership decisions are based on live figures rather than a month-old workbook.",
+      },
+    ],
+    benefitsTitle: "Why property teams build with Ramest",
+    benefits: [
+      {
+        icon: "fa-bolt",
+        title: "Faster response on every enquiry",
+        description:
+          "Portal and campaign leads land directly in the pipeline with automated follow-up, so enquiries get answered while intent is high instead of being discovered in an inbox two days later.",
+      },
+      {
+        icon: "fa-layer-group",
+        title: "One record per property and tenant",
+        description:
+          "Listings, documents, agreements, payments, and maintenance history attach to a single record, which removes the reconciliation work and the contradictory answers that come from parallel spreadsheets.",
+      },
+      {
+        icon: "fa-indian-rupee-sign",
+        title: "Collections that do not slip",
+        description:
+          "Automated rent schedules, reminders, and online payment options improve collection timelines and give finance an accurate arrears position at any moment.",
+      },
+      {
+        icon: "fa-arrow-up-right-dots",
+        title: "Scales with the portfolio",
+        description:
+          "Architecture designed for growing inventory and multi-project, multi-city operations, so adding a new tower or city is a configuration change rather than a new system.",
+      },
+    ],
+    processTitle: "From portfolio review to platform rollout",
+    processSubtitle:
+      "A delivery rhythm that proves value on one project or property before scaling to the portfolio.",
+    process: [
+      {
+        step: "01",
+        title: "Discovery & Process Review",
+        description:
+          "Mapping how enquiries, site visits, bookings, agreements, and maintenance flow today — including the spreadsheets and chat groups — to define scope, data model, and the metrics that matter.",
+      },
+      {
+        step: "02",
+        title: "Architecture & Experience Design",
+        description:
+          "Designing the property and tenancy data model plus the buyer, agent, and tenant journeys, reviewed with your sales and operations teams before build starts.",
+      },
+      {
+        step: "03",
+        title: "Agile Build & Pilot Project",
+        description:
+          "Two-week sprints with a working pilot on one project or property set, so agents and property managers use the system under real conditions before wider rollout.",
+      },
+      {
+        step: "04",
+        title: "Portfolio Rollout & Support",
+        description:
+          "Phased rollout across remaining projects with data migration, team training, monitoring, and a roadmap for the next set of integrations or automation.",
+      },
+    ],
+    stackTitle: "Our PropTech engineering stack",
+    stackSubtitle:
+      "Technologies chosen for fast search, reliable payments, and mobile-ready field use.",
+    techStack: [
+      {
+        category: "Frontend & Mobile",
+        items: ["React", "Next.js", "React Native", "Flutter", "TypeScript"],
+      },
+      {
+        category: "Backend & APIs",
+        items: ["Node.js", "Python", ".NET", "REST APIs", "Background jobs"],
+      },
+      {
+        category: "Search, Maps & Media",
+        items: ["Elasticsearch", "Google Maps Platform", "Mapbox", "Image & video CDN"],
+      },
+      {
+        category: "Data & Integrations",
+        items: ["PostgreSQL", "Redis", "Payment gateways", "E-sign providers", "AWS"],
+      },
+    ],
+    faqSubtitle:
+      "What developers, brokerages, and property managers ask before starting.",
+    faqs: [
+      {
+        question: "How much does a real estate software project cost?",
+        answer:
+          "Cost depends on scope — whether you need a listing portal, a sales CRM, lease and property management, tenant portals, or a combination, and how many integrations are involved. We scope in a consultation and agree a fixed quote before work starts. A focused listing site or tenant portal sits well below a full portfolio management platform, and smaller projects are welcome.",
+      },
+      {
+        question: "How long does a property platform take to build?",
+        answer:
+          "A listing portal or tenant self-service portal typically ships in 8–14 weeks. A combined platform covering listings, sales CRM, leasing, and maintenance usually runs 4–8 months, delivered in phases so one project or property set is live and in daily use well before the full rollout.",
+      },
+      {
+        question: "Can you integrate with property portals and our existing CRM?",
+        answer:
+          "Generally yes. We integrate with listing portals for lead capture and inventory syndication where they expose an API or feed, connect to payment gateways and e-sign providers, and either integrate with your existing CRM or migrate its data into the new pipeline. Where a portal offers no API, we will tell you what is realistically possible before you commit.",
+      },
+      {
+        question: "Will tenants and buyers be able to pay online?",
+        answer:
+          "Yes. We integrate established payment gateways for rent, booking amounts, and maintenance charges, with receipts, statements, and automated reminders. Payment card data is handled by the gateway rather than stored on your servers, which keeps your compliance obligations far simpler.",
+      },
+      {
+        question: "Should we build custom software or buy an off-the-shelf PropTech product?",
+        answer:
+          "An off-the-shelf product is a sensible start if your portfolio is small and your process is standard. Custom software earns its keep once you are managing multiple projects or cities, running approval and commission rules specific to your business, or needing your portal, CRM, and leasing data to behave as one system — which is where packaged tools usually hit configuration limits.",
+      },
+      {
+        question: "What happens after the platform goes live?",
+        answer:
+          "You own the source code, data, and infrastructure outright. We offer support retainers covering monitoring, portal and gateway integration changes, and new modules as the portfolio grows, and most clients keep the same engineering team so knowledge of your inventory and process carries forward.",
+      },
+    ],
+  },
 };
 
 export function getServiceDetail(slug: string): ServiceDetail | undefined {

@@ -99,13 +99,15 @@ export function AppSidebar() {
             />
           ) : (
             <div className="flex min-w-0 flex-col gap-1.5">
+              {/* Transparent dark-navy lettering — reads cleanly on the white
+                  sidebar (the old logo_final had a baked navy pill). */}
               <Image
-                src="/assets/logo_final.webp"
+                src="/assets/logo_mark_dark.webp"
                 alt="Ramest Technolabs"
-                width={687}
-                height={267}
+                width={528}
+                height={206}
                 priority
-                className="h-8 w-auto self-start"
+                className="h-7 w-auto self-start"
               />
               <span className="truncate text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                 Admin Console

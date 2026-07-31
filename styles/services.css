@@ -600,13 +600,15 @@
   padding: 0.95rem 0.25rem;
   background: transparent;
   border: 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.95);
   font-size: 1.05rem;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
 }
 
+/* The overlay is navy — brand-blue icons vanished on it. White glass tile
+   with light-blue glyph reads clearly. */
 .mobile-accordion-category-icon {
   width: 2rem;
   height: 2rem;
@@ -614,8 +616,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(3, 87, 168, 0.15);
-  color: var(--first-color);
+  background: rgba(255, 255, 255, 0.14);
+  color: #A9D4FF;
   font-size: 0.9rem;
 }
 
@@ -647,7 +649,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0.2rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.98rem;
   min-height: 44px;
   transition: color 0.2s ease-out;
@@ -655,7 +657,7 @@
 
 .mobile-accordion-link i {
   width: 1.1rem;
-  color: rgba(3, 87, 168, 0.8);
+  color: #A9D4FF;
   font-size: 0.85rem;
 }
 
@@ -665,7 +667,7 @@
 }
 
 .mobile-accordion-link--all {
-  color: var(--first-color);
+  color: #8FC0FF;
   font-weight: 600;
   justify-content: space-between;
 }
@@ -1443,11 +1445,23 @@
   margin: 0;
   padding: 0;
   display: grid;
+  /* Column count follows the real number of steps (set via data-steps),
+     so there is never a phantom empty column with a dangling connector. */
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1.5rem;
   position: relative;
 }
 
+.svc-timeline[data-steps="4"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.svc-timeline[data-steps="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Connector runs from the centre of the first dot to the centre of the last:
+   inset = half a column. 4 cols -> 12.5%, 5 cols -> 10%. */
 .svc-timeline::before {
   content: "";
   position: absolute;
@@ -1462,6 +1476,17 @@
   );
 }
 
+.svc-timeline[data-steps="4"]::before {
+  left: 12.5%;
+  right: 12.5%;
+}
+
+.svc-timeline[data-steps="3"]::before {
+  left: 16.66%;
+  right: 16.66%;
+}
+
+/* Legacy modifier kept as an alias in case anything still references it. */
 .svc-timeline--four {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

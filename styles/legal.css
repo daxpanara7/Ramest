@@ -1,0 +1,371 @@
+/* ===========================================================================
+   LEGAL PAGES (Terms & Conditions / Privacy Policy)
+
+   One route, two documents, switched by ?tab= — the tabs are links, so each
+   document is its own URL. Layout: a centred hero (eyebrow, h1, lede, tabs)
+   above a single centred document column. Body copy inside the document stays
+   left-aligned — centred paragraphs are hard to read at legal-text length.
+   =========================================================================== */
+
+.legal-page {
+    position: relative;
+    padding: 9.5rem 0 5.5rem;
+}
+
+/* Soft wash behind the hero so the white document card reads as lifted off
+   the page rather than floating on flat background. */
+.legal-page::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30rem;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 100% at 50% 0%, rgba(6, 96, 188, 0.09) 0%, rgba(6, 96, 188, 0) 70%);
+}
+
+/* ------------------------------------------------------------------- head */
+
+.legal-head {
+    max-width: 46rem;
+    margin: 0 auto 3rem;
+    text-align: center;
+}
+
+.legal-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--first-color);
+    background: var(--first-color-light);
+    border-radius: 100px;
+    padding: 0.45rem 1rem;
+    margin: 0 0 1.1rem;
+}
+
+.legal-title {
+    font-family: var(--title-font);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--title-color);
+    margin: 0;
+    text-wrap: balance;
+}
+
+.legal-lede {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-color);
+    max-width: 40rem;
+    margin: 1.1rem auto 0;
+    text-wrap: pretty;
+}
+
+.legal-lede a {
+    color: var(--first-color);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------- tabs */
+
+.legal-tabs {
+    display: inline-flex;
+    gap: 0.4rem;
+    margin: 2.25rem auto 0;
+    padding: 0.4rem;
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    background: var(--container-color);
+    box-shadow: 0 12px 28px -22px rgba(3, 87, 168, 0.5);
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.legal-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.legal-tab {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 0.7rem 1.6rem;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+
+.legal-tab:hover {
+    color: var(--first-color);
+    background: var(--first-color-light);
+}
+
+.legal-tab.is-active {
+    color: #fff;
+    background: linear-gradient(120deg, #003A8C 0%, #0660BC 100%);
+    box-shadow: 0 10px 20px -12px rgba(3, 87, 168, 0.75);
+}
+
+/* --------------------------------------------------------------- document */
+
+.legal-doc {
+    max-width: 68rem;
+    margin: 0 auto;
+    min-width: 0;
+    padding: 3rem 3.25rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    background: var(--container-color);
+    box-shadow: 0 30px 70px -46px rgba(3, 87, 168, 0.45);
+}
+
+/* Only the document's own header is centred — sections below stay ranged
+   left so long clauses remain readable. */
+.legal-doc-head {
+    text-align: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.legal-doc-title {
+    font-family: var(--title-font);
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--title-color);
+    margin: 0;
+}
+
+.legal-updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--first-color);
+    background: var(--first-color-light);
+    border-radius: 100px;
+    padding: 0.4rem 0.95rem;
+    margin: 0.95rem 0 0;
+}
+
+.legal-updated-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.legal-intro {
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    max-width: 40rem;
+    margin: 1.25rem auto 0;
+    text-wrap: pretty;
+}
+
+/* Scroll-margin so anchor jumps clear the fixed header capsule. */
+.legal-section {
+    scroll-margin-top: 7.5rem;
+    margin-top: 2.5rem;
+}
+
+.legal-section-title {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-items: baseline;
+    font-family: var(--title-font);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--title-color);
+    margin: 0 0 0.7rem;
+}
+
+.legal-section-num {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--first-color);
+    opacity: 0.7;
+}
+
+/* Body copy aligns to the section title, not to the number gutter. */
+.legal-section > :not(.legal-section-title) {
+    margin-left: 2.25rem;
+}
+
+.legal-subhead {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--title-color);
+    margin: 1.25rem 0 0.5rem;
+}
+
+.legal-text {
+    font-size: 0.98rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    margin: 0 0 0.75rem;
+}
+
+.legal-text:last-child {
+    margin-bottom: 0;
+}
+
+.legal-list {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+}
+
+.legal-list li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+.legal-list li::before {
+    content: "";
+    position: absolute;
+    left: 0.25rem;
+    top: 0.72em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--first-color);
+    opacity: 0.65;
+}
+
+.legal-doc a {
+    color: var(--first-color);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    /* Long emails/URLs must not blow out the layout on phones. */
+    overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------- footnote */
+
+.legal-footnote {
+    margin-top: 3rem;
+    padding: 2rem 1.75rem;
+    border-radius: 20px;
+    background: var(--first-color-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+}
+
+.legal-footnote-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    text-wrap: pretty;
+}
+
+/* Scoped to `.legal-doc a` strength so the generic document-link rule above
+   cannot repaint this pill's label blue-on-blue. */
+.legal-doc a.legal-crosslink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.9rem;
+    border-radius: 100px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    background: linear-gradient(120deg, #003A8C 0%, #0660BC 100%);
+    box-shadow: 0 14px 28px -16px rgba(3, 87, 168, 0.7);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.legal-doc a.legal-crosslink:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px -14px rgba(3, 87, 168, 0.75);
+}
+
+.legal-crosslink i {
+    font-size: 0.78em;
+    transition: transform 0.3s ease;
+}
+
+.legal-doc a.legal-crosslink:hover i {
+    transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .legal-doc a.legal-crosslink,
+    .legal-doc a.legal-crosslink:hover,
+    .legal-doc a.legal-crosslink:hover i {
+        transform: none;
+        transition: none;
+    }
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 640px) {
+    .legal-page {
+        padding: 8rem 0 3.5rem;
+    }
+
+    .legal-tabs {
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .legal-tab {
+        padding: 0.65rem 1.15rem;
+        font-size: 0.85rem;
+    }
+
+    .legal-doc {
+        padding: 1.9rem 1.35rem 1.75rem;
+        border-radius: 20px;
+    }
+
+    .legal-section-title {
+        grid-template-columns: 1.9rem minmax(0, 1fr);
+    }
+
+    .legal-section > :not(.legal-section-title) {
+        margin-left: 1.9rem;
+    }
+
+    .legal-footnote {
+        padding: 1.6rem 1.15rem;
+        align-items: stretch;
+    }
+
+    .legal-doc a.legal-crosslink {
+        justify-content: center;
+    }
+}

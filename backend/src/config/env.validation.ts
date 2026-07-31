@@ -26,6 +26,10 @@ class EnvVars {
   @IsOptional()
   @IsString()
   CORS_ORIGINS?: string;
+
+  @IsOptional()
+  @IsString()
+  RECAPTCHA_SECRET_KEY?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
@@ -44,8 +48,17 @@ export function validateEnv(config: Record<string, unknown>) {
   }
 
   // Secrets are optional in dev but mandatory in production.
+  //
+  // RECAPTCHA_SECRET_KEY is in this list on purpose: the service degrades
+  // silently to "skip verification" when it is missing, so without a boot-time
+  // check a production deploy could serve unprotected public endpoints for
+  // weeks with only a log line to show for it. Failing to start is louder.
   if (validated.NODE_ENV === 'production') {
-    for (const key of ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'] as const) {
+    for (const key of [
+      'JWT_ACCESS_SECRET',
+      'JWT_REFRESH_SECRET',
+      'RECAPTCHA_SECRET_KEY',
+    ] as const) {
       if (!validated[key]) throw new Error(`${key} is required in production`);
     }
   }

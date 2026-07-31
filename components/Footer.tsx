@@ -3,13 +3,29 @@ import { SITE, SOCIAL_LINKS } from "@/lib/site";
 import { serviceCategories } from "@/lib/services";
 
 /**
- * Blue footer, rebuilt against the sdipresence.com reference: brand +
- * newsletter on the left, four link columns on the right, and a translucent
- * rounded bar along the bottom.
+ * Blue footer: brand mark + positioning line on the left, four link columns
+ * on the right, and a bottom bar with the copyright and legal link.
+ *
+ * The left column deliberately carries no call to action — the CtaBanner
+ * section immediately above the footer already asks "Ready to Build
+ * Something Great?" and links the identical "Start a Project" → /contact
+ * button, so repeating it here read as duplication rather than emphasis.
  *
  * Link columns are generated from the real nav/service data rather than
  * hard-coded, so they cannot drift out of sync with the site.
  */
+
+/**
+ * Icon row shown until the real profile URLs land in SOCIAL_LINKS
+ * (lib/site.ts). Rendered as inert <span>s, not <a href="#">, so nothing is
+ * focusable or clickable while it has nowhere to go — a dead link is worse
+ * than a plain glyph. The moment SOCIAL_LINKS is populated these are
+ * replaced automatically by the real anchors below.
+ */
+const SOCIAL_PLACEHOLDERS = [
+  { label: "LinkedIn", icon: "fa-brands fa-linkedin-in" },
+  { label: "Instagram", icon: "fa-brands fa-instagram" },
+];
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About Us" },
@@ -27,25 +43,18 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="container site-footer-inner">
-        {/* ---------- Brand + newsletter ---------- */}
-        <div>
+        {/* ---------- Brand wordmark + positioning line ---------- */}
+        <div className="footer-brand-col">
+          {/* Text branding, per the brief: "Ramest" white, "Technolabs" in
+              the light-blue accent gradient. */}
           <Link href="/" aria-label={`${SITE.name} home`} className="footer-brand">
             Ramest <em>Technolabs</em>
           </Link>
 
-          <h2 className="footer-connect-title">
-            Have an idea? Let&apos;s build it together.
-          </h2>
-
-          <div className="footer-actions">
-            <Link href="/contact" className="footer-news-btn">
-              Start a Project{" "}
-              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </Link>
-            <Link href="/services" className="footer-ghost-btn">
-              Explore Services
-            </Link>
-          </div>
+          <p className="footer-tagline">
+            Engineering reliable web, mobile, and AI software for teams that
+            ship — from {SITE.address.city}, India.
+          </p>
         </div>
 
         {/* ---------- Link columns ---------- */}
@@ -105,29 +114,40 @@ export default function Footer() {
               </ul>
             </div>
           </div>
-
-          {/* Rendered only for profiles that actually exist. */}
-          {SOCIAL_LINKS.length > 0 && (
-            <div className="footer-social">
-              {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer me"
-                >
-                  {s.label}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
-      {/* ---------- Bottom bar ---------- */}
+      {/* ---------- Bottom bar: copyright and legal link left, social icons
+                     pushed to the right edge of the same line ---------- */}
       <div className="container">
         <div className="footer-bottom-bar">
           <span>© 2026 {SITE.name}. All rights reserved.</span>
+          <nav className="footer-legal-links" aria-label="Legal">
+            <Link href="/legal">Terms &amp; Conditions</Link>
+          </nav>
+
+          {/* Real anchors once profiles exist — SOCIAL_LINKS is the same
+              array Organization.sameAs is derived from — otherwise the inert
+              placeholder glyphs. */}
+          <div className="footer-social">
+            {SOCIAL_LINKS.length > 0
+              ? SOCIAL_LINKS.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    aria-label={s.label}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                  >
+                    <i className={s.icon} aria-hidden="true" />
+                  </a>
+                ))
+              : SOCIAL_PLACEHOLDERS.map((s) => (
+                  <span key={s.label} className="footer-social-placeholder">
+                    <i className={s.icon} aria-hidden="true" />
+                  </span>
+                ))}
+          </div>
         </div>
       </div>
     </footer>

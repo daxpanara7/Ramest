@@ -619,10 +619,11 @@
     transition: background 0.35s ease, color 0.35s ease, transform 0.35s ease;
 }
 
+/* Grow only — no tilt. */
 .hx-card:hover .hx-card-icon {
     background: var(--hx-red);
     color: #fff;
-    transform: scale(1.06) rotate(-3deg);
+    transform: scale(1.06);
 }
 
 .hx-card-title {
@@ -723,7 +724,7 @@
     font-size: 0.88rem;
     font-weight: 600;
     color: var(--title-color);
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .hx-value i {
@@ -733,7 +734,6 @@
 
 .hx-value:hover {
     border-color: rgba(3, 87, 168, 0.35);
-    transform: translateY(-2px);
 }
 
 /* -------------------------------------------------------------- industries */
@@ -755,19 +755,20 @@
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-color);
-    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease,
-        transform 0.3s ease;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 .hx-industry:hover {
     color: var(--hx-red);
     border-color: rgba(3, 87, 168, 0.4);
     background: var(--hx-red-soft);
-    transform: translateY(-2px);
 }
 
 /* ------------------------------------------------------------ testimonials */
 
+/* Solid surface, no transform hover: backdrop-filter + a moving card forced
+   the browser to re-rasterize the whole backdrop every frame — the
+   full-screen "fluctuation". Highlight via border + shadow only. */
 .hx-quote {
     position: relative;
     display: flex;
@@ -776,15 +777,11 @@
     margin: 0;
     border: 1px solid var(--hx-hairline);
     border-radius: var(--hx-r-md);
-    background: color-mix(in srgb, var(--container-color) 72%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.4s ease, box-shadow 0.4s ease;
+    background: var(--container-color);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .hx-quote:hover {
-    transform: translateY(-6px);
     border-color: rgba(3, 87, 168, 0.3);
     box-shadow: var(--hx-shadow-soft);
 }
@@ -1928,5 +1925,137 @@ html {
     .nv-stats,
     .nv-aurora-c {
         animation: none;
+    }
+}
+
+/* ===========================================================================
+   INDUSTRIES BAND (ind-) — centred pill + icon grid on a soft tinted panel,
+   replacing the flat chip row that read as an empty white gap.
+   =========================================================================== */
+
+.ind-band {
+    position: relative;
+    text-align: center;
+    padding: 3.5rem clamp(1.25rem, 4vw, 3rem) 3.75rem;
+    border-radius: 32px;
+    border: 1px solid rgba(3, 87, 168, 0.1);
+    background:
+        radial-gradient(120% 100% at 50% 0%, rgba(56, 152, 236, 0.10) 0%, transparent 60%),
+        linear-gradient(180deg, #F4F9FF 0%, #FFFFFF 100%);
+}
+
+.ind-pill {
+    display: inline-block;
+    margin: 0 0 1.1rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: 100px;
+    background: rgba(56, 152, 236, 0.12);
+    color: var(--first-color);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.ind-title {
+    margin: 0 auto;
+    max-width: 22ch;
+}
+
+.ind-lede {
+    max-width: 68ch;
+    margin: 1rem auto 0;
+    font-size: var(--hx-body);
+    line-height: 1.75;
+    color: var(--text-color);
+}
+
+.ind-grid {
+    list-style: none;
+    margin: 2.75rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.ind-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    height: 100%;
+    padding: 1.6rem 0.9rem 1.4rem;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    text-decoration: none;
+    /* Colour/border only — no transform: a moving card over the tinted
+       panel is the "fluctuation" class of bug we removed elsewhere. */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.ind-item:hover,
+.ind-item:focus-visible {
+    background: #fff;
+    border-color: rgba(3, 87, 168, 0.16);
+}
+
+.ind-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.35rem;
+    height: 3.35rem;
+    border-radius: 18px;
+    background: rgba(56, 152, 236, 0.12);
+    color: var(--first-color);
+    font-size: 1.35rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.ind-item:hover .ind-icon,
+.ind-item:focus-visible .ind-icon {
+    background: var(--first-color);
+    color: #fff;
+}
+
+.ind-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--title-color);
+    text-wrap: balance;
+}
+
+@media (max-width: 900px) {
+    .ind-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .ind-band {
+        padding: 2.5rem 1.1rem 2.75rem;
+        border-radius: 24px;
+    }
+
+    .ind-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin-top: 2rem;
+    }
+
+    .ind-item {
+        padding: 1.25rem 0.6rem 1.1rem;
+    }
+
+    .ind-icon {
+        width: 2.9rem;
+        height: 2.9rem;
+        font-size: 1.15rem;
+    }
+
+    .ind-name {
+        font-size: 0.88rem;
     }
 }

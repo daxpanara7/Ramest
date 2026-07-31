@@ -36,10 +36,12 @@
    so the card's big rounded bottom corners are filled solid blue and the shell
    hands off to the fixed footer with no visible seam — exactly the reference's
    corner treatment. */
+/* No gap above: the card starts flush with the previous section and fades
+   from the page background into white, so no seam band is visible. */
 .cta-section {
     position: relative;
     padding: 0;
-    margin-top: 4.5rem;
+    margin-top: 0;
 }
 
 /* Full-bleed white card with a LARGE organic bottom curve into the footer. */
@@ -47,8 +49,9 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: #fff;
-    padding: 4rem 0 4.5rem;
+    /* Fade in from the page background — no crisp white top edge. */
+    background: linear-gradient(180deg, var(--body-color, #FBFCFE) 0%, #ffffff 160px);
+    padding: 5.5rem 0 4.5rem;
     text-align: center;
 }
 
@@ -59,20 +62,45 @@
 
 /* Wide blue bloom across the base: near-white at the edges, saturated in the
    centre, fading up. This is the dominant visual in the reference. */
+/* The reference's bloom is literally a gradient pill blurred 100px inside an
+   overflow-hidden box — replicated 1:1 (same 90deg gradient stops, same
+   blur). Static layer: the blur rasterizes once, no per-frame cost. */
 .cta-card::before {
     content: "";
     position: absolute;
-    inset: auto 0 0 0;
-    height: 62%;
+    left: 50%;
+    /* Pill centre pinned just above the card's bottom edge (like the
+       reference, where it peeks over its box top); blur bleeds upward to
+       the button, heading stays on white. */
+    bottom: -60px;
+    transform: translateX(-50%);
+    width: min(630px, 72vw);
+    height: 190px;
+    border-radius: 1280px;
     z-index: -2;
-    background:
-        radial-gradient(84% 132% at 50% 112%,
-            rgba(35, 84, 230, 0.98) 0%,
-            rgba(56, 152, 236, 0.86) 22%,
-            rgba(104, 158, 255, 0.58) 42%,
-            rgba(158, 197, 255, 0.28) 62%,
-            rgba(214, 232, 255, 0.10) 76%,
-            rgba(255, 255, 255, 0) 88%);
+    background: linear-gradient(90deg, #65ACFF 0%, #3866F1 56%, #0063FF 100%);
+    filter: blur(100px);
+}
+
+/* Phones: a 100px blur is raster cost at first paint — swap the blurred
+   pill for an equivalent soft radial with no filter. */
+@media (max-width: 640px) {
+    .cta-card::before {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: none;
+        width: auto;
+        height: 55%;
+        border-radius: 0;
+        filter: none;
+        background:
+            radial-gradient(120% 140% at 50% 120%,
+                rgba(56, 102, 241, 0.95) 0%,
+                rgba(101, 172, 255, 0.65) 40%,
+                rgba(175, 205, 255, 0.28) 62%,
+                rgba(255, 255, 255, 0) 82%);
+    }
 }
 
 /* Soft speckle over the bloom.
@@ -87,28 +115,38 @@
     inset: auto 0 0 0;
     height: 58%;
     z-index: -1;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='170'%3E%3Cg font-family='monospace' font-size='14' fill='white' opacity='0.55'%3E%3Ctext x='14' y='28'%3E01%3C/text%3E%3Ctext x='150' y='62'%3E00%3C/text%3E%3Ctext x='70' y='104'%3E10%3C/text%3E%3Ctext x='180' y='140'%3E11%3C/text%3E%3C/g%3E%3C/svg%3E");
-    background-size: 220px 170px;
-    -webkit-mask-image: radial-gradient(60% 100% at 50% 100%, #000 6%, transparent 70%);
-    mask-image: radial-gradient(60% 100% at 50% 100%, #000 6%, transparent 70%);
-    opacity: 0.7;
+    /* Denser binary rows, blended like the reference (code layer at low
+       opacity over the glow). */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150'%3E%3Cg font-family='monospace' font-size='13' fill='white'%3E%3Ctext x='10' y='24'%3E01%3C/text%3E%3Ctext x='120' y='24'%3E11%3C/text%3E%3Ctext x='64' y='58'%3E00%3C/text%3E%3Ctext x='160' y='72'%3E10%3C/text%3E%3Ctext x='20' y='96'%3E10%3C/text%3E%3Ctext x='110' y='112'%3E01%3C/text%3E%3Ctext x='60' y='140'%3E11%3C/text%3E%3Ctext x='168' y='138'%3E00%3C/text%3E%3C/g%3E%3C/svg%3E");
+    background-size: 200px 150px;
+    -webkit-mask-image: radial-gradient(62% 100% at 50% 100%, #000 8%, transparent 72%);
+    mask-image: radial-gradient(62% 100% at 50% 100%, #000 8%, transparent 72%);
+    opacity: 0.55;
     pointer-events: none;
 }
 
-/* Thin curved strokes sweeping in from both sides toward the centre. */
+/* Two mirrored fans of thin curves — same geometry as the reference's SVG:
+   each side's lines converge to a waist at the screen centre (button line)
+   and fan out to the top and bottom toward the screen edge. Hairline width
+   is kept constant via vector-effect. */
 .cta-lines {
     position: absolute;
-    inset: auto 0 28% 0;
-    height: 300px;
+    left: 0;
+    right: 0;
+    /* Waist (element centre) fixed ~90px above the card bottom — the button
+       line — independent of how tall the card is on a given page. */
+    bottom: calc(90px - 310px);
+    height: 620px;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.6;
     background-repeat: no-repeat, no-repeat;
     background-position: left center, right center;
-    background-size: 52% 100%, 52% 100%;
+    background-size: 47% 100%, 47% 100%;
     background-image:
-        radial-gradient(130% 62% at 0% 50%, transparent 57.6%, rgba(90, 132, 220, 0.34) 58%, transparent 58.6%),
-        radial-gradient(130% 62% at 100% 50%, transparent 57.6%, rgba(90, 132, 220, 0.34) 58%, transparent 58.6%);
+        /* left fan — converges at its right edge (screen centre) */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 750' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23A3BDE9' stroke-opacity='0.75'%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C430,372 235,325 0,120'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C430,373 240,340 0,215'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C435,374 250,356 0,300'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C435,376 250,394 0,450'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C430,377 240,410 0,535'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M600,375 C430,378 235,425 0,630'/%3E%3C/g%3E%3C/svg%3E"),
+        /* right fan — converges at its left edge (screen centre) */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 750' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23A3BDE9' stroke-opacity='0.75'%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C170,372 365,325 600,120'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C170,373 360,340 600,215'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C165,374 350,356 600,300'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C165,376 350,394 600,450'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C170,377 360,410 600,535'/%3E%3Cpath vector-effect='non-scaling-stroke' d='M0,375 C170,378 365,425 600,630'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .cta-title {
@@ -119,26 +157,33 @@
     letter-spacing: -0.015em;
     margin: 0 auto 1.1rem;
     max-width: 16ch;
-    color: #002B66;
+    /* Reference-exact: one vertical gradient (black -> #013B9A) clipped to
+       the text, which is what makes line 1 read dark and line 2 blue.
+       Static clip, and nothing animates this element's transform. */
+    background: linear-gradient(180deg, #000000 0%, #013B9A 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .cta-title em {
     font-style: normal;
-    color: #1D5FD6;
+    /* Transparent so the parent's clipped gradient shows through. */
+    color: transparent;
 }
 
 .cta-desc {
     font-family: var(--font-title-face), var(--body-font);
     font-size: 1rem;
     line-height: 1.6;
-    color: #4B5B72;
+    /* Near-black like the reference's sub line */
+    color: #14203A;
     margin: 0 auto 2.5rem;
     max-width: 52ch;
 }
 
 /* Pill button — gradient, lift on hover */
-.cta-button,
-.footer-news-btn {
+.cta-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -161,8 +206,7 @@
     min-width: 272px;
 }
 
-.cta-button:hover,
-.footer-news-btn:hover {
+.cta-button:hover {
     box-shadow: 0 18px 30px rgba(0, 84, 177, 0.26);
 }
 
@@ -212,8 +256,16 @@
     max-width: 860px;
 }
 
-/* ---- left: brand + newsletter ---- */
-/* Text branding, per the brief: "Ramest" white, "Technolabs" in the accent. */
+/* ---- left: brand mark + positioning line ---- */
+/* The wordmark is the real logo asset, not styled text — same file the
+   header capsule uses, so the two marks are pixel-identical and the brand
+   tone is locked to the artwork rather than to a hand-tuned gradient. */
+.footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 .footer-brand {
     display: inline-block;
     font-family: var(--font-body-face), "Inter", var(--body-font);
@@ -222,7 +274,6 @@
     letter-spacing: -0.01em;
     color: #fff;
     line-height: 1;
-    margin-bottom: 2.75rem;
     text-decoration: none;
 }
 
@@ -234,86 +285,14 @@
     color: transparent;
 }
 
-.footer-connect-title {
-    font-family: var(--font-body-face), "Inter", var(--body-font);
-    font-weight: 500;
-    font-size: 1.6rem;
-    line-height: 1.2;
-    color: #fff;
-    margin: 0 0 1.5rem;
-}
-
-.footer-news-form,
-.footer-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    max-width: 340px;
-}
-
-.footer-ghost-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
+.footer-tagline {
     font-family: var(--font-title-face), var(--body-font);
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #fff;
-    padding: 0.85rem 2.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: var(--footer-pill);
-    text-decoration: none;
-    transition: background-color 0.25s ease, border-color 0.25s ease,
-        transform 0.3s ease;
-}
-
-.footer-ghost-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: #fff;
-}
-
-.footer-news-input {
-    width: 100%;
-    font: inherit;
-    font-size: 0.9rem;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.40);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: var(--footer-pill);
-    padding: 0.8rem 1.5rem;
-    transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-.footer-news-input::placeholder {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.footer-news-input:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.52);
-    border-color: #fff;
-}
-
-.footer-news-btn {
-    width: 100%;
-}
-
-.footer-news-btn:disabled {
-    opacity: 0.7;
-    cursor: default;
-    transform: none;
-}
-
-.footer-news-msg {
-    font-size: 0.82rem;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.65;
     color: var(--blue-050);
-    margin: 0;
-}
-
-.footer-news-msg.is-error {
-    color: #FFD9D4;
+    max-width: 34ch;
+    margin: 1.75rem 0 0;
+    text-wrap: pretty;
 }
 
 /* ---- right: link columns ---- */
@@ -359,38 +338,56 @@
     background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* ---- social ---- */
+/* ---- social: icon row pinned to the right end of the bottom line ---- */
 .footer-social {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.75rem;
-    margin-top: 2.25rem;
+    align-items: center;
+    gap: 0.55rem;
+    /* Pushes the row to the far right of .footer-bottom-bar, opposite the
+       copyright and the legal link. */
+    margin-left: auto;
 }
 
-.footer-social a {
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #fff;
+/* Anchors and the inert placeholders share one appearance, so swapping in
+   real URLs changes behaviour only — never the look. */
+.footer-social a,
+.footer-social-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    /* Inherits the bottom bar's own tint and face, so the icons read as part
+       of that line rather than as a separate control. */
+    color: inherit;
+    font-size: 0.95rem;
+    line-height: 1;
     text-decoration: none;
-    padding-bottom: 2px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.25s ease, opacity 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transition: color 0.25s ease, background-color 0.25s ease,
+        border-color 0.25s ease;
 }
 
+/* Hover affordance is for the real links only — the placeholders do nothing,
+   so they must not advertise that they do. */
 .footer-social a:hover {
-    border-bottom-color: #fff;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: #fff;
 }
 
-/* ---- bottom line: plain text, styled like the rest of the footer ---- */
+/* ---- bottom line: copyright hard left, legal links next to it ---- */
 .footer-bottom-bar {
     position: relative;
     margin-top: 4rem;
     padding: 1.05rem 0 1.6rem;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    text-align: left;
     display: flex;
-    flex-wrap: wrap;
+    /* Copyright and the legal link stay on one line; the row is short enough
+       that wrapping only ever happened because wrap was allowed. */
+    flex-wrap: nowrap;
     align-items: center;
     gap: 0.5rem 2rem;
     /* Identical to the footer link columns: same face, size, and tint. */
@@ -399,8 +396,20 @@
     color: var(--blue-200);
 }
 
+.footer-legal-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem 1.75rem;
+    white-space: nowrap;
+}
+
+/* The link is body text that happens to be clickable — same face, size, and
+   tint as the copyright beside it, with the colour shift saved for hover. */
 .footer-bottom-bar a {
-    color: rgba(255, 255, 255, 0.92);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
     text-decoration: none;
     transition: color 0.25s ease;
 }
@@ -425,7 +434,7 @@
 
 @media screen and (max-width: 768px) {
     .cta-section {
-        margin-top: 3.5rem;
+        margin-top: 0;
     }
 
     .cta-card {
@@ -441,16 +450,15 @@
         padding: 3.25rem 0 1.5rem;
     }
 
-    .footer-news-form {
-        max-width: none;
-    }
-
     .footer-bottom-bar {
         margin-top: 2.5rem;
-        border-radius: 24px;
-        padding: 1rem 1.35rem;
-        justify-content: center;
-        text-align: center;
+        padding: 1rem 0 1.4rem;
+        justify-content: flex-start;
+        text-align: left;
+        gap: 0.5rem 1.25rem;
+        /* One line is the desktop intent; on a narrow phone the two strings
+           cannot both fit, and wrapping beats horizontal overflow. */
+        flex-wrap: wrap;
     }
 }
 
@@ -465,8 +473,7 @@
 
     .footer-col-list a:hover,
     .footer-social a:hover,
-    .cta-button:hover,
-    .footer-news-btn:hover {
+    .cta-button:hover {
         transform: none;
     }
 }
@@ -480,8 +487,7 @@
 /* Links keep only the pill highlight on hover — no movement. */
 
 /* ---- Button: gradient sweep + scale + glow on hover ---- */
-.cta-button,
-.footer-news-btn {
+.cta-button {
     background-size: 160% 100%;
     background-position: 0% 50%;
     /* glossy bevel: bright top edge, deep lower inset, soft drop */
@@ -495,40 +501,30 @@
         background-position .55s ease;
 }
 
-.cta-button:hover,
-.footer-news-btn:hover {
+.cta-button:hover {
     box-shadow:
         inset 0 2px 1px rgba(255, 255, 255, 0.6),
         inset 0 -4px 8px rgba(2, 32, 90, 0.3),
         0 18px 34px rgba(9, 64, 160, 0.45);
 }
 
-.cta-button:hover,
-.footer-news-btn:hover {
+.cta-button:hover {
     background-position: 100% 50%;
     box-shadow: 0 18px 34px rgba(0, 84, 177, .34);
 }
 
-/* ---- Input: border glow + focus ring ---- */
-.footer-news-input {
-    transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
-}
-
-.footer-news-input:hover {
-    border-color: rgba(255, 255, 255, .6);
-}
-
-.footer-news-input:focus {
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, .18), 0 0 22px rgba(140, 190, 255, .35);
-}
-
 /* ---- Social: glow only, no movement ---- */
+/* No `display` here: the icons are centred flex circles, and re-declaring
+   inline-block below their own rule would silently undo that. */
 .footer-social a {
-    display: inline-block;
-    transition: text-shadow .3s ease, border-color .25s ease;
+    transition: color .25s ease, background-color .25s ease,
+        border-color .25s ease, text-shadow .3s ease;
 }
 
-.footer-social a:hover {
+/* Specific enough to beat `.footer-bottom-bar a:hover`, which would
+   otherwise draw an underline through the glyphs. */
+.footer-bottom-bar .footer-social a:hover {
+    text-decoration: none;
     text-shadow: 0 0 18px rgba(255, 255, 255, .55);
 }
 
@@ -536,8 +532,7 @@
 
     .footer-col-list a:hover,
     .footer-social a:hover,
-    .cta-button:hover,
-    .footer-news-btn:hover {
+    .cta-button:hover {
         transform: none;
     }
 }

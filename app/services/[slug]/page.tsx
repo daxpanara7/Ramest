@@ -265,7 +265,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </h2>
                 <p className="svc-category-desc">{detail.processSubtitle}</p>
               </header>
-              <ol className="svc-timeline reveal">
+              {/* Column count follows the real step count so there is never
+                  an empty trailing slot with the connector line dangling. */}
+              <ol className="svc-timeline reveal" data-steps={detail.process.length}>
                 {detail.process.map((step) => (
                   <li key={step.step} className="svc-timeline-step">
                     <span className="svc-timeline-dot" aria-hidden="true">

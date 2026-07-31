@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api-base";
 import { executeRecaptcha } from "@/lib/recaptcha";
@@ -28,6 +28,29 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<FormStatus>("idle");
   const [error, setError] = useState("");
+  const [slow, setSlow] = useState(false);
+  const slowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /**
+   * Wake the API as soon as the form is on screen.
+   *
+   * Render's free tier sleeps after ~15 minutes idle and takes 50s+ to cold
+   * start, which lands entirely on whoever submits first. A visitor spends
+   * 30-60s filling this form, so pinging health on mount usually means the
+   * container is already awake by the time they hit Send.
+   *
+   * keepalive + ignored failure: this is best-effort warming, never
+   * something the user should see or that can block the real submit.
+   */
+  useEffect(() => {
+    fetch(`${API_BASE}/health`, { method: "GET", keepalive: true }).catch(() => {});
+    // Preload the redirect target so the post-submit navigation is instant.
+    router.prefetch("/thank-you");
+  }, [router]);
+
+  useEffect(() => () => {
+    if (slowTimer.current) clearTimeout(slowTimer.current);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,6 +81,10 @@ export default function ContactForm() {
     }
 
     setStatus("sending");
+    setSlow(false);
+    // A cold container can take ~50s. Silence that long reads as "broken",
+    // so explain the wait rather than leaving a spinner with no context.
+    slowTimer.current = setTimeout(() => setSlow(true), 4000);
 
     try {
       const recaptchaToken = await executeRecaptcha("contact");
@@ -99,6 +126,9 @@ export default function ContactForm() {
           ? err.message
           : "Something went wrong. Please try again.",
       );
+    } finally {
+      if (slowTimer.current) clearTimeout(slowTimer.current);
+      setSlow(false);
     }
   };
 
@@ -158,6 +188,15 @@ export default function ContactForm() {
         </p>
       ) : null}
 
+      {/* Cold-start explainer. The API sleeps when idle and can take ~50s to
+          wake; an unexplained wait that long reads as a broken form. */}
+      {status === "sending" && slow ? (
+        <p role="status" style={{ marginBottom: "1rem", opacity: 0.85 }}>
+          Still sending — our server is waking up. This can take up to a
+          minute the first time. Please don&apos;t close this page.
+        </p>
+      ) : null}
+
       {/* Shown only for the instant before the /thank-you navigation lands. */}
       {status === "sent" ? (
         <p role="status" style={{ marginBottom: "1rem", opacity: 0.85 }}>
@@ -170,7 +209,7 @@ export default function ContactForm() {
         className="button button-primary"
         disabled={status === "sending"}
       >
-        {status === "sending" ? "Sending…" : "Send Message"}
+        {status === "sending" ? (slow ? "Still sending…" : "Sending…") : "Send Message"}
       </button>
 
       <RecaptchaNotice />

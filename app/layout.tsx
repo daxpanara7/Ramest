@@ -103,7 +103,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';document.head.appendChild(l);var s=document.createElement('style');s.textContent='@font-face{font-family:\\'Font Awesome 6 Free\\';font-style:normal;font-weight:900;font-display:swap;src:url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2) format(\\'woff2\\')}';document.head.appendChild(s);})();",
+              "(function(){var B='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/';var l=document.createElement('link');l.rel='stylesheet';l.href=B+'css/all.min.css';document.head.appendChild(l);var f=function(n,w,u){return '@font-face{font-family:\\''+n+'\\';font-style:normal;font-weight:'+w+';font-display:swap;src:url('+B+'webfonts/'+u+') format(\\'woff2\\')}'};var s=document.createElement('style');s.textContent=f('Font Awesome 6 Free',900,'fa-solid-900.woff2')+f('Font Awesome 6 Free',400,'fa-regular-400.woff2')+f('Font Awesome 6 Brands',400,'fa-brands-400.woff2');document.head.appendChild(s);})();",
           }}
         />
         <noscript>

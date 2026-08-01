@@ -86,31 +86,33 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="" />
-        {/* Preload the only icon font actually used (fa-solid) so it isn't
-            discovered late through the injected stylesheet. */}
+        {/* Font Awesome is self-hosted (public/fa). It used to come from
+            cdnjs, which cost a separate DNS + TLS handshake and put the icon
+            font at the end of a 3-hop chain — 705ms and the longest path in
+            the Lighthouse trace. Same-origin means it reuses the existing
+            HTTP/2 connection, and the Brands/Regular faces (which nothing
+            renders) are stripped out entirely.
+
+            Preload so the font is fetched in parallel with the stylesheet
+            rather than discovered through it. */}
         <link
           rel="preload"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2"
+          href="/fa/fa-solid-900.woff2"
         />
-        {/* Font Awesome loads NON-render-blocking: the stylesheet is
-            script-injected (script-inserted styles never block first paint)
-            and lives outside React's tree, so there is no hydration diff.
-            <noscript> keeps icons working without JS. */}
+        {/* Non-render-blocking: script-inserted stylesheets never block first
+            paint, and this lives outside React's tree so there is no
+            hydration diff. <noscript> keeps icons working without JS. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var B='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/';var l=document.createElement('link');l.rel='stylesheet';l.href=B+'css/all.min.css';document.head.appendChild(l);var s=document.createElement('style');s.textContent='@font-face{font-family:\\'Font Awesome 6 Free\\';font-style:normal;font-weight:900;font-display:swap;src:url('+B+'webfonts/fa-solid-900.woff2) format(\\'woff2\\')}';document.head.appendChild(s);})();",
+              "(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='/fa/fa.min.css';document.head.appendChild(l);})();",
           }}
         />
         <noscript>
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          />
+          <link rel="stylesheet" href="/fa/fa.min.css" />
         </noscript>
       </head>
       <body className={inter.className}>

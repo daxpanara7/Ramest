@@ -32,10 +32,13 @@ export function initHomeMotion(): () => void {
   const lenis = new Lenis({
     lerp: 0.08, // soft acceleration/deceleration (lower = floatier)
     wheelMultiplier: 1,
-    // Smooth the touch scroll too (mobile "smoothness"): syncTouch keeps
-    // Lenis in charge of momentum on touch devices instead of raw native.
-    syncTouch: true,
-    touchMultiplier: 1.4,
+    /* syncTouch was ON and caused the mobile stutter. It takes momentum away
+       from the browser's compositor and re-drives it from JS, so every frame
+       has to wait on the main thread — on a phone that reads as juddering
+       and rubber-banding. Native touch momentum is already smooth and runs
+       off-thread, so Lenis now handles wheel only and leaves touch alone. */
+    syncTouch: false,
+    smoothWheel: true,
   });
   lenis.on("scroll", ScrollTrigger.update);
   const tick = (time: number) => lenis.raf(time * 1000);

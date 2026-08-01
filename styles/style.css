@@ -534,10 +534,14 @@ img {
     box-shadow: 0 28px 60px rgba(25, 23, 22, 0.12),
         0 0 0 1px rgba(3, 87, 168, 0.06);
     z-index: 200;
+    /* visibility is a discrete property: with a 0.35s duration it flips only
+       at the END, so a closing panel stayed hittable and on-screen while the
+       next one opened — that overlap is the flash of the wrong menu. Opening
+       is animated; hiding is immediate. */
     transition:
-        opacity 0.35s ease-out,
-        transform 0.35s ease-out,
-        visibility 0.35s ease-out;
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out,
+        visibility 0s linear 0.2s;
     pointer-events: none;
 }
 
@@ -547,6 +551,12 @@ img {
     visibility: visible;
     transform: translateX(-50%) translateY(0);
     pointer-events: auto;
+    /* No delay on the way in — the panel must be visible the moment its
+       caret has been positioned. */
+    transition:
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out,
+        visibility 0s linear;
 }
 
 /* Desktop: both dropdown panels center under the whole capsule and hang the

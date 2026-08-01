@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import MobileServicesAccordion from "@/components/nav/MobileServicesAccordion";
 import ServicesMegaMenu from "@/components/nav/ServicesMegaMenu";
 import {
@@ -199,6 +199,28 @@ export default function Header() {
      capsule. Tracked every frame while the capsule is hovered/open, so the
      caret stays glued to Services/Company even DURING the expansion
      transition (a one-shot measurement briefly parked it under "Home"). */
+  /* Position the caret SYNCHRONOUSLY the moment a dropdown opens.
+     The rAF loop below keeps it glued during the capsule's expand
+     transition, but rAF first fires AFTER the opening paint — so the very
+     first frame rendered the caret at its `50%` fallback, which sits under
+     whichever trigger happens to be mid-capsule. That one-frame jump is the
+     flash of the wrong menu. useLayoutEffect runs before paint, so the
+     caret is already correct on frame one. */
+  useLayoutEffect(() => {
+    if (!isDesktop || openDropdown === null) return;
+    document
+      .querySelectorAll<HTMLElement>(".nav-item.has-dropdown")
+      .forEach((li) => {
+        const trigger = li.querySelector<HTMLElement>(".dropdown-toggle");
+        const panel = li.querySelector<HTMLElement>(".mega-menu, .dropdown-panel");
+        if (!trigger || !panel) return;
+        const t = trigger.getBoundingClientRect();
+        const p = panel.getBoundingClientRect();
+        if (!t.width || !p.width) return;
+        panel.style.setProperty("--caret-x", `${t.left + t.width / 2 - p.left}px`);
+      });
+  }, [isDesktop, openDropdown]);
+
   useEffect(() => {
     if (!isDesktop) return;
     const active = capsuleHover.isHovered || openDropdown !== null;

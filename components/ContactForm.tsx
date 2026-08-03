@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api-base";
 import { executeRecaptcha } from "@/lib/recaptcha";
 import RecaptchaNotice from "@/components/RecaptchaNotice";
+import { SITE } from "@/lib/site";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
 
@@ -30,6 +31,15 @@ export default function ContactForm() {
   const [error, setError] = useState("");
   const [slow, setSlow] = useState(false);
   const slowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* Same two bot filters as the homepage inquiry form — this posts to the
+     same public endpoint, so leaving it unprotected would just move the
+     spam here. See CreateLeadDto for why these exist alongside reCAPTCHA. */
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const mountedAt = useRef<number>(0);
+  if (mountedAt.current === 0 && typeof performance !== "undefined") {
+    mountedAt.current = performance.now();
+  }
 
   /**
    * Wake the API as soon as the form is on screen.
@@ -100,6 +110,8 @@ export default function ContactForm() {
           email: trimmedEmail,
           message: trimmedMessage,
           recaptchaToken,
+          website: honeypotRef.current?.value || undefined,
+          elapsedMs: Math.round(performance.now() - mountedAt.current),
         }),
       });
 
@@ -112,7 +124,11 @@ export default function ContactForm() {
         throw new Error(
           res.status === 429
             ? "Too many submissions. Please wait a minute and try again."
-            : msg || "Something went wrong. Please try again.",
+            : // See InquiryForm — 403 is the bot gate, and the realistic
+              // cause for a human is a blocked reCAPTCHA script.
+              res.status === 403
+              ? `Verification failed — this usually means an ad blocker or privacy extension stopped the security check. Please disable it for this page and retry, or email us at ${SITE.email}.`
+              : msg || "Something went wrong. Please try again.",
         );
       }
 
@@ -180,6 +196,21 @@ export default function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required
+        />
+      </div>
+
+      {/* Honeypot — see .hp-field in globals.css for why it is positioned
+          off-screen rather than display:none. */}
+      <div className="hp-field" aria-hidden="true">
+        <label htmlFor="contact-website">Website (leave blank)</label>
+        <input
+          ref={honeypotRef}
+          id="contact-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
         />
       </div>
 

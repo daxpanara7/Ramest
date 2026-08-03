@@ -7,6 +7,8 @@
 @import "../styles/homepage.css";
 @import "../styles/legal.css";
 @import "../styles/thank-you.css";
+@import "../styles/blog.css";
+@import "../styles/testimonials.css";
 @import "../styles/footer.css";
 
 :root {
@@ -34,6 +36,20 @@
 }
 
 /* Visually hidden but available to screen readers / SEO labels */
+/* Honeypot wrapper. Deliberately NOT `display:none` or `visibility:hidden` —
+   the better spam bots skip fields hidden that way precisely because they
+   recognise the trap. Positioned off-screen instead, which they do fill.
+   Paired with tabIndex={-1}, aria-hidden and autocomplete="off" on the input
+   so no keyboard user, screen reader or password manager can reach it. */
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

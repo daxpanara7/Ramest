@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { api, ApiError, API_BASE, getAccessToken } from "@/lib/admin/api";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime, formatBytes } from "@/lib/admin/format";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Original layout — folder rail, grid/list toggle, search — over /api/media.
@@ -286,10 +287,12 @@ function UploadButton({ onUploaded }: { onUploaded: () => void }) {
 function DeleteAsset({
   asset, onDeleted, className,
 }: { asset: Asset; onDeleted: () => void; className?: string }) {
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
 
   const remove = async () => {
-    if (!confirm(`Delete "${asset.alt?.trim() || asset.key}"? Any page using it will break.`)) return;
+    const yes = await confirm({ title: `Delete "${asset.alt?.trim() || asset.key}"? Any page using it will break.` });
+    if (!yes) return;
     setBusy(true);
     try {
       await api(`/media/${asset.id}`, { method: "DELETE" });

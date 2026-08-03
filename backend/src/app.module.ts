@@ -16,6 +16,7 @@ import { BlogModule } from './modules/blog/blog.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { MediaModule } from './modules/media/media.module';
 import { SeoModule } from './modules/seo/seo.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env.validation';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -41,6 +42,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     NewsletterModule,
     MediaModule,
     SeoModule,
+    SettingsModule,
   ],
   controllers: [HealthController],
   providers: [

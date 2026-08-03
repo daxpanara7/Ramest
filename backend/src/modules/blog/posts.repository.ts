@@ -6,6 +6,21 @@ import { PrismaService } from '../../prisma/prisma.service';
 const detailInclude = {
   category: true,
   tags: { include: { tag: true } },
+  // Selected, not `true`: the public site needs the URL and the intrinsic
+  // dimensions (so <Image> can reserve the box and avoid layout shift) — but
+  // never the storage key or uploader, which are internal.
+  // `deletedAt` is selected only so the service can drop covers whose asset
+  // was removed from the media library; it never reaches the public payload.
+  coverImage: {
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      width: true,
+      height: true,
+      deletedAt: true,
+    },
+  },
 } satisfies Prisma.BlogPostInclude;
 
 /**

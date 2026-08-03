@@ -22,6 +22,7 @@ import { postStatusBadge } from "@/components/admin/badges";
 import { api, ApiError } from "@/lib/admin/api";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime } from "@/lib/admin/format";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Original layout, live data from /api/blog/posts.
@@ -52,6 +53,7 @@ const PAGE_SIZE = 25;
 const title = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 export default function BlogPage() {
+  const confirm = useConfirm();
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [status, setStatus] = useState("all");
@@ -91,7 +93,13 @@ export default function BlogPage() {
   // Sequential, not Promise.all: the API is rate-limited and a partial
   // failure should not leave the UI claiming everything succeeded.
   const bulk = async (kind: "publish" | "delete") => {
-    if (kind === "delete" && !confirm(`Delete ${selected.length} post(s)? This cannot be undone.`)) return;
+    if (kind === "delete") {
+      const yes = await confirm({
+        title: `Delete ${selected.length} post${selected.length === 1 ? "" : "s"}?`,
+        description: "Deleted posts are removed from the public blog immediately. This cannot be undone.",
+      });
+      if (!yes) return;
+    }
     setBulkBusy(true);
     const failed: string[] = [];
     for (const id of selected) {
@@ -238,12 +246,19 @@ function PostRow({
   post: Post; author: string; checked: boolean;
   onCheck: (v: boolean) => void; onChanged: () => void;
 }) {
+  const confirm = useConfirm();
   const [busy, setBusy] = useState<null | "toggle" | "delete">(null);
   const [err, setErr] = useState<string | null>(null);
   const isPublished = post.status === "PUBLISHED";
 
   const call = async (kind: "toggle" | "delete") => {
-    if (kind === "delete" && !confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+    if (kind === "delete") {
+      const yes = await confirm({
+        title: `Delete "${post.title}"?`,
+        description: "This removes the post from the public blog immediately. It cannot be undone.",
+      });
+      if (!yes) return;
+    }
     setBusy(kind); setErr(null);
     try {
       if (kind === "delete") await api(`/blog/posts/${post.id}`, { method: "DELETE" });

@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/subset-fontawesome.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

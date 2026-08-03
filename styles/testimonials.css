@@ -1,0 +1,370 @@
+/* ==================== CLIENT IMPACT — TESTIMONIAL RAIL ====================
+   Centre-focused scroll-snap rail. Layout follows the reference: headline and
+   lede on the left, stacked avatars + a headline stat on the right, then a
+   three-across rail whose centre card is raised while its neighbours sit back.
+
+   All brand colours — navy/blue, light surface. No new colour tokens.
+
+   Everything that moves here is transform/opacity only, so the section stays
+   on the compositor and does not add main-thread work to the existing Lenis +
+   GSAP stack. No backdrop-filter anywhere: it is what corrupted the blog
+   cards inside the sticky, clipped .stack-card (see styles/blog.css). */
+
+.ci-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.ci-lede {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-color);
+    margin: 1rem 0 0;
+    max-width: 60ch;
+}
+
+/* ---- right rail: overlapping avatars + the standing-strong stat ---- */
+.ci-proof {
+    justify-self: end;
+    text-align: right;
+}
+
+.ci-faces {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.ci-face {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--first-color-light);
+    border: 3px solid var(--container-color);
+    box-shadow: 0 6px 16px -8px rgba(0, 43, 102, 0.55);
+}
+
+.ci-face img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* Overlap, newest on top — the stacked-faces motif from the reference. */
+.ci-face + .ci-face {
+    margin-left: -0.9rem;
+}
+
+.ci-proof-rule {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0 0 0.9rem;
+}
+
+.ci-proof-stat {
+    font-size: 1.35rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--title-color);
+    margin: 0;
+}
+
+.ci-proof-stat strong {
+    color: var(--first-color);
+    font-weight: 800;
+}
+
+/* ---- arrows ---- */
+.ci-wrap {
+    position: relative;
+}
+
+.ci-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.ci-arrow {
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: var(--first-color);
+    border: 1.5px solid var(--first-color);
+    cursor: pointer;
+    /* transform/colour only — never `all`, which would animate layout props. */
+    transition: background-color 0.25s ease, color 0.25s ease,
+        transform 0.25s ease, opacity 0.25s ease;
+}
+
+.ci-arrow:hover:not(:disabled) {
+    background: var(--first-color);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.ci-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.ci-arrow:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 3px;
+}
+
+/* ---- rail ---- */
+.ci-rail {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* Room for the raised centre card's shadow so overflow-x cannot clip it. */
+    padding: 1.25rem 0 2rem;
+}
+
+.ci-rail::-webkit-scrollbar {
+    display: none;
+}
+
+.ci-rail:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 4px;
+    border-radius: 16px;
+}
+
+.ci-track {
+    display: flex;
+    align-items: stretch;
+    gap: 1.75rem;
+    width: max-content;
+    /* Half a CARD, not half a viewport: enough for the first and last card to
+       reach the centre, and no more. The old 21rem gutter pushed the two
+       neighbours past the container edge, which is what clipped them. */
+    padding-inline: max(1rem, calc(50% - 10.5rem));
+}
+
+.ci-item {
+    scroll-snap-align: center;
+    flex: 0 0 auto;
+    /* 21rem so three cards + two gaps (1064px) sit inside the 1140px
+       container with room to spare — all three fully visible, no edge cut. */
+    width: min(21rem, 80vw);
+    margin: 0;
+    /* Neighbours sit back; the centred card comes forward. Transform + opacity
+       only, so this is a compositor-only change. */
+    transform: scale(0.94);
+    opacity: 0.55;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.45s ease;
+}
+
+.ci-item.is-active {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.ci-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--container-color);
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    padding: 2rem 1.9rem 1.75rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -24px rgba(0, 43, 102, 0.45);
+    transition: box-shadow 0.45s ease, border-color 0.45s ease;
+}
+
+.ci-item.is-active .ci-card {
+    border-color: rgba(3, 87, 168, 0.28);
+    box-shadow: 0 30px 60px -34px rgba(0, 43, 102, 0.6);
+}
+
+/* Diagonal hatch in the corner, echoing the reference card texture. Painted
+   with a gradient rather than an asset — no extra request. */
+.ci-card::after {
+    content: "";
+    position: absolute;
+    right: -2rem;
+    bottom: -2rem;
+    width: 9rem;
+    height: 9rem;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(3, 87, 168, 0.09) 0 2px,
+        transparent 2px 9px
+    );
+    pointer-events: none;
+}
+
+.ci-quote-mark {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--first-color);
+    opacity: 0.22;
+    display: block;
+    height: 1.6rem;
+}
+
+.ci-quote {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    margin: 0 0 1.75rem;
+    flex: 1 1 auto;
+}
+
+/* ---- person: round avatar overlapping an angled name plate ---- */
+.ci-person {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-top: auto;
+}
+
+.ci-avatar {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #003A8C 0%, #0660BC 100%);
+    border: 3px solid var(--container-color);
+    box-shadow: 0 10px 24px -12px rgba(0, 43, 102, 0.6);
+    overflow: hidden;
+}
+
+.ci-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* The plate slides out from behind the avatar; the right edge is cut at an
+   angle, matching the reference. clip-path, so no extra element. */
+.ci-plate {
+    margin-left: -1.5rem;
+    padding: 0.85rem 2.5rem 0.85rem 2.1rem;
+    background: linear-gradient(135deg, #0357A8 0%, #0660BC 100%);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 1.15rem) 100%, 0 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.ci-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.35;
+}
+
+.ci-role,
+.ci-location {
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---- dots ---- */
+.ci-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.ci-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease, width 0.3s ease;
+}
+
+.ci-dot.is-active {
+    width: 1.5rem;
+    border-radius: 100px;
+    background: var(--first-color);
+}
+
+.ci-dot:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 2px;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+    .ci-head {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+
+    .ci-proof {
+        justify-self: start;
+        text-align: left;
+    }
+
+    .ci-faces {
+        justify-content: flex-start;
+    }
+
+    .ci-nav {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .ci-track {
+        padding-inline: 1rem;
+    }
+
+    .ci-card {
+        padding: 1.6rem 1.4rem 1.4rem;
+    }
+
+    .ci-plate {
+        padding: 0.75rem 1.9rem 0.75rem 1.9rem;
+    }
+}
+
+/* Honour the same reduced-motion contract as the rest of the homepage: the
+   rail still scrolls, it just stops scaling and easing. */
+@media (prefers-reduced-motion: reduce) {
+
+    .ci-item,
+    .ci-card,
+    .ci-arrow,
+    .ci-dot {
+        transition: none;
+    }
+
+    .ci-item {
+        transform: none;
+        opacity: 1;
+    }
+}

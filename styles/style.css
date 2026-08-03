@@ -433,8 +433,30 @@ img {
            on the capsule (.header) instead. Transitions from the collapsed
            translateX(-6px) still animate (none = identity). */
         transform: none;
-        pointer-events: auto;
         overflow: visible;
+    }
+
+    /* Hit-testing is deliberately NOT enabled by .is-hovered.
+     *
+     * `max-width` animates 0 → 1000px over 450ms and the capsule is
+     * width:max-content, so for that whole stretch the nav links are sliding
+     * outward — measured: Services travels 903px → 683px and Company
+     * 1218px → 997px. With pointer-events on from frame one, every link that
+     * swept under the cursor fired a real mouseenter, and a pointer heading
+     * for Services was dragged across Company's moving box on the way. That
+     * is the dropdown flash.
+     *
+     * So the links only become targets once the capsule has stopped moving.
+     * `.is-settled` is applied by Header.tsx off the capsule's transitionend
+     * (see hooks/useNavDropdown.ts). Nothing is lost: they are still fading
+     * in during that window, so there was never anything worth clicking.
+     *
+     * .menu-open is the mobile drawer — no expand animation, so it is
+     * interactive immediately.
+     */
+    .header.is-hovered.is-settled .nav-menu,
+    .header.menu-open .nav-menu {
+        pointer-events: auto;
     }
 
     /* .nav-btns holds only the (hidden) hamburger on desktop — no extra

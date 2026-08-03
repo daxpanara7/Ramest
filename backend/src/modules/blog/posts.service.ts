@@ -224,6 +224,26 @@ export class PostsService {
     return this.toPublicShape(post);
   }
 
+  /**
+   * Public shape for a cover asset: drops `deletedAt` (internal) and returns
+   * null for an asset that no longer exists, so callers render their
+   * placeholder rather than a URL that 404s.
+   */
+  private toPublicMedia(
+    media?: {
+      id: string;
+      url: string;
+      alt: string | null;
+      width: number | null;
+      height: number | null;
+      deletedAt: Date | null;
+    } | null,
+  ) {
+    if (!media || media.deletedAt) return null;
+    const { deletedAt: _deletedAt, ...rest } = media;
+    return rest;
+  }
+
   /** Strips internal-only fields before handing a post to the public site. */
   private toPublicShape<
     T extends {
@@ -234,6 +254,14 @@ export class PostsService {
       contentJson: unknown;
       contentHtml: string | null;
       coverImageId: string | null;
+      coverImage?: {
+        id: string;
+        url: string;
+        alt: string | null;
+        width: number | null;
+        height: number | null;
+        deletedAt: Date | null;
+      } | null;
       status: PostStatus;
       publishedAt: Date | null;
       readingMinutes: number | null;
@@ -255,6 +283,14 @@ export class PostsService {
       contentJson: post.contentJson,
       contentHtml: post.contentHtml,
       coverImageId: post.coverImageId,
+      // The resolved asset, not just the id — without this the public site
+      // has no URL to render and every card falls back to the gradient.
+      //
+      // Deleting an asset from the media library soft-deletes the row but
+      // leaves post.coverImageId pointing at it, and GET /media/file/:key
+      // then 404s. Suppressing it here turns that into the clean gradient
+      // fallback instead of a broken-image box on every card.
+      coverImage: this.toPublicMedia(post.coverImage),
       status: post.status,
       publishedAt: post.publishedAt,
       readingMinutes: post.readingMinutes,

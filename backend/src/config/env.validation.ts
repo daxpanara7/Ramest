@@ -30,6 +30,16 @@ class EnvVars {
   @IsOptional()
   @IsString()
   RECAPTCHA_SECRET_KEY?: string;
+
+  /**
+   * "false" downgrades the public lead form from hard-blocking failed
+   * captchas to scoring them and filing them as SPAM. Default (unset) is the
+   * hard block. Escape hatch only — flip it if the block is ever seen to cost
+   * real enquiries, no redeploy of code needed.
+   */
+  @IsOptional()
+  @IsString()
+  LEADS_REQUIRE_CAPTCHA?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

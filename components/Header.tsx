@@ -18,18 +18,14 @@ import {
   DEFAULT_LEAVE_DELAY,
   useDelayedHover,
 } from "@/hooks/useDelayedHover";
+import { useNavDropdown } from "@/hooks/useNavDropdown";
 
 const MOBILE_BREAKPOINT = 768;
 
 const CAPSULE_ENTER_DELAY = DEFAULT_ENTER_DELAY;
 const CAPSULE_LEAVE_DELAY = DEFAULT_LEAVE_DELAY;
-// Dwell before a dropdown opens (short, so it still feels instant) and grace
-// after leaving before it closes (long enough to cross the capsule→panel gap).
-const DROPDOWN_ENTER_DELAY = 80;
-const DROPDOWN_LEAVE_DELAY = 180;
 
 type MobilePanel = "services" | "company" | null;
-type DesktopDropdown = "services" | "company" | null;
 
 export default function Header() {
   const pathname = usePathname();
@@ -60,91 +56,24 @@ export default function Header() {
   });
 
   /* ---------------------------------------------------------------------
-     DESKTOP DROPDOWN CONTROLLER — single source of truth.
-
-     Rewritten from scratch: the old design used two independent hover
-     hooks (services + company) that cross-closed each other through
-     effects. That is racy by construction — the pointer, the capsule
-     expansion, and React batching could all land in an order that opened
-     Company for a frame before Services, producing the flash.
-
-     Here exactly ONE value describes the desktop dropdown state:
-       openDropdown ∈ {"services", "company", null}
-     So "both open" is impossible, and switching between menus is a single
-     atomic state change (no close-then-open gap). Timers live in refs so
-     they never trigger re-renders or stale-closure races.
+     DESKTOP DROPDOWN — see hooks/useNavDropdown.ts for why this is not
+     just a hover handler. Short version: the capsule's 450ms width
+     transition slides nav items under a stationary cursor, and the
+     mouseenter events that produces are real but meaningless. The hook
+     gates on the capsule being still, then confirms by hit-testing the
+     pointer's actual position.
      --------------------------------------------------------------------- */
-  const [openDropdown, setOpenDropdown] = useState<DesktopDropdown>(null);
-  const openDropdownRef = useRef<DesktopDropdown>(null);
-  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearDropdownTimers = useCallback(() => {
-    if (openTimerRef.current !== null) {
-      clearTimeout(openTimerRef.current);
-      openTimerRef.current = null;
-    }
-    if (closeTimerRef.current !== null) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-  }, []);
-
-  const applyDropdown = useCallback((next: DesktopDropdown) => {
-    openDropdownRef.current = next;
-    setOpenDropdown(next);
-  }, []);
-
-  // Pointer entered a dropdown trigger (or its panel — same <li> subtree).
-  const enterDropdown = useCallback(
-    (key: Exclude<DesktopDropdown, null>) => {
-      if (!isDesktop) return;
-      clearDropdownTimers();
-      // Already showing this one → nothing to do.
-      if (openDropdownRef.current === key) return;
-      // Another menu is already open → switch instantly (atomic, no flash).
-      if (openDropdownRef.current !== null) {
-        applyDropdown(key);
-        return;
-      }
-      // Nothing open yet → open after a short dwell. If the pointer is only
-      // passing over on its way elsewhere, the leave/enter of the next
-      // trigger clears this timer before it ever fires.
-      openTimerRef.current = setTimeout(() => {
-        openTimerRef.current = null;
-        applyDropdown(key);
-      }, DROPDOWN_ENTER_DELAY);
-    },
-    [isDesktop, clearDropdownTimers, applyDropdown],
-  );
-
-  // Pointer left a dropdown's <li> subtree (trigger + panel + hover bridge).
-  const leaveDropdown = useCallback(() => {
-    if (!isDesktop) return;
-    // Cancel any pending open — we left before it committed.
-    if (openTimerRef.current !== null) {
-      clearTimeout(openTimerRef.current);
-      openTimerRef.current = null;
-    }
-    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = setTimeout(() => {
-      closeTimerRef.current = null;
-      applyDropdown(null);
-    }, DROPDOWN_LEAVE_DELAY);
-  }, [isDesktop, applyDropdown]);
-
-  const closeDropdownNow = useCallback(() => {
-    clearDropdownTimers();
-    applyDropdown(null);
-  }, [clearDropdownTimers, applyDropdown]);
-
-  // Leaving the capsule (or going mobile) always closes the dropdown.
-  useEffect(() => {
-    if (!capsuleHover.isHovered || !isDesktop) closeDropdownNow();
-  }, [capsuleHover.isHovered, isDesktop, closeDropdownNow]);
-
-  // Clean up timers on unmount.
-  useEffect(() => () => clearDropdownTimers(), [clearDropdownTimers]);
+  const {
+    open: openDropdown,
+    settled: capsuleSettled,
+    onEnter: enterDropdown,
+    onLeave: leaveDropdown,
+    closeNow: closeDropdownNow,
+  } = useNavDropdown({
+    enabled: isDesktop && !menuOpen,
+    capsuleOpen: capsuleHover.isHovered,
+    headerRef,
+  });
 
   const placeNavMenu = useCallback(() => {
     const navMenu = navMenuRef.current;
@@ -206,8 +135,7 @@ export default function Header() {
      whichever trigger happens to be mid-capsule. That one-frame jump is the
      flash of the wrong menu. useLayoutEffect runs before paint, so the
      caret is already correct on frame one. */
-  useLayoutEffect(() => {
-    if (!isDesktop || openDropdown === null) return;
+  const positionCarets = useCallback(() => {
     document
       .querySelectorAll<HTMLElement>(".nav-item.has-dropdown")
       .forEach((li) => {
@@ -219,44 +147,60 @@ export default function Header() {
         if (!t.width || !p.width) return;
         panel.style.setProperty("--caret-x", `${t.left + t.width / 2 - p.left}px`);
       });
-  }, [isDesktop, openDropdown]);
+  }, []);
 
+  useLayoutEffect(() => {
+    if (!isDesktop || openDropdown === null) return;
+    positionCarets();
+  }, [isDesktop, openDropdown, positionCarets]);
+
+  /* Keep the caret glued DURING the capsule's expand transition only.
+     This used to be an unbounded rAF loop that ran for as long as the header
+     was hovered — two getBoundingClientRect() reads per dropdown, every
+     frame, forcing a synchronous layout each time. It was live on every page
+     of the site, so merely having the pointer near the header taxed
+     scrolling. Now it runs only while the capsule is actually moving and
+     stops the moment it settles: same visual result, bounded cost. */
   useEffect(() => {
-    if (!isDesktop) return;
-    const active = capsuleHover.isHovered || openDropdown !== null;
-    if (!active) return;
+    if (!isDesktop || !capsuleHover.isHovered || capsuleSettled) return;
     let raf = 0;
     const position = () => {
-      document
-        .querySelectorAll<HTMLElement>(".nav-item.has-dropdown")
-        .forEach((li) => {
-          const trigger = li.querySelector<HTMLElement>(".dropdown-toggle");
-          const panel = li.querySelector<HTMLElement>(
-            ".mega-menu, .dropdown-panel",
-          );
-          if (!trigger || !panel) return;
-          const t = trigger.getBoundingClientRect();
-          const p = panel.getBoundingClientRect();
-          if (!t.width || !p.width) return;
-          panel.style.setProperty(
-            "--caret-x",
-            `${t.left + t.width / 2 - p.left}px`,
-          );
-        });
+      positionCarets();
       raf = requestAnimationFrame(position);
     };
     raf = requestAnimationFrame(position);
     return () => cancelAnimationFrame(raf);
-  }, [isDesktop, capsuleHover.isHovered, openDropdown]);
+  }, [isDesktop, capsuleHover.isHovered, capsuleSettled, positionCarets]);
 
+  /* Scrolled state, rAF-coalesced and write-only-on-change.
+     It previously ran on every scroll event (non-passive) and called
+     classList.add/remove unconditionally — so a class write, and the style
+     recalc it forces, happened dozens of times per second while scrolling
+     even though the value almost never changed. Now: passive listener, at
+     most one check per frame, and the DOM is touched only when the state
+     actually flips. */
   useEffect(() => {
-    const onScroll = () => {
+    let ticking = false;
+    let isScrolled: boolean | null = null;
+
+    const update = () => {
+      ticking = false;
       const header = headerRef.current;
       if (!header) return;
-      if (window.scrollY >= 50) header.classList.add("scrolled");
-      else header.classList.remove("scrolled");
+      const next = window.scrollY >= 50;
+      if (next === isScrolled) return;
+      isScrolled = next;
+      header.classList.toggle("scrolled", next);
     };
-    window.addEventListener("scroll", onScroll);
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -293,7 +237,7 @@ export default function Header() {
 
   return (
     <header
-      className={`header${capsuleHover.isHovered ? " is-hovered" : ""}${menuOpen ? " menu-open" : ""}`}
+      className={`header${capsuleHover.isHovered ? " is-hovered" : ""}${capsuleSettled ? " is-settled" : ""}${menuOpen ? " menu-open" : ""}`}
       id="header"
       ref={headerRef}
       onMouseEnter={capsuleHover.onMouseEnter}
@@ -331,8 +275,9 @@ export default function Header() {
 
             {/* Desktop Services mega-menu */}
             <li
+              data-dropdown="services"
               className={`nav-item has-dropdown has-mega-menu desktop-only-dropdown${servicesOpen ? " open is-hovered" : ""}`}
-              onMouseEnter={() => enterDropdown("services")}
+              onMouseEnter={(e) => enterDropdown("services", e)}
               onMouseLeave={leaveDropdown}
             >
               <Link
@@ -367,9 +312,16 @@ export default function Header() {
               </Link>
             </li>
 
+            <li className="nav-item">
+              <Link href="/blog" className={navLinkClass("blog")} onClick={closeMenu}>
+                Blog
+              </Link>
+            </li>
+
             <li
+              data-dropdown="company"
               className={`nav-item has-dropdown${companyOpen ? " open is-hovered" : ""}`}
-              onMouseEnter={() => enterDropdown("company")}
+              onMouseEnter={(e) => enterDropdown("company", e)}
               onMouseLeave={leaveDropdown}
             >
               <div className="mobile-accordion-head company-trigger-row">

@@ -21,6 +21,13 @@ const ALL_STATUSES: LeadStatus[] = [
 
 const CSV_HEADER = 'name,email,phone,company,service,status,country,createdAt';
 
+/**
+ * Floor for a genuine fill of this form (name + email + a 10-char-minimum
+ * message). Deliberately conservative — the cost of a false positive here is
+ * a lost customer, so it only catches submissions no human could produce.
+ */
+const MIN_FILL_MS = 2_500;
+
 @Injectable()
 export class LeadsService {
   private readonly logger = new Logger(LeadsService.name);
@@ -40,8 +47,48 @@ export class LeadsService {
    * the worst outcome.
    */
   async create(dto: CreateLeadDto, meta: { ip?: string; country?: string; userAgent?: string }) {
-    const score = await this.recaptcha.verify(dto.recaptchaToken, meta.ip);
+    /* --- layer 1: deterministic filters, dropped silently ----------------
+       These catch the traffic reCAPTCHA is weakest against — plain scripted
+       POSTs that never execute the page's JS.
+
+       Dropped SILENTLY (the caller gets an ordinary success) rather than
+       rejected, on purpose. A 403 here would tell the bot exactly which
+       field is the trap and how fast is too fast, and it would adapt within
+       a run. Nothing is written and no mail is sent, so the spam still never
+       reaches you — which is the actual requirement. */
+    const trippedHoneypot = Boolean(dto.website && dto.website.trim());
+    const submittedTooFast =
+      typeof dto.elapsedMs === 'number' && dto.elapsedMs < MIN_FILL_MS;
+
+    if (trippedHoneypot || submittedTooFast) {
+      this.logger.warn(
+        `Bot filter tripped — discarded (honeypot=${trippedHoneypot} fast=${submittedTooFast} elapsed=${dto.elapsedMs ?? 'n/a'}ms) ip=${meta.ip}`,
+      );
+      return { id: null, status: LeadStatus.NEW };
+    }
+
+    /* --- layer 2: reCAPTCHA, a hard gate ---------------------------------
+       assertHuman throws 403 when the token is missing, rejected by Google,
+       or scores below the threshold — nothing is stored and no mail is sent.
+
+       Two cases still pass deliberately, and neither is a loophole:
+         - RECAPTCHA_SECRET_KEY unset  → nothing to verify against. Layer 1
+           and the 5/min per-IP throttle still apply.
+         - Google's siteverify unreachable → failing closed would take the
+           contact form down for everyone every time Google has an incident.
+
+       Set LEADS_REQUIRE_CAPTCHA=false to fall back to scoring without
+       blocking, if the block ever costs real enquiries. */
     const minScore = Number(this.config.get('RECAPTCHA_MIN_SCORE') ?? 0.5);
+    const hardBlock =
+      String(this.config.get('LEADS_REQUIRE_CAPTCHA') ?? 'true') !== 'false';
+
+    const score = hardBlock
+      ? await this.recaptcha.assertHuman(dto.recaptchaToken, meta.ip, minScore)
+      : await this.recaptcha.verify(dto.recaptchaToken, meta.ip);
+
+    // Only reachable with the block disabled; keeps the old scored-but-kept
+    // behaviour intact behind that flag.
     const looksLikeSpam = score !== null && score < minScore;
 
     const lead = await this.leads.create({

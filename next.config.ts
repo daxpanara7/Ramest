@@ -56,6 +56,29 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85],
+    // Blog covers are uploaded to the backend and served from its origin, so
+    // it has to be whitelisted or <Image> refuses the src outright. Derived
+    // from the same env var the API client uses, so staging/prod need no
+    // second place to update. Narrowed to the media path — a whitelisted host
+    // otherwise lets anyone use the optimizer as an open image proxy.
+    remotePatterns: [
+      ...(() => {
+        const raw = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+        try {
+          const u = new URL(raw);
+          return [
+            {
+              protocol: u.protocol.replace(":", "") as "http" | "https",
+              hostname: u.hostname,
+              port: u.port || undefined,
+              pathname: "/api/media/**",
+            },
+          ];
+        } catch {
+          return [];
+        }
+      })(),
+    ],
   },
   // Hide the Next.js "N" badge — only appears in development
   devIndicators: false,

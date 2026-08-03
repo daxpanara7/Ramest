@@ -25,6 +25,7 @@ import { userStatusBadge } from "@/components/admin/badges";
 import { api, ApiError } from "@/lib/admin/api";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime } from "@/lib/admin/format";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Original layout, live over /api/users.
@@ -167,6 +168,7 @@ export default function UsersPage() {
 }
 
 function UserRow({ user, onEdit, onChanged }: { user: User; onEdit: () => void; onChanged: () => void }) {
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
 
   const toggleActive = async () => {
@@ -180,7 +182,11 @@ function UserRow({ user, onEdit, onChanged }: { user: User; onEdit: () => void; 
   };
 
   const remove = async () => {
-    if (!confirm(`Delete ${user.name}? This cannot be undone.`)) return;
+    const yes = await confirm({
+      title: `Delete ${user.name}?`,
+      description: `${user.email} will lose access immediately. This cannot be undone.`,
+    });
+    if (!yes) return;
     setBusy(true);
     try {
       await api(`/users/${user.id}`, { method: "DELETE" });

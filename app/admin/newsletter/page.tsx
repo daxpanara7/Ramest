@@ -21,6 +21,7 @@ import { subscriberStatusBadge } from "@/components/admin/badges";
 import { api, ApiError, API_BASE, getAccessToken } from "@/lib/admin/api";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime } from "@/lib/admin/format";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Original layout, live data from /api/newsletter/subscribers.
@@ -171,6 +172,7 @@ export default function NewsletterPage() {
 }
 
 function SubscriberRow({ sub, onChanged }: { sub: Subscriber; onChanged: () => void }) {
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -185,7 +187,12 @@ function SubscriberRow({ sub, onChanged }: { sub: Subscriber; onChanged: () => v
   };
 
   const remove = async () => {
-    if (!confirm(`Remove ${sub.email} from the list?`)) return;
+    const yes = await confirm({
+      title: `Remove ${sub.email}?`,
+      description: "They will stop receiving the newsletter and be removed from the list.",
+      confirmLabel: "Remove",
+    });
+    if (!yes) return;
     setBusy(true); setErr(null);
     try {
       await api(`/newsletter/subscribers/${sub.id}`, { method: "DELETE" });

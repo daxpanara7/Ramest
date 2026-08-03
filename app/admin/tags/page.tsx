@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { api, ApiError } from "@/lib/admin/api";
 import { useApi } from "@/lib/admin/use-api";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Original layout — one card, a search box, and #chips — now live over
@@ -104,10 +105,15 @@ export default function TagsPage() {
 }
 
 function TagChip({ tag, onDeleted }: { tag: Tag; onDeleted: () => void }) {
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
 
   const remove = async () => {
-    if (!confirm(`Delete the tag "${tag.name}"? It will be removed from any posts using it.`)) return;
+    const yes = await confirm({
+      title: `Delete the tag "${tag.name}"?`,
+      description: "It will be removed from every post currently using it.",
+    });
+    if (!yes) return;
     setBusy(true);
     try {
       await api(`/blog/tags/${tag.id}`, { method: "DELETE" });

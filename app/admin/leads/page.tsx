@@ -27,6 +27,7 @@ import { apiLeadStatusBadge } from "@/components/admin/badges";
 import { api, ApiError, API_BASE, getAccessToken } from "@/lib/admin/api";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime } from "@/lib/admin/format";
+import { useConfirm } from "@/components/admin/use-confirm";
 
 /**
  * Layout matches the original design. Data is now live from /api/leads.
@@ -215,6 +216,7 @@ export default function LeadsPage() {
 function LeadSheet({
   lead, onClose, onSaved,
 }: { lead: Lead | null; onClose: () => void; onSaved: () => void }) {
+  const confirm = useConfirm();
   const [status, setStatus] = useState("NEW");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -247,7 +249,12 @@ function LeadSheet({
   };
 
   const remove = async () => {
-    if (!lead || !confirm(`Delete the lead from ${lead.name}? This cannot be undone.`)) return;
+    if (!lead) return;
+    const yes = await confirm({
+      title: `Delete the lead from ${lead.name}?`,
+      description: "This removes the enquiry from your CRM. It cannot be undone.",
+    });
+    if (!yes) return;
     setDeleting(true); setErr(null);
     try {
       await api(`/leads/${lead.id}`, { method: "DELETE" });

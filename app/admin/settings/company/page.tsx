@@ -1,45 +1,51 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { SettingsSection, Field } from "@/components/admin/settings-form";
+import { useSettings } from "@/lib/admin/use-settings";
 
-
+/** Persisted under the "company.*" prefix in the settings table. */
 export default function CompanySettings() {
-  return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div>
-        <h3 className="font-display text-lg">Company</h3>
-        <p className="text-sm text-muted-foreground">Legal and billing details.</p>
-      </div>
-      <Card className="lg:col-span-2">
-        <CardContent className="grid gap-5 p-6 md:grid-cols-2">
-          <Field label="Legal name"><Input defaultValue="Ramest Technolabs Pvt. Ltd." /></Field>
-          <Field label="Registration no."><Input defaultValue="U72900GJ2019PTC110842" /></Field>
-          <Field label="GSTIN"><Input defaultValue="24AAJCR1234R1Z5" /></Field>
-          <Field label="Email"><Input defaultValue="hello@ramesttechnolabs.com" /></Field>
-          <Field label="Phone"><Input defaultValue="+91 98230 12345" /></Field>
-          <Field label="Country"><Input defaultValue="India" /></Field>
-          <div className="md:col-span-2">
-            <Field label="Registered address"><Textarea rows={3} defaultValue="4th Floor, Iscon Business Hub, Ahmedabad, Gujarat 380015, India" /></Field>
-          </div>
-          <div className="md:col-span-2 flex justify-end gap-2">
-            <Button variant="outline" size="sm">Cancel</Button>
-            <Button size="sm">Save changes</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+  const s = useSettings("company", {
+    "company.legalName": "",
+    "company.registrationNo": "",
+    "company.gstin": "",
+    "company.email": "",
+    "company.phone": "",
+    "company.country": "India",
+    "company.address": "",
+  });
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-widest text-muted-foreground">{label}</Label>
-      {children}
-    </div>
+    <SettingsSection
+      title="Company"
+      description="Legal and billing details."
+      loading={s.loading} error={s.error} saveError={s.saveError}
+      dirty={s.dirty} saving={s.saving} justSaved={s.justSaved}
+      onSave={s.save} onReset={s.reset} onRetry={s.reload}
+    >
+      <Field label="Legal name">
+        <Input value={s.str("company.legalName")} onChange={(e) => s.set("company.legalName", e.target.value)} />
+      </Field>
+      <Field label="Registration no.">
+        <Input value={s.str("company.registrationNo")} onChange={(e) => s.set("company.registrationNo", e.target.value)} />
+      </Field>
+      <Field label="GSTIN">
+        <Input value={s.str("company.gstin")} onChange={(e) => s.set("company.gstin", e.target.value)} />
+      </Field>
+      <Field label="Email">
+        <Input type="email" value={s.str("company.email")} onChange={(e) => s.set("company.email", e.target.value)} />
+      </Field>
+      <Field label="Phone">
+        <Input value={s.str("company.phone")} onChange={(e) => s.set("company.phone", e.target.value)} />
+      </Field>
+      <Field label="Country">
+        <Input value={s.str("company.country")} onChange={(e) => s.set("company.country", e.target.value)} />
+      </Field>
+      <Field label="Registered address" full>
+        <Textarea rows={3} value={s.str("company.address")} onChange={(e) => s.set("company.address", e.target.value)} />
+      </Field>
+    </SettingsSection>
   );
 }

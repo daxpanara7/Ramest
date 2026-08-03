@@ -257,11 +257,21 @@ export function stackCards(cards: Element[]) {
         "--veil": 0.5,
         transformOrigin: "center top",
         ease: "none",
+        // Force a 3D matrix so the scale runs on the compositor instead of
+        // triggering a main-thread repaint of a full-viewport card each frame.
+        force3D: true,
         scrollTrigger: {
           trigger: next,
           start: "top bottom",
           end: "top 15%",
-          scrub: true,
+          // Numeric scrub adds ~0.4s of catch-up smoothing. `scrub: true`
+          // maps 1:1 to scroll position, so every jitter in the wheel or
+          // trackpad delta shows up directly in the scale — that is what
+          // reads as "rough".
+          scrub: 0.4,
+          // Snap layer promotion to whole pixels; sub-pixel scaling on a
+          // large card is what makes text shimmer while it animates.
+          fastScrollEnd: true,
         },
       }),
     );

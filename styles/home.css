@@ -146,7 +146,21 @@
     /* Top highlight edge so each new card reads as a surface, not a line. */
     border-top: 1px solid var(--border-color);
     padding-top: 0.5rem;
-    will-change: transform;
+    /* No permanent `will-change: transform`. It forced a compositor layer
+       for EVERY card at once — six full-viewport layers held in memory,
+       which is the stutter. GSAP sets will-change itself for the duration
+       of a tween, which is exactly when it is needed.
+
+       z-index: 0 is LOAD-BEARING. will-change used to make each card a
+       stacking context as a side effect; removing it let card INTERNALS —
+       the ::after veil at z-index:10, sections with z-indexed children —
+       escape into the .stack context and paint OVER later sibling cards
+       (the grey box bleeding through the form). A positioned element with
+       z-index:0 creates the stacking context without forcing a layer, and
+       identical z-indexes keep later-card-paints-on-top DOM order. */
+    z-index: 0;
+    isolation: isolate;
+    backface-visibility: hidden;
 }
 
 /* The first card holds the stats band right after the 100vh hero. */
@@ -181,6 +195,10 @@
     opacity: var(--veil);
     pointer-events: none;
     border-radius: inherit;
+    /* Own compositor layer. This overlay is full-viewport, so animating its
+       opacity on the main thread repainted every pixel behind it on every
+       scroll frame — the single most expensive thing on the page. */
+    transform: translateZ(0);
 }
 
 /* ==================== TRUST MARQUEE (below hero) ====================

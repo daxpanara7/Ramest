@@ -1,0 +1,1162 @@
+/* ===========================================================================
+   PUBLIC BLOG (/blog and /blog/[slug])
+
+   Card grid on the index, single centred column on the article. Matches the
+   legal-page language: soft radial wash, navy display type, pill buttons.
+   =========================================================================== */
+
+.blog-page {
+    position: relative;
+    padding: 9.5rem 0 5.5rem;
+}
+
+.blog-page::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(60% 100% at 50% 0%, rgba(6, 96, 188, 0.09) 0%, rgba(6, 96, 188, 0) 70%);
+}
+
+.blog-head {
+    max-width: 46rem;
+    margin: 0 auto 3rem;
+    text-align: center;
+}
+
+.blog-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--first-color);
+    background: var(--first-color-light);
+    border-radius: 100px;
+    padding: 0.45rem 1rem;
+    margin: 0 0 1.1rem;
+}
+
+.blog-title {
+    font-family: var(--title-font);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--title-color);
+    margin: 0;
+    text-wrap: balance;
+}
+
+.blog-lede {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-color);
+    max-width: 40rem;
+    margin: 1.1rem auto 0;
+    text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------- grid */
+
+/* Fixed 3-up, not auto-fill: the page ships exactly 9 posts, so the layout is
+   a deliberate 3x3 block rather than a count that drifts with viewport width. */
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+}
+
+@media (max-width: 1024px) {
+    .blog-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+}
+
+.blog-card {
+    display: flex;
+    flex-direction: column;
+    /* min-height:0 so a flex item can actually shrink; without it the cover
+       kept its aspect-ratio height, grew past the card, and overflow:hidden
+       clipped the whole body away. */
+    min-height: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: var(--container-color);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* The <a> wrapping the cover is a flex child — pin it so it can never
+   absorb the free space the body needs. */
+.blog-card > a {
+    display: block;
+    flex: 0 0 auto;
+}
+
+.blog-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(3, 87, 168, 0.28);
+    box-shadow: 0 22px 46px -30px rgba(3, 87, 168, 0.5);
+}
+
+/* Cover strip. Posts have no image yet, so this is a brand gradient with the
+   category as the only mark — deliberately not a stock photo. */
+.blog-card-cover {
+    position: relative;
+    /* Fixed height, not aspect-ratio: inside a stretched flex row the ratio
+       resolved against the tallest sibling and every cover came out a
+       different size. */
+    height: 11rem;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+    background: linear-gradient(135deg, #003A8C 0%, #0660BC 100%);
+}
+
+.blog-card-cover img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Scrim, only on covers that actually have a photo. The category pill is
+   white-on-translucent and vanishes over a light image; this keeps the bottom
+   edge dark enough to read against without dimming the whole picture. Uses
+   the gradient already painted on the parent as the base, so a transparent
+   PNG still lands on brand navy rather than on white. */
+.blog-card-cover.has-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0, 26, 61, 0.62) 0%,
+        rgba(0, 26, 61, 0.18) 42%,
+        rgba(0, 26, 61, 0) 70%
+    );
+}
+
+.blog-card-cat {
+    position: relative;
+    /* Above the ::after scrim. Both are positioned with z-index:auto, and the
+       pseudo-element is the parent's last child — so without this it paints
+       over the pill and dims it. */
+    z-index: 1;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    /* Opaque-enough pill INSTEAD of a frosted one. backdrop-filter was the
+       cause of the blog rendering corruption on both /blog and the homepage
+       rail: each badge becomes its own backdrop root, and with one per card
+       (24 on /blog) Chrome mis-resolved which backdrop to sample. Whole cards
+       failed to paint, covers went blank, and on the homepage the FAQ card
+       and footer bled through the stacked section — because inside a sticky,
+       `overflow: clip`, GSAP-3D-scaled .stack-card the backdrop root is
+       resolved against the wrong ancestor. Same fix the hero stats band
+       already uses (homepage.css .nv-stats): drop the filter, carry the
+       contrast in the background alpha. */
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 100px;
+    padding: 0.35rem 0.8rem;
+}
+
+.blog-card-body {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    padding: 1.35rem 1.4rem 1.5rem;
+}
+
+.blog-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.75;
+    margin-bottom: 0.6rem;
+}
+
+.blog-card h2 {
+    font-family: var(--title-font);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--title-color);
+    margin: 0 0 0.55rem;
+}
+
+.blog-card p {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin: 0 0 1.1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-card-more {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--first-color);
+}
+
+.blog-card-more i {
+    font-size: 0.75em;
+    transition: transform 0.3s ease;
+}
+
+.blog-card:hover .blog-card-more i {
+    transform: translateX(3px);
+}
+
+.blog-empty {
+    grid-column: 1 / -1;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    border: 1px dashed var(--border-color);
+    border-radius: 20px;
+    color: var(--text-color);
+}
+
+/* ------------------------------------------------------------- pagination */
+
+/* Plain <a> links to ?page=N — no client JS, no hydration cost. Next prefetches
+   them on hover, so a page change is a cached RSC swap rather than a reload. */
+.blog-pager {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 3.5rem;
+    padding-top: 2.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.blog-pager-count {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0;
+}
+
+.blog-pager-count strong {
+    color: var(--title-color);
+    font-weight: 700;
+}
+
+.blog-pager-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.45;
+}
+
+.blog-pager-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem;
+    background: var(--container-color);
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    box-shadow: 0 18px 40px -34px rgba(3, 87, 168, 0.55);
+}
+
+.blog-pager-num,
+.blog-pager-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    height: 2.5rem;
+    border-radius: 100px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--title-color);
+    /* Only the paint properties transition — no layout-affecting ones, so
+       hovering the row never triggers reflow. */
+    transition: background-color 0.22s ease, color 0.22s ease;
+}
+
+.blog-pager-num {
+    min-width: 2.5rem;
+    padding: 0 0.6rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.blog-pager-arrow {
+    padding: 0 1.05rem;
+    color: var(--first-color);
+}
+
+.blog-pager-arrow i {
+    font-size: 0.72em;
+    transition: transform 0.22s ease;
+}
+
+.blog-pager-num:hover,
+.blog-pager-arrow:hover {
+    background: var(--first-color-light);
+    color: var(--first-color);
+}
+
+.blog-pager-arrow[rel="next"]:hover i { transform: translateX(3px); }
+.blog-pager-arrow[rel="prev"]:hover i { transform: translateX(-3px); }
+
+.blog-pager-num.is-current {
+    background: linear-gradient(135deg, #003A8C 0%, #0660BC 100%);
+    color: #fff;
+    box-shadow: 0 10px 22px -12px rgba(3, 87, 168, 0.7);
+}
+
+.blog-pager-arrow.is-off {
+    color: var(--text-color);
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.blog-pager-arrow.is-off:hover {
+    background: none;
+    color: var(--text-color);
+}
+
+.blog-pager-gap {
+    min-width: 1.5rem;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.55;
+    letter-spacing: 0.05em;
+}
+
+.blog-pager-num:focus-visible,
+.blog-pager-arrow:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+    .blog-pager-arrow span { display: none; }
+    .blog-pager-arrow { padding: 0 0.85rem; }
+    .blog-pager-list { gap: 0.25rem; }
+    .blog-pager-num { min-width: 2.25rem; height: 2.25rem; }
+}
+
+/* ---------------------------------------------------------------- article */
+
+.post-page {
+    position: relative;
+    padding: 9.5rem 0 5.5rem;
+}
+
+.post-head {
+    max-width: 46rem;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+}
+
+/* Article hero. A fixed 16:9 box rather than the image's own ratio: the
+   height is known before the bytes arrive, so the body copy never jumps when
+   the cover paints (zero CLS). */
+.post-cover {
+    position: relative;
+    max-width: 52rem;
+    margin: 0 auto 2.75rem;
+    aspect-ratio: 16 / 9;
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #003A8C 0%, #0660BC 100%);
+    box-shadow: 0 30px 60px -40px rgba(3, 87, 168, 0.6);
+}
+
+.post-cover img {
+    object-fit: cover;
+}
+
+@media (max-width: 640px) {
+    .post-cover { border-radius: 16px; margin-bottom: 2rem; }
+}
+
+.post-title {
+    font-family: var(--title-font);
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--title-color);
+    margin: 0.9rem 0 0;
+    text-wrap: balance;
+}
+
+.post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.1rem;
+    margin-top: 1rem;
+    font-size: 0.86rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.post-body {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 2.5rem 0 0;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Long-form typography for server-rendered HTML we do not control. */
+.post-body p {
+    font-size: 1.02rem;
+    line-height: 1.85;
+    color: var(--text-color);
+    margin: 0 0 1.25rem;
+}
+
+.post-body h2,
+.post-body h3 {
+    font-family: var(--title-font);
+    color: var(--title-color);
+    line-height: 1.3;
+    margin: 2.25rem 0 0.85rem;
+}
+
+.post-body h2 { font-size: 1.5rem; }
+.post-body h3 { font-size: 1.2rem; }
+
+.post-body ul,
+.post-body ol {
+    margin: 0 0 1.25rem 1.25rem;
+    padding: 0;
+}
+
+.post-body ul { list-style: disc; }
+.post-body ol { list-style: decimal; }
+
+.post-body li {
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+}
+
+.post-body a {
+    color: var(--first-color);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+}
+
+.post-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 14px;
+    margin: 1.5rem 0;
+}
+
+.post-body blockquote {
+    margin: 1.5rem 0;
+    padding: 0.85rem 1.25rem;
+    border-left: 3px solid var(--first-color);
+    background: var(--first-color-light);
+    border-radius: 0 12px 12px 0;
+}
+
+.post-body pre {
+    overflow-x: auto;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    background: #0B1E44;
+    color: #E3F0FC;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0 0 1.25rem;
+}
+
+.post-body code {
+    font-size: 0.9em;
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 44rem;
+    margin: 2.5rem auto 0;
+}
+
+.post-tag {
+    font-size: 0.78rem;
+    color: var(--first-color);
+    background: var(--first-color-light);
+    border-radius: 100px;
+    padding: 0.35rem 0.85rem;
+}
+
+.post-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2.75rem auto 0;
+    padding: 0.8rem 1.6rem;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(120deg, #003A8C 0%, #0660BC 100%);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.post-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -14px rgba(3, 87, 168, 0.7);
+}
+
+.post-back-wrap {
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .blog-page, .post-page { padding: 8rem 0 3.5rem; }
+    .blog-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+}
+
+/* Homepage strip reuses the card, but its heading is an h3. */
+.blog-card-title {
+    font-family: var(--title-font);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--title-color);
+    margin: 0 0 0.55rem;
+}
+
+/* ===========================================================================
+   HOMEPAGE INQUIRY FORM
+   Blue card matching the reference: brand gradient, translucent fields.
+   =========================================================================== */
+
+.inquiry-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-large, 2.5rem);
+    padding: clamp(2.25rem, 5vw, 4rem) clamp(1.5rem, 5vw, 4rem);
+    background: linear-gradient(135deg, #0B6ACB 0%, #0660BC 45%, #003A8C 100%);
+    box-shadow: 0 34px 80px -50px rgba(3, 87, 168, 0.8);
+    color: #fff;
+}
+
+/* Soft key light in the top-left corner. A plain linear gradient reads flat
+   at this size; this gives the card a light source the inner surfaces can
+   agree with. Gradient only — no backdrop-filter, which corrupts painting
+   inside the GSAP-transformed .stack-card. */
+.inquiry-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(70% 55% at 10% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 62%);
+}
+
+.inquiry-card > * {
+    position: relative;
+}
+
+/* Pitch on the left, form on the right — the form is the wider column because
+   it carries five fields. Single column under 960px. */
+.inquiry-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(2rem, 4vw, 3.5rem);
+    /* stretch, not start — the form column needs the full height to push its
+       Submit row down to the contact row's line. */
+    align-items: stretch;
+}
+
+.inquiry-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+/* Head pinned to the top, form pushed to the bottom of the column. Both
+   columns stretch to the same height, so the Submit button lands on the same
+   line as the email / WhatsApp row on the left instead of floating mid-card. */
+.inquiry-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* Hairline between pitch and form so the two columns read as one card
+       split deliberately, not as two things that happen to sit side by side. */
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    padding-left: clamp(1.75rem, 3vw, 3rem);
+}
+
+/* Fill the column rather than being pushed to the bottom of it. Pushing left a
+   dead band under the title; growing means the message box takes the slack and
+   Submit still lands on the contact row's line. */
+.inquiry-main .inquiry-form {
+    flex: 1 1 auto;
+}
+
+.inquiry-head {
+    max-width: 34rem;
+}
+
+/* ------------------------------------------------------- offer + next steps */
+
+.inquiry-offer {
+    font-family: var(--title-font);
+    font-size: clamp(1.9rem, 3.4vw, 2.65rem);
+    font-weight: 700;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin: 0;
+    text-wrap: balance;
+}
+
+.inquiry-offer span {
+    display: block;
+}
+
+.inquiry-next-label {
+    font-family: var(--title-font);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 1.1rem;
+}
+
+.inquiry-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.inquiry-steps li {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+/* Connector between the markers. Drawn on the <li> rather than as a single
+   line behind the column so it stops at the last step instead of running past
+   it, and so it survives the steps wrapping to different heights. */
+.inquiry-steps li:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 1.1rem;
+    top: 2.2rem;
+    bottom: -1.1rem;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.inquiry-step-num {
+    flex: 0 0 auto;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.inquiry-steps p {
+    margin: 0;
+    padding-top: 0.25rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.88);
+    max-width: 26rem;
+    text-wrap: pretty;
+}
+
+/* Pill, matching the eyebrow language used on /blog and the legal pages —
+   plain uppercase text read as a stray line above the title. */
+.inquiry-eyebrow {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    padding: 0.4rem 0.9rem;
+    margin-bottom: 0.95rem;
+}
+
+/* Sits above the fields now, so it reads a step below the offer headline on
+   the left rather than competing with it. */
+.inquiry-title {
+    font-family: var(--title-font);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin: 0;
+    text-wrap: balance;
+}
+
+.inquiry-sub {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0.7rem 0 0;
+    max-width: 38rem;
+    text-wrap: pretty;
+}
+
+/* ------------------------------------------------------- founder + contacts */
+
+.inquiry-founder {
+    display: flex;
+    align-items: center;
+    gap: 1.35rem;
+    padding: 1.35rem 1.5rem;
+    border-radius: 1.25rem;
+    /* Lit from the top-left like a real surface rather than a flat wash — the
+       card sits on a diagonal gradient, so a flat fill looked pasted on. */
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.07) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 18px 40px -30px rgba(0, 20, 55, 0.9);
+}
+
+.inquiry-founder-avatar {
+    position: relative;
+    flex: 0 0 auto;
+    display: block;
+    width: 7rem;
+    height: 7rem;
+}
+
+.inquiry-founder img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    background: #fff;
+    /* Solid white ring, not a translucent one: the portrait's own backdrop is
+       near-white, so a see-through border let the blue bleed through and the
+       edge went muddy. */
+    border: 3px solid #fff;
+    box-shadow: 0 10px 24px -12px rgba(0, 20, 55, 0.75);
+}
+
+.inquiry-founder-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.inquiry-founder-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.68);
+    margin-bottom: 0.2rem;
+}
+
+/* The name is the biggest thing in this card — it was previously losing the
+   contest to the phone number, which read as the headline. */
+.inquiry-founder-text strong {
+    font-size: 1.4rem;
+    font-family: var(--title-font);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+}
+
+.inquiry-founder-role {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* Direct line, inside the card with the face it belongs to. Plain text, no
+   pill: a filled capsule gave it a button's weight and it kept reading as the
+   loudest thing in the card, above the name. */
+.inquiry-founder-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* Hairline above it rather than a pill around it — gives the number its
+       own register in the card without competing with the name. */
+    margin-top: 0.7rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.78);
+    transition: color 0.25s ease;
+}
+
+.inquiry-founder-phone i {
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.inquiry-founder-phone:hover {
+    color: #fff;
+}
+
+.inquiry-founder-phone:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+    border-radius: 0.35rem;
+}
+
+.inquiry-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.inquiry-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 100%;
+    padding: 0.7rem 1.05rem;
+    border-radius: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    /* Same lit-surface treatment as the founder card above them. */
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    /* Paint-only transition — the chips sit in a wrapping row and animating
+       anything geometric would reflow the whole rail on hover. */
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.inquiry-chip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inquiry-chip i,
+.inquiry-chip svg {
+    flex: 0 0 auto;
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+.inquiry-chip:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* WhatsApp keeps its own identity, as in the reference row. */
+.inquiry-chip.is-whatsapp {
+    background: rgba(37, 211, 102, 0.16);
+    border-color: rgba(37, 211, 102, 0.55);
+}
+
+.inquiry-chip.is-whatsapp svg {
+    color: #25D366;
+}
+
+.inquiry-chip.is-whatsapp:hover {
+    background: rgba(37, 211, 102, 0.26);
+    border-color: #25D366;
+}
+
+.inquiry-chip:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Flex, not grid: the error and "still sending" rows come and go, and a flex
+   column keeps the growing message field working without the row template
+   shifting under them. */
+.inquiry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.inquiry-field-grow {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 8rem;
+}
+
+.inquiry-field-grow textarea {
+    height: 100%;
+    min-height: 0;
+    resize: none;
+}
+
+.inquiry-row {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inquiry-field input,
+.inquiry-field textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.75rem;
+    padding: 0.95rem 1.15rem;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.inquiry-field textarea {
+    resize: vertical;
+    min-height: 8rem;
+}
+
+.inquiry-field input::placeholder,
+.inquiry-field textarea::placeholder {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.inquiry-field input:focus,
+.inquiry-field textarea:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.14);
+}
+
+.inquiry-error {
+    margin: 0;
+    padding: 0.7rem 0.95rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 217, 212, 0.16);
+    border: 1px solid rgba(255, 217, 212, 0.45);
+    color: #FFE4E0;
+    font-size: 0.9rem;
+}
+
+.inquiry-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.inquiry-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1.25rem;
+    margin-top: 0.35rem;
+}
+
+.inquiry-assure {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    /* Small basis so it shares the row with the button instead of being
+       bumped onto a line of its own, which would drop the button off the
+       contact row's line. */
+    flex: 1 1 9rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.75);
+    text-wrap: pretty;
+}
+
+.inquiry-assure i {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* White pill on the blue card — the site's primary blue would vanish here. */
+.inquiry-actions .button-primary {
+    background-color: #fff;
+    color: var(--first-color);
+    min-width: 11.5rem;
+}
+
+.inquiry-actions .button-primary:hover {
+    background-color: #EAF3FF;
+    color: var(--first-color-alt);
+}
+
+.inquiry-actions .button-primary .btn-spinner {
+    border-color: rgba(3, 87, 168, 0.3);
+    border-top-color: var(--first-color);
+}
+
+.inquiry-recaptcha {
+    margin: 0.4rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.inquiry-recaptcha a {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+@media (max-width: 960px) {
+    .inquiry-grid { grid-template-columns: 1fr; gap: 2.25rem; }
+    .inquiry-head { max-width: 44rem; }
+    /* Stacked: the rule would cut down the middle of the page. */
+    .inquiry-main { border-left: 0; padding-left: 0; }
+}
+
+@media (max-width: 720px) {
+    .inquiry-row { grid-template-columns: 1fr; }
+    .inquiry-actions .button-primary { width: 100%; }
+    .inquiry-chip { width: 100%; }
+    .inquiry-founder { padding: 1.1rem 1.15rem; gap: 1rem; }
+    .inquiry-founder-avatar { width: 5rem; height: 5rem; }
+}
+
+/* ===========================================================================
+   HOMEPAGE BLOG CAROUSEL
+   Scroll-snap rail — no JS. Full-bleed so cards reach the screen edge.
+   =========================================================================== */
+
+/* Stack cards supply their own surface, so these sections only set rhythm. */
+.home-blogs {
+    padding: 5.5rem 0 4.5rem;
+}
+
+.home-blogs-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.home-blogs-sub {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin: 0.75rem 0 0;
+    max-width: 46ch;
+}
+
+.home-blogs-all {
+    flex-shrink: 0;
+}
+
+.blog-rail {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    /* Hidden scrollbar, but the rail keeps native keyboard + touch scroll. */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+}
+
+.blog-rail::-webkit-scrollbar {
+    display: none;
+}
+
+.blog-rail:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+.blog-rail-track {
+    display: flex;
+    /* stretch so every card is the same height as the tallest */
+    align-items: stretch;
+    gap: 1.5rem;
+    width: max-content;
+    /* Room for the card shadow/lift so it is not clipped by overflow-x. */
+    padding: 0.25rem 0.25rem 0.75rem;
+}
+
+.blog-rail-item {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    /* Three across inside a 1140px container, minus the two gaps. */
+    width: min(21.5rem, 80vw);
+}
+
+.blog-rail-hint {
+    margin: 1.1rem 0 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+/* Three cards fit on a wide screen, so the hint is noise there. */
+@media (min-width: 1200px) {
+    .blog-rail-hint { display: none; }
+}
+
+@media (max-width: 640px) {
+    .home-blogs { padding: 4rem 0 1rem; }
+    .home-blogs-all { width: 100%; justify-content: center; }
+}
+
+/* Inquiry section spacing when it follows the rail. */
+.inquiry-section {
+    padding: 5rem 0 5.5rem;
+}
+

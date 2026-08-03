@@ -33,3 +33,7 @@ next-env.d.ts
 backend/.env
 backend/node_modules/
 backend/dist/
+
+# Original client photos — converted into public/assets/clients/*.webp.
+# Kept out of git and out of public/ so 77MB never ships to Vercel.
+assets-src/

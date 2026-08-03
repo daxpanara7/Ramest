@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { notifications } from "@/lib/mock-data";
+import { useApi } from "@/lib/admin/use-api";
+import { relativeTime } from "@/lib/admin/format";
 import { useAuth } from "@/lib/admin/auth-context";
 
 const CRUMBS: Record<string, string> = {
@@ -33,7 +34,17 @@ export function AppHeader() {
   const { user, logout } = useAuth();
   // Drop the leading "admin" segment — it's the app root, not a crumb.
   const parts = pathname.split("/").filter(Boolean).slice(1);
-  const unread = notifications.filter((n) => n.unread).length;
+  // Recent activity doubles as the notification feed — it is the only real
+  // event stream the system has. "Unread" is not modelled server-side, so
+  // the dot reflects whether anything happened in the last 24h rather than
+  // inventing a read/unread flag.
+  const { data: activity } = useApi<{
+    items: { id: string; action: string; entity: string | null; createdAt: string;
+             user: { name: string } | null }[];
+  }>("/activity?take=8");
+  const events = activity?.items ?? [];
+  const dayAgo = Date.now() - 86_400_000;
+  const unread = events.filter((e) => new Date(e.createdAt).getTime() >= dayAgo).length;
   const firstName = user?.name.split(/\s+/)[0] ?? "";
   const initials = user
     ? user.name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()
@@ -95,16 +106,26 @@ export function AppHeader() {
               <Badge variant="secondary" className="text-[10px]">{unread} new</Badge>
             </div>
             <div className="max-h-80 overflow-auto">
-              {notifications.map((n) => (
-                <div key={n.id} className="flex gap-3 border-b px-3 py-2.5 last:border-0 hover:bg-accent/40">
-                  <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${n.unread ? "bg-primary" : "bg-muted"}`} />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{n.title}</p>
-                    <p className="line-clamp-2 text-xs text-muted-foreground">{n.body}</p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground/70">{n.at}</p>
+              {events.length === 0 ? (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">
+                  No activity yet.
+                </p>
+              ) : events.map((e) => {
+                const fresh = new Date(e.createdAt).getTime() >= dayAgo;
+                return (
+                  <div key={e.id} className="flex gap-3 border-b px-3 py-2.5 last:border-0 hover:bg-accent/40">
+                    <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${fresh ? "bg-primary" : "bg-muted"}`} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{e.action}</p>
+                      <p className="line-clamp-2 text-xs text-muted-foreground">
+                        {e.user?.name ?? "System"}
+                        {e.entity ? ` · ${e.entity}` : ""}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground/70">{relativeTime(e.createdAt)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </DropdownMenuContent>
         </DropdownMenu>

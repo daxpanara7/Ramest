@@ -30,8 +30,19 @@ export function initHomeMotion(): () => void {
 
   /* ---- premium scroll: Lenis + ScrollTrigger, one rAF loop (GSAP ticker) */
   const lenis = new Lenis({
-    lerp: 0.08, // soft acceleration/deceleration (lower = floatier)
-    wheelMultiplier: 1,
+    /* lerp is how much of the remaining distance is covered each frame, so
+       it controls how *quickly the smoothing catches up*, not how far a
+       gesture travels. 0.11 took ~20 frames to converge, which is what made
+       the stacked sections feel heavy — you scrolled, then waited for the
+       page to arrive. 0.18 lands in roughly half that: still visibly
+       smoothed, no longer laggy. */
+    lerp: 0.18,
+    /* Distance per wheel notch. This is the actual "scroll speed" control —
+       1 meant a full first-to-last pass through the stacked sections took
+       far more wheeling than it should. 1.35 covers the page noticeably
+       faster while staying under the point where a single notch skips past
+       a whole stacked card. */
+    wheelMultiplier: 1.35,
     /* syncTouch was ON and caused the mobile stutter. It takes momentum away
        from the browser's compositor and re-drives it from JS, so every frame
        has to wait on the main thread — on a phone that reads as juddering
@@ -139,12 +150,31 @@ export function initHomeMotion(): () => void {
       ScrollTrigger.refresh();
     };
     setStackTops();
-    const ro = new ResizeObserver(setStackTops);
+
+    /* ResizeObserver fired on every card on every scroll frame on mobile —
+       the URL bar collapsing changes viewport height, which changes card
+       height, which re-entered this callback and called
+       ScrollTrigger.refresh() (a full layout pass) each time. Debounced, and
+       guarded so identical measurements are a no-op. */
+    let raf = 0;
+    let lastSignature = "";
+    const scheduleStackTops = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const signature = `${window.innerHeight}:${stack.map((c) => c.offsetHeight).join(",")}`;
+        if (signature === lastSignature) return;
+        lastSignature = signature;
+        setStackTops();
+      });
+    };
+
+    const ro = new ResizeObserver(scheduleStackTops);
     stack.forEach((card) => ro.observe(card));
-    window.addEventListener("resize", setStackTops, { passive: true });
+    window.addEventListener("resize", scheduleStackTops, { passive: true });
     cleanups.push(() => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
-      window.removeEventListener("resize", setStackTops);
+      window.removeEventListener("resize", scheduleStackTops);
     });
   }
 

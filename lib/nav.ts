@@ -8,6 +8,7 @@ export type NavPage =
   | "infrastructure"
   | "certifications"
   | "careers"
+  | "blog"
   | "contact";
 
 const PATH_TO_PAGE: Record<string, NavPage> = {
@@ -20,6 +21,7 @@ const PATH_TO_PAGE: Record<string, NavPage> = {
   "/infrastructure": "infrastructure",
   "/certifications": "certifications",
   "/careers": "careers",
+  "/blog": "blog",
   "/contact": "contact",
 };
 
@@ -145,6 +147,7 @@ export const sitemapRoutes = [
   "/infrastructure",
   "/certifications",
   "/careers",
+  "/blog",
   "/contact",
   "/legal",
   "/legal?tab=privacy",

@@ -12,7 +12,14 @@ async function bootstrap() {
   });
 
   // Security headers (Task 04/15).
-  app.use(helmet());
+  //
+  // crossOriginResourcePolicy is relaxed to "cross-origin" because uploaded
+  // media is served from this API but rendered by the Next.js frontend on a
+  // different origin. Helmet's default of "same-origin" makes the browser
+  // refuse to paint those images — they download fine but render broken.
+  // This only affects who may EMBED a response; it is not an access control,
+  // and every non-public route stays behind the JWT guard.
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
   app.set('trust proxy', 1); // real client IP behind Render/CDN
 

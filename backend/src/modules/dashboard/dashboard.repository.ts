@@ -61,4 +61,56 @@ export class DashboardRepository {
       },
     });
   }
+
+  /**
+   * Leads per day for the last N days, bucketed in SQL rather than in JS —
+   * pulling every row back just to group it would scale with lead volume.
+   * generate_series fills days with zero leads, which a plain GROUP BY drops
+   * and which would otherwise make the chart lie about quiet days.
+   */
+  leadsPerDay(days: number) {
+    return this.prisma.$queryRaw<{ day: Date; total: bigint; qualified: bigint }[]>`
+      SELECT d.day::date AS day,
+             COUNT(l.id) AS total,
+             COUNT(l.id) FILTER (WHERE l.status IN ('QUALIFIED','WON')) AS qualified
+      FROM generate_series(
+             CURRENT_DATE - (${days}::int - 1) * INTERVAL '1 day',
+             CURRENT_DATE,
+             INTERVAL '1 day'
+           ) AS d(day)
+      LEFT JOIN "ContactLead" l
+             ON l."createdAt" >= d.day
+            AND l."createdAt" <  d.day + INTERVAL '1 day'
+            AND l."deletedAt" IS NULL
+      GROUP BY d.day
+      ORDER BY d.day ASC;
+    `;
+  }
+
+  /** Published posts per month for the last N months. */
+  postsPerMonth(months: number) {
+    return this.prisma.$queryRaw<{ month: Date; total: bigint }[]>`
+      SELECT m.month::date AS month, COUNT(p.id) AS total
+      FROM generate_series(
+             date_trunc('month', CURRENT_DATE) - (${months}::int - 1) * INTERVAL '1 month',
+             date_trunc('month', CURRENT_DATE),
+             INTERVAL '1 month'
+           ) AS m(month)
+      LEFT JOIN "BlogPost" p
+             ON p."publishedAt" >= m.month
+            AND p."publishedAt" <  m.month + INTERVAL '1 month'
+            AND p."deletedAt" IS NULL
+      GROUP BY m.month
+      ORDER BY m.month ASC;
+    `;
+  }
+
+  /** Lead volume grouped by source-ish dimension we actually store. */
+  leadsByCountry() {
+    return this.prisma.contactLead.groupBy({
+      by: ['country'],
+      where: { deletedAt: null },
+      _count: true,
+    });
+  }
 }

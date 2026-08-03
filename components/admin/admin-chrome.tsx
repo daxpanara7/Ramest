@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/admin/app-sidebar";
 import { AppHeader } from "@/components/admin/app-header";
 import { Toaster } from "@/components/ui/sonner";
+import { ConfirmProvider } from "@/components/admin/use-confirm";
 
 /**
  * Admin chrome: auth provider + route guard + the ported Lovable shell
@@ -15,7 +16,9 @@ import { Toaster } from "@/components/ui/sonner";
 export default function AdminChrome({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
+      <ConfirmProvider>
       <ChromeBody>{children}</ChromeBody>
+    </ConfirmProvider>
     </AuthProvider>
   );
 }

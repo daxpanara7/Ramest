@@ -1,61 +1,67 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { SettingsSection, Field } from "@/components/admin/settings-form";
+import { useSettings } from "@/lib/admin/use-settings";
 
-
+/**
+ * Persisted under the "email.*" prefix.
+ *
+ * The SPF/DKIM/DMARC panel is intentionally read-only and unpopulated: those
+ * are DNS facts, not settings. Showing them as live would need a DNS lookup
+ * or the Resend domains API, so they render "not checked" rather than
+ * claiming a verification that was never performed.
+ */
 export default function EmailSettings() {
-  return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div>
-        <h3 className="font-display text-lg">Email</h3>
-        <p className="text-sm text-muted-foreground">Sending domain, SMTP, and notification defaults.</p>
-      </div>
-      <Card className="lg:col-span-2">
-        <CardContent className="space-y-5 p-6">
-          <Field label="From name"><Input defaultValue="Ramest Technolabs" /></Field>
-          <Field label="From address"><Input defaultValue="notifications@ramesttechnolabs.com" /></Field>
-          <Field label="Reply-to"><Input defaultValue="hello@ramesttechnolabs.com" /></Field>
-          <div className="space-y-3 rounded-lg border border-border/60 p-4">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Domain verification</p>
-            <div className="flex items-center justify-between text-sm">
-              <span>SPF</span><span className="text-emerald-400">Verified</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span>DKIM</span><span className="text-emerald-400">Verified</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span>DMARC</span><span className="text-amber-400">Warning · p=none</span>
-            </div>
-          </div>
-          <Toggle label="Send weekly digest to admins" />
-          <Toggle label="Notify on new lead" defaultChecked />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm">Send test</Button>
-            <Button size="sm">Save changes</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+  const s = useSettings("email", {
+    "email.fromName": "Ramest Technolabs",
+    "email.fromAddress": "",
+    "email.replyTo": "",
+    "email.weeklyDigest": false,
+    "email.notifyOnLead": true,
+  });
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-widest text-muted-foreground">{label}</Label>
-      {children}
-    </div>
-  );
-}
-function Toggle({ label, defaultChecked }: { label: string; defaultChecked?: boolean }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm">{label}</span>
-      <Switch defaultChecked={defaultChecked} />
-    </div>
+    <SettingsSection
+      title="Email"
+      description="Sending domain, SMTP, and notification defaults."
+      loading={s.loading} error={s.error} saveError={s.saveError}
+      dirty={s.dirty} saving={s.saving} justSaved={s.justSaved}
+      onSave={s.save} onReset={s.reset} onRetry={s.reload}
+    >
+      <Field label="From name" full>
+        <Input value={s.str("email.fromName")} onChange={(e) => s.set("email.fromName", e.target.value)} />
+      </Field>
+      <Field label="From address" full>
+        <Input type="email" value={s.str("email.fromAddress")} onChange={(e) => s.set("email.fromAddress", e.target.value)} />
+      </Field>
+      <Field label="Reply-to" full>
+        <Input type="email" value={s.str("email.replyTo")} onChange={(e) => s.set("email.replyTo", e.target.value)} />
+      </Field>
+
+      <div className="md:col-span-2 space-y-3 rounded-lg border border-border/60 p-4">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">Domain verification</p>
+        {["SPF", "DKIM", "DMARC"].map((r) => (
+          <div key={r} className="flex items-center justify-between text-sm">
+            <span>{r}</span>
+            <span className="text-muted-foreground">Not checked</span>
+          </div>
+        ))}
+        <p className="text-xs text-muted-foreground">
+          These are DNS records, not settings — wiring them live needs the
+          Resend domains API.
+        </p>
+      </div>
+
+      <div className="md:col-span-2 flex items-center justify-between">
+        <p className="text-sm">Send weekly digest to admins</p>
+        <Switch checked={s.bool("email.weeklyDigest")} onCheckedChange={(v) => s.set("email.weeklyDigest", v)} />
+      </div>
+      <div className="md:col-span-2 flex items-center justify-between">
+        <p className="text-sm">Notify on new lead</p>
+        <Switch checked={s.bool("email.notifyOnLead", true)} onCheckedChange={(v) => s.set("email.notifyOnLead", v)} />
+      </div>
+    </SettingsSection>
   );
 }

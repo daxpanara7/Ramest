@@ -18,7 +18,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { visitorSeries, leadSeries, trafficSources } from "@/lib/mock-data";
+
 import { apiLeadStatusBadge, postStatusBadge } from "@/components/admin/badges";
 import { useApi } from "@/lib/admin/use-api";
 import { relativeTime, formatDateTime } from "@/lib/admin/format";
@@ -29,21 +29,16 @@ import { relativeTime, formatDateTime } from "@/lib/admin/format";
  *
  *   LIVE   — the five stat values, Recent blog posts, Recent leads, Recent
  *            activity. All from GET /api/dashboard and /api/blog/posts.
- *   STATIC — the three charts (Visitors & Blog views, Traffic sources, Lead
- *            generation) and the "vs last month" deltas. The backend stores
- *            no page views, referrers, or historical snapshots, so these
- *            still render the sample series. They are the Search Console
- *            integration's job — see SEARCH_CONSOLE_TODO below.
+ *   The three charts are now real too: publishing cadence and lead volume
+ *   come from GET /dashboard/series (day/month buckets computed in SQL),
+ *   and the donut shows leads by country. The old "visitors" and "traffic
+ *   sources" charts were removed rather than faked — the backend records no
+ *   page views or referrers, and Search Console cannot supply direct or
+ *   social traffic. Those need GA4.
  *
  * Nothing is removed while it waits: the cards keep rendering so the layout
  * is exactly what was designed.
  */
-
-// TODO(search-console): replace visitorSeries / trafficSources / leadSeries
-// and the Stat deltas once the Search Console API is wired. Clicks,
-// impressions, CTR and average position all come from
-// searchanalytics.query; traffic sources need GA4 rather than GSC.
-const SEARCH_CONSOLE_TODO = true;
 
 const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
@@ -75,9 +70,45 @@ type Post = {
 };
 type PostList = { items: Post[]; total: number };
 
+type Series = {
+  leadsPerDay: { date: string; leads: number; qualified: number }[];
+  postsPerMonth: { month: string; posts: number }[];
+  leadsByCountry: { country: string; value: number }[];
+};
+
 export default function DashboardPage() {
   const { data, loading, error, reload } = useApi<DashboardStats>("/dashboard");
   const { data: posts } = useApi<PostList>("/blog/posts?take=5");
+  const { data: series } = useApi<Series>("/dashboard/series?days=30&months=12");
+
+  const leadsPerDay = series?.leadsPerDay ?? [];
+  const postsPerMonth = series?.postsPerMonth ?? [];
+  const leadsByCountry = series?.leadsByCountry ?? [];
+
+  /**
+   * Real month-over-month from the publishing series. Returns null when
+   * there is no prior month to compare against — "+100%" from a zero
+   * baseline is meaningless, so the UI omits the delta instead.
+   */
+  const momPosts = (() => {
+    if (postsPerMonth.length < 2) return null;
+    const cur = postsPerMonth[postsPerMonth.length - 1].posts;
+    const prev = postsPerMonth[postsPerMonth.length - 2].posts;
+    if (prev === 0) return null;
+    return Math.round(((cur - prev) / prev) * 1000) / 10;
+  })();
+
+  /** Leads in the last 15 days vs the 15 before — same honesty rule. */
+  const leadDelta = (() => {
+    if (leadsPerDay.length < 4) return null;
+    const half = Math.floor(leadsPerDay.length / 2);
+    const prev = leadsPerDay.slice(0, half).reduce((a, d) => a + d.leads, 0);
+    const cur = leadsPerDay.slice(half).reduce((a, d) => a + d.leads, 0);
+    if (prev === 0) return null;
+    return Math.round(((cur - prev) / prev) * 1000) / 10;
+  })();
+
+  const pct = (v: number | null) => (v === null ? undefined : `${v > 0 ? "+" : ""}${v}%`);
 
   const totalBlogs = (data?.blogPosts.published ?? 0) + (data?.blogPosts.draft ?? 0);
   const recentPosts = posts?.items ?? [];
@@ -109,27 +140,29 @@ export default function DashboardPage() {
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-        <Stat label="Total Blogs" value={totalBlogs} delta="+8.2%" icon={<Newspaper className="h-4 w-4" />} />
-        <Stat label="Published" value={data?.blogPosts.published ?? 0} delta="+4.6%" icon={<FileText className="h-4 w-4" />} />
-        <Stat label="Contact Leads" value={data?.leads.total ?? 0} delta="+18.4%" icon={<Users2 className="h-4 w-4" />} />
-        <Stat label="Subscribers" value={(data?.newsletter.activeSubscribers ?? 0).toLocaleString()} delta="+2.1%" icon={<Mail className="h-4 w-4" />} />
-        <Stat label="Team" value={data?.users.total ?? 0} delta="0%" icon={<ShieldCheck className="h-4 w-4" />} />
+        <Stat label="Total Blogs" value={totalBlogs} icon={<Newspaper className="h-4 w-4" />} />
+        <Stat label="Published" value={data?.blogPosts.published ?? 0} delta={pct(momPosts)} icon={<FileText className="h-4 w-4" />} />
+        <Stat label="Contact Leads" value={data?.leads.total ?? 0} delta={pct(leadDelta)} icon={<Users2 className="h-4 w-4" />} />
+        <Stat label="Subscribers" value={(data?.newsletter.activeSubscribers ?? 0).toLocaleString()} icon={<Mail className="h-4 w-4" />} />
+        <Stat label="Team" value={data?.users.total ?? 0} icon={<ShieldCheck className="h-4 w-4" />} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
-              <CardTitle className="text-base">Visitors &amp; Blog views</CardTitle>
-              <CardDescription>Trailing 12 months</CardDescription>
+              <CardTitle className="text-base">Publishing cadence</CardTitle>
+              <CardDescription>Posts published per month · trailing 12 months</CardDescription>
             </div>
-            <Badge variant="secondary" className="gap-1">
-              <ArrowUpRight className="h-3 w-3" /> 24.6% MoM
-            </Badge>
+            {momPosts !== null && (
+              <Badge variant="secondary" className="gap-1">
+                <ArrowUpRight className="h-3 w-3" /> {pct(momPosts)} MoM
+              </Badge>
+            )}
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={visitorSeries} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+              <AreaChart data={postsPerMonth} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                 <defs>
                   <linearGradient id="v1" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
@@ -141,14 +174,13 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip
                   contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
                   cursor={{ stroke: "var(--border)" }}
                 />
-                <Area type="monotone" dataKey="views" stroke="var(--chart-2)" strokeWidth={2} fill="url(#v2)" />
-                <Area type="monotone" dataKey="visitors" stroke="var(--chart-1)" strokeWidth={2} fill="url(#v1)" />
+                <Area type="monotone" dataKey="posts" stroke="var(--chart-1)" strokeWidth={2} fill="url(#v1)" name="Posts published" />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -156,14 +188,14 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Traffic sources</CardTitle>
-            <CardDescription>Last 30 days</CardDescription>
+            <CardTitle className="text-base">Leads by country</CardTitle>
+            <CardDescription>All leads received</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={trafficSources} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} strokeWidth={0}>
-                  {trafficSources.map((_, i) => <Cell key={i} fill={CHART_COLORS[i]} />)}
+                <Pie data={leadsByCountry} dataKey="value" nameKey="country" innerRadius={55} outerRadius={90} strokeWidth={0}>
+                  {leadsByCountry.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                 </Pie>
                 <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
@@ -178,7 +210,7 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
               <CardTitle className="text-base">Lead generation</CardTitle>
-              <CardDescription>Weekly leads vs qualified</CardDescription>
+              <CardDescription>Leads vs qualified · last 30 days</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin/leads" className="text-xs">View all <ExternalLink className="ml-1 h-3 w-3" /></Link>
@@ -186,10 +218,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={leadSeries} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={leadsPerDay} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="d" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip
                   contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
                   cursor={{ fill: "color-mix(in oklab, var(--foreground) 4%, transparent)" }}

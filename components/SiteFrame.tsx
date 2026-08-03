@@ -49,71 +49,139 @@ export default function SiteFrame({ children }: { children: React.ReactNode }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let ticking = false;
 
+    /* Last value written, so an unchanged frame touches no DOM at all.
+       Writing a custom property invalidates style for the footer subtree even
+       when the value is identical — at 120Hz that is 120 pointless style
+       recalcs a second, and it is a large subtree. */
+    let lastShift = "";
+
     const parallax = () => {
       ticking = false;
       if (!shell || !height || reduced.matches) {
-        el.style.removeProperty("--fr-shift");
+        if (lastShift !== "") {
+          lastShift = "";
+          el.style.removeProperty("--fr-shift");
+        }
         return;
       }
+
       const revealed = window.innerHeight - shell.getBoundingClientRect().bottom;
       const usable = Math.max(1, height - FOOTER_OVERLAP);
+
+      /* Off-screen short-circuit. On a long page (the blog index is three
+         rows of cards) the footer is nowhere near the viewport for most of
+         the scroll, yet this still recomputed and rewrote every frame. Once
+         the value has been pinned to its resting state there is nothing to
+         do until the footer is actually approaching. */
+      if (revealed <= 0) {
+        const resting = `${(height * 0.35).toFixed(1)}px`;
+        if (lastShift !== resting) {
+          lastShift = resting;
+          el.style.setProperty("--fr-shift", resting);
+        }
+        return;
+      }
+
       const progress = Math.min(1, Math.max(0, revealed / usable));
-      el.style.setProperty(
-        "--fr-shift",
-        `${((1 - progress) * height * 0.35).toFixed(1)}px`,
-      );
+      const next = `${((1 - progress) * height * 0.35).toFixed(1)}px`;
+      if (next === lastShift) return;
+      lastShift = next;
+      el.style.setProperty("--fr-shift", next);
     };
 
-    // HARD STOP: never allow the viewport past the resting frame (rounded
-    // card sitting on the footer). The browser caps scrollTop at the doc end
-    // already; this snaps back any transient overshoot (elastic, momentum,
-    // stale layout) the same frame it happens — on every page.
-    const clampScroll = () => {
+    /* Scroll handler does ZERO layout work.
+     *
+     * It previously ran three forced synchronous layouts on EVERY scroll
+     * event — doc.scrollHeight, getComputedStyle(shell).marginBottom and
+     * el.offsetHeight — and then wrote doc.scrollTop. Reading geometry mid-
+     * scroll forces the browser to flush layout before it can answer, and
+     * writing scrollTop fights macOS momentum. Together that is the visible
+     * fluctuation: the page appears to stutter and snap while scrolling.
+     *
+     * Now the listener only sets a flag. All measurement happens once per
+     * frame inside rAF, and the expensive drift check is sampled rather than
+     * run continuously.
+     */
+    let maxScroll = 0;
+    const refreshMax = () => {
       const doc = document.scrollingElement;
-      if (!doc) return;
-      const max = doc.scrollHeight - window.innerHeight;
-      if (doc.scrollTop > max) doc.scrollTop = max;
+      maxScroll = doc ? doc.scrollHeight - window.innerHeight : 0;
+    };
+
+    const frame = () => {
+      ticking = false;
+
+      // Clamp against a CACHED max — no scrollHeight read per frame. Only
+      // correct a real overshoot, with a 1px tolerance so sub-pixel rounding
+      // never triggers a write (a write every frame is itself the judder).
+      const doc = document.scrollingElement;
+      if (doc && maxScroll > 0 && doc.scrollTop > maxScroll + 1) {
+        doc.scrollTop = maxScroll;
+      }
+
+      /* The drift self-heal that used to live here is GONE.
+       *
+       * It ran `getComputedStyle(shell).marginBottom` and `el.offsetHeight`
+       * every 30th frame. Both are forced synchronous layouts, and firing
+       * them mid-scroll made the browser flush layout twice a second — a
+       * regular, rhythmic hitch. That is exactly the "jitter/fluctuation"
+       * that was still showing up on the blog page, and it was worse there
+       * than on the homepage because the blog has no Lenis smoothing to mask
+       * a dropped frame.
+       *
+       * It was only ever guarding against the footer's height changing after
+       * first measure (late fonts, viewport resize). Both of those already
+       * have precise triggers — `document.fonts.ready` and the
+       * ResizeObserver on the footer below — so polling for them during
+       * scroll bought nothing. Measurement now happens when the thing being
+       * measured actually changes, never on a timer.
+       */
+
+      parallax();
     };
 
     const onScroll = () => {
-      clampScroll();
-      // Self-heal on every scroll: the reserved scroll room (shell
-      // margin-bottom) must equal the footer's REAL height. If they ever
-      // drift (late font load, viewport change, stale measurement), you can
-      // scroll PAST the fully-revealed footer into a bare rectangle —
-      // re-sync the instant a mismatch is detected.
-      if (shell) {
-        const applied = parseFloat(getComputedStyle(shell).marginBottom) || 0;
-        const expected = el.offsetHeight - FOOTER_OVERLAP;
-        if (applied > 0 && Math.abs(applied - expected) > 1) sync();
-      }
       if (!ticking) {
         ticking = true;
-        requestAnimationFrame(parallax);
+        requestAnimationFrame(frame);
       }
     };
 
     sync();
+    refreshMax();
     parallax();
     // Fonts change text metrics after first measure — re-sync when ready.
     if (document.fonts?.ready) {
       document.fonts.ready.then(() => {
         sync();
+        refreshMax();
         parallax();
       });
     }
     const observer = new ResizeObserver(() => {
       sync();
+      refreshMax();
       parallax();
     });
     observer.observe(el);
+    // Also watch the scrolling content: blog covers and late-loading media
+    // change the document height, which invalidates the cached maxScroll.
+    // This replaces what the polled self-heal was really protecting against,
+    // and it fires only when the height genuinely changes.
+    if (shell) observer.observe(shell);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+        // Named, so the cleanup below can actually remove it — an inline arrow
+    // here would leak a listener on every route change.
+    const onResize = () => {
+      refreshMax();
+      onScroll();
+    };
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
       el.style.removeProperty("--fr-shift");
     };
   }, [isAdmin, pathname]);

@@ -42,4 +42,34 @@ export class DashboardService {
       activity: { recent: recentActivity },
     };
   }
+
+  /**
+   * Time series for the dashboard charts.
+   *
+   * Postgres COUNT() comes back as bigint, which JSON.stringify cannot
+   * serialise — every count is coerced to Number here rather than at the
+   * controller, so no caller can forget.
+   */
+  async series(days = 30, months = 12) {
+    const [leads, posts, countries] = await Promise.all([
+      this.repo.leadsPerDay(days),
+      this.repo.postsPerMonth(months),
+      this.repo.leadsByCountry(),
+    ]);
+
+    return {
+      leadsPerDay: leads.map((r) => ({
+        date: r.day.toISOString().slice(0, 10),
+        leads: Number(r.total),
+        qualified: Number(r.qualified),
+      })),
+      postsPerMonth: posts.map((r) => ({
+        month: r.month.toISOString().slice(0, 7),
+        posts: Number(r.total),
+      })),
+      leadsByCountry: countries
+        .map((c) => ({ country: c.country ?? "Unknown", value: c._count }))
+        .sort((a, b) => b.value - a.value),
+    };
+  }
 }

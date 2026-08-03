@@ -75,6 +75,11 @@ export class MediaController {
   async serveFile(@Param('key') key: string, @Res() res: Response): Promise<void> {
     const { path, mimeType } = await this.media.resolveLocalFile(key);
     res.setHeader('Content-Type', mimeType);
+    // Keys are random and an upload never changes in place — replacing an
+    // image mints a new key. So the bytes are genuinely immutable and can be
+    // cached for a year: the optimizer fetches each origin image once, and a
+    // returning visitor re-downloads nothing.
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     const stream = createReadStream(path);
     stream.on('error', () => {
       if (!res.headersSent) {

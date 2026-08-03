@@ -1,9 +1,11 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
@@ -57,4 +59,34 @@ export class CreateLeadDto {
   @IsOptional()
   @IsString()
   recaptchaToken?: string;
+
+  /**
+   * Honeypot. Rendered as a real input that is hidden from people and marked
+   * tabindex=-1/aria-hidden/autocomplete=off, so no human ever fills it —
+   * but the naive form-filling bots that reCAPTCHA scores generously will,
+   * because they populate every field they can find. A non-empty value here
+   * is the single highest-confidence spam signal available: it has no
+   * plausible false positive.
+   *
+   * Named `website` rather than `honeypot` on purpose — the name has to look
+   * worth filling in.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  website?: string;
+
+  /**
+   * Milliseconds between the form rendering and the submit. Humans cannot
+   * read this form, type a name, an email and a sentence in under a couple
+   * of seconds; scripted posts routinely submit in double digits.
+   *
+   * Spoofable by a determined attacker, which is fine — this is a cheap
+   * filter for volume spam, not the security boundary. reCAPTCHA and the
+   * per-IP throttle are.
+   */
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  elapsedMs?: number;
 }

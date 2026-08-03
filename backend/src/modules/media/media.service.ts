@@ -5,11 +5,22 @@ import { MediaRepository } from './media.repository';
 import { StorageService } from './storage.service';
 import { UpdateMediaDto } from './dto/update-media.dto';
 
-/** Only images may be uploaded to the media library. */
+/**
+ * Only images may be uploaded to the media library.
+ *
+ * AVIF is accepted alongside WebP so an editor can upload the already-modern
+ * format directly — it is typically 30-50% smaller than the same JPEG at
+ * equal quality, and Next's optimizer passes it through rather than
+ * re-encoding. The legacy formats stay allowed because that is what phones
+ * and stock libraries actually produce; the optimizer converts those down to
+ * AVIF/WebP at serve time, so an editor uploading a JPEG costs the visitor
+ * nothing.
+ */
 export const ALLOWED_MIME_TYPES = new Set([
   'image/png',
   'image/jpeg',
   'image/webp',
+  'image/avif',
   'image/gif',
   'image/svg+xml',
 ]);
@@ -18,6 +29,7 @@ const EXT_BY_MIME: Record<string, string> = {
   'image/png': '.png',
   'image/jpeg': '.jpg',
   'image/webp': '.webp',
+  'image/avif': '.avif',
   'image/gif': '.gif',
   'image/svg+xml': '.svg',
 };

@@ -40,6 +40,30 @@ const SOCIAL_PLACEHOLDERS = [
   },
 ];
 
+/**
+ * The column that replaced Contact.
+ *
+ * Chosen for what the footer was actually missing, not to fill space: before
+ * this, the only hrefs in the whole footer were "/" and "/legal" plus the
+ * service and company items. /blog, /services, /hire-developers and /contact
+ * had NO sitewide link anywhere in the footer.
+ *
+ * That matters because the footer is the one block on every page. A link here
+ * gives every crawl of any page a one-hop path to the blog — which is the
+ * part of the site that gains new URLs — and spreads internal link equity to
+ * the two pages that actually convert. All four are static internal routes,
+ * so this costs one <ul> of markup and zero runtime work.
+ *
+ * Only routes that really exist are listed; a footer link to a 404 is worse
+ * for SEO than no link at all.
+ */
+const EXPLORE_LINKS = [
+  { href: "/blog", label: "Blog & Insights" },
+  { href: "/services", label: "All Services" },
+  { href: "/hire-developers", label: "Hire Developers" },
+  { href: "/contact", label: "Contact Us" },
+];
+
 const COMPANY_LINKS = [
   { href: "/about", label: "About Us" },
   { href: "/team", label: "Our Team" },
@@ -68,10 +92,53 @@ export default function Footer() {
             Engineering reliable web, mobile, and AI software for teams that
             ship — from {SITE.address.city}, India.
           </p>
+
+          {/* NAP (name / address / phone) sits directly under the wordmark
+              rather than in a far-right column. Keeping the business name and
+              its address in one block is what local search wants to see, and
+              it matches the Organization schema in lib/site.ts — same values,
+              so the page and the structured data can never disagree.
+
+              <address> is the correct element for an organisation's own
+              contact details and costs nothing; the italic default is reset
+              in footer.css. */}
+          <address className="footer-contact">
+            <ul className="footer-contact-list">
+              <li className="footer-contact-item">
+                <i className="fa-solid fa-envelope" aria-hidden="true" />
+                <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+              </li>
+              <li className="footer-contact-item">
+                <i className="fa-solid fa-phone" aria-hidden="true" />
+                <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
+              </li>
+              <li className="footer-contact-item">
+                <i className="fa-solid fa-location-dot" aria-hidden="true" />
+                {/* Linked to Maps: the address is the one footer line people
+                    actually act on, and a plain <span> made them copy it by
+                    hand. Opens a search rather than a hard-coded place ID so
+                    it cannot rot if the listing changes. */}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${SITE.name}, ${SITE.address.street}, ${SITE.address.city}, ${SITE.address.region} ${SITE.address.postalCode}`,
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {SITE.address.street}, {SITE.address.city},{" "}
+                  {SITE.address.region} {SITE.address.postalCode}
+                </a>
+              </li>
+            </ul>
+          </address>
         </div>
 
-        {/* ---------- Link columns ---------- */}
-        <div>
+        {/* ---------- Link columns ----------
+            One <nav> around the whole block, not one per column: four
+            landmarks all called something different is noise in a screen
+            reader's landmark list, where one clearly-labelled "Footer" is
+            what people actually navigate by. */}
+        <nav aria-label="Footer">
           <div className="footer-columns">
             <div>
               <h3 className="footer-col-title">Services</h3>
@@ -107,27 +174,17 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="footer-col-title">Contact</h3>
+              <h3 className="footer-col-title">Explore</h3>
               <ul className="footer-col-list">
-                <li className="footer-contact-item">
-                  <i className="fa-solid fa-envelope" aria-hidden="true" />
-                  <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-                </li>
-                <li className="footer-contact-item">
-                  <i className="fa-solid fa-phone" aria-hidden="true" />
-                  <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
-                </li>
-                <li className="footer-contact-item">
-                  <i className="fa-solid fa-location-dot" aria-hidden="true" />
-                  <span>
-                    {SITE.address.street}, {SITE.address.city},{" "}
-                    {SITE.address.region} {SITE.address.postalCode}
-                  </span>
-                </li>
+                {EXPLORE_LINKS.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href}>{l.label}</Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
-        </div>
+        </nav>
       </div>
 
       {/* ---------- Bottom bar: copyright and legal link left, social icons

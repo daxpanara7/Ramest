@@ -774,27 +774,58 @@ img {
     transition: background-color .3s, border-color .3s, color .3s, box-shadow .3s, transform .3s;
 }
 
-.button-primary {
-    background-color: var(--first-color);
+/* One primary button for the whole site, matching the homepage hero's
+   "Schedule a Call" (.nv-btn-primary in homepage.css). Before this, three
+   different primaries shipped: a flat 8px-radius square here, a lighter
+   left-to-right gradient on the CTA banner, and the hero pill — so the same
+   action looked like a different control depending on the page.
+
+   The angled gradient is drawn at 150% width so hover slides it rather than
+   cross-fading two colours, which is what gives the hero button its sheen. */
+.button-primary,
+.cta-button {
+    border-radius: 100px;
+    font-weight: 600;
     color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(110deg, #0357A8 0%, #0B6ACB 55%, #3898EC 130%);
+    background-size: 150% 100%;
+    background-position: 0 50%;
+    border: none;
+    box-shadow: 0 14px 34px -12px rgba(3, 87, 168, 0.55);
+    transition: background-position 0.5s ease, box-shadow 0.35s ease,
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.button-primary:hover {
-    background-color: var(--first-color-alt);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.button-primary:hover,
+.cta-button:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 20px 46px -14px rgba(3, 87, 168, 0.65);
 }
 
+.button-primary i,
+.cta-button i {
+    font-size: 0.8em;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.button-primary:hover i,
+.cta-button:hover i {
+    transform: translateX(4px);
+}
+
+/* Ghost pair for the primary, mirroring .nv-btn-ghost next to the hero
+   button — a square outline beside a pill reads as two unrelated controls. */
 .button-secondary {
-    background-color: transparent;
-    color: var(--title-color);
-    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    background-color: rgba(255, 255, 255, 0.55);
+    color: #0357A8;
+    border: 1px solid rgba(3, 87, 168, 0.28);
 }
 
 .button-secondary:hover {
-    border-color: var(--first-color);
-    color: var(--first-color);
+    border-color: #3898EC;
+    color: #2A6FD0;
+    background-color: #fff;
 }
 
 /* ==================== HERO ==================== */

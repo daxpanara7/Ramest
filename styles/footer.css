@@ -182,40 +182,20 @@
     max-width: 52ch;
 }
 
-/* Pill button — gradient, lift on hover */
+/* Layout only. The colour, gradient, radius, weight and hover all come from
+   the shared primary in style.css so this matches the hero's "Schedule a Call"
+   — footer.css is imported last, so anything restated here would silently win
+   and put the old washed-out gradient back. */
 .cta-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.55rem;
-    font-family: var(--font-title-face), var(--body-font);
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #fff;
-    padding: 0.85rem 2.6rem;
-    border: none;
-    border-radius: var(--footer-pill);
-    background: linear-gradient(90deg, var(--blue-400) 0%, var(--blue-500) 56%, var(--blue-900) 100%);
-    box-shadow: 0 10px 15px rgba(0, 84, 177, 0.10);
+    font-size: 0.97rem;
+    padding: 1rem 2.1rem;
+    min-width: 17rem;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
-}
-
-.cta-button {
-    min-width: 272px;
-}
-
-.cta-button:hover {
-    box-shadow: 0 18px 30px rgba(0, 84, 177, 0.26);
-}
-
-.cta-button i {
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cta-button:hover i {
-    transform: translateX(4px);
 }
 
 /* ============================  FOOTER  =================================== */
@@ -249,8 +229,14 @@
 }
 
 /* The whole link-columns block hugs the right edge, clearing the artwork's
-   circle patterns in the middle-left of the background. */
-.site-footer-inner>div:last-child {
+   circle patterns in the middle-left of the background.
+
+   Selects the <nav> by element, not `> div:last-child`. The columns wrapper
+   became a <nav> when it was given a landmark label, and a structural
+   selector that loose silently stops matching the moment the tag changes —
+   which cost the block its width cap and its right alignment with no error
+   anywhere. */
+.site-footer-inner>nav {
     justify-self: end;
     width: 100%;
     max-width: 860px;
@@ -298,8 +284,11 @@
 /* ---- right: link columns ---- */
 .footer-columns {
     display: grid;
-    /* last (Contact) column wider: the address settles into two lines */
-    grid-template-columns: repeat(3, minmax(0, 1fr)) 2.1fr;
+    /* Four EVEN columns. The old `repeat(3, 1fr) 2.1fr` existed solely to give
+       the address room to wrap onto two lines; with contact moved up into the
+       brand block there is nothing left needing the extra width, and even
+       columns read as a deliberate grid instead of a lopsided one. */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 2.5rem 2.25rem;
 }
 
@@ -486,32 +475,10 @@
 
 /* Links keep only the pill highlight on hover — no movement. */
 
-/* ---- Button: gradient sweep + scale + glow on hover ---- */
-.cta-button {
-    background-size: 160% 100%;
-    background-position: 0% 50%;
-    /* glossy bevel: bright top edge, deep lower inset, soft drop */
-    box-shadow:
-        inset 0 2px 1px rgba(255, 255, 255, 0.55),
-        inset 0 -4px 8px rgba(2, 32, 90, 0.28),
-        0 12px 24px rgba(9, 64, 160, 0.35);
-    transition:
-        transform .35s cubic-bezier(.22, 1, .36, 1),
-        box-shadow .35s ease,
-        background-position .55s ease;
-}
-
-.cta-button:hover {
-    box-shadow:
-        inset 0 2px 1px rgba(255, 255, 255, 0.6),
-        inset 0 -4px 8px rgba(2, 32, 90, 0.3),
-        0 18px 34px rgba(9, 64, 160, 0.45);
-}
-
-.cta-button:hover {
-    background-position: 100% 50%;
-    box-shadow: 0 18px 34px rgba(0, 84, 177, .34);
-}
+/* The button deliberately has no rules in this layer. It used to restate the
+   gradient sweep plus a glossy inset bevel, which is what made the CTA read as
+   a lighter, shinier control than the hero's "Schedule a Call". It now inherits
+   the shared primary in style.css. */
 
 /* ---- Social: glow only, no movement ---- */
 /* No `display` here: the icons are centred flex circles, and re-declaring
@@ -552,11 +519,43 @@
 }
 
 /* contact column: icon + text rows — same type as the link lists */
+/* ---- contact block, now under the wordmark ---- */
+
+/* <address> defaults to italic in every engine — reset it, the block is a
+   contact list rather than a quotation. */
+.footer-contact {
+    font-style: normal;
+    margin-top: 1.75rem;
+    /* Matches .footer-tagline so the wordmark, the line under it and this
+       block share one left-hand measure instead of three different ones. */
+    max-width: 34ch;
+}
+
+.footer-contact-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .footer-contact-item {
     display: flex;
     align-items: flex-start;
     gap: 0.6rem;
     padding: 0.4rem 0;
+}
+
+/* Underline on hover only — three permanently underlined lines directly
+   under the wordmark fought with it for attention. */
+.footer-contact-item a {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-contact-item a:hover,
+.footer-contact-item a:focus-visible {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 .footer-contact-item a,

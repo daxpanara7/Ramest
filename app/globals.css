@@ -10,6 +10,8 @@
 @import "../styles/blog.css";
 @import "../styles/testimonials.css";
 @import "../styles/footer.css";
+/* Must stay last — see the file header. */
+@import "../styles/interaction.css";
 
 :root {
   --body-font: var(--font-body-face), "Inter", sans-serif;

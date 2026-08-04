@@ -1773,14 +1773,24 @@
 }
 
 @media (max-width: 1100px) {
-  .svc-timeline {
+  /* The [data-steps] column rules above are more specific than a bare
+     .svc-timeline, and a media query adds no specificity — so the stacked
+     layout has to repeat those selectors or the desktop grid never releases. */
+  .svc-timeline,
+  .svc-timeline[data-steps="3"],
+  .svc-timeline[data-steps="4"],
+  .svc-timeline[data-steps="5"],
+  .svc-timeline--four {
     grid-template-columns: 1fr;
     gap: 1.75rem;
     max-width: 34rem;
     margin: 0 auto;
   }
 
-  .svc-timeline::before {
+  .svc-timeline::before,
+  .svc-timeline[data-steps="3"]::before,
+  .svc-timeline[data-steps="4"]::before,
+  .svc-timeline[data-steps="5"]::before {
     top: 0.25rem;
     bottom: 0.25rem;
     left: 1.6rem;

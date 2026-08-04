@@ -96,10 +96,30 @@
     flex: 0 0 auto;
 }
 
-.blog-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(3, 87, 168, 0.28);
-    box-shadow: 0 22px 46px -30px rgba(3, 87, 168, 0.5);
+/* Hover lift, mouse only.
+ *
+ * `@media (hover: hover) and (pointer: fine)` is the fix for phones: a tap on
+ * a touch screen leaves :hover stuck on the card until you tap elsewhere, so
+ * one card sat raised with a shadow while the rest did not — read as the page
+ * "fluctuating" while scrolling a tapped list.
+ *
+ * `html:not(.is-scrolling)` is the fix for desktop: without it, every card
+ * that slides under a stationary cursor runs a 0.3s lift plus a 46px-blur
+ * shadow repaint, so a single wheel gesture can kick off half a dozen
+ * overlapping animations. The page was never dropping frames — it was
+ * animating rows nobody hovered on purpose. */
+@media (hover: hover) and (pointer: fine) {
+    html:not(.is-scrolling) .blog-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(3, 87, 168, 0.28);
+        box-shadow: 0 22px 46px -30px rgba(3, 87, 168, 0.5);
+    }
+}
+
+/* No transition while scrolling either — otherwise leaving the suppressed
+   state animates back and reintroduces the same movement. */
+html.is-scrolling .blog-card {
+    transition: none;
 }
 
 /* Cover strip. Posts have no image yet, so this is a brand gradient with the
@@ -222,8 +242,10 @@
     transition: transform 0.3s ease;
 }
 
-.blog-card:hover .blog-card-more i {
-    transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+    html:not(.is-scrolling) .blog-card:hover .blog-card-more i {
+        transform: translateX(3px);
+    }
 }
 
 .blog-empty {
@@ -1025,15 +1047,22 @@
 }
 
 /* White pill on the blue card — the site's primary blue would vanish here. */
+/* background-image:none, not just a background-color — the shared primary
+   paints its blue gradient as a background *image*, which would sit on top of
+   this white fill and make the button invisible against the blue card. */
 .inquiry-actions .button-primary {
     background-color: #fff;
+    background-image: none;
     color: var(--first-color);
     min-width: 11.5rem;
+    box-shadow: 0 10px 24px -14px rgba(0, 20, 55, 0.8);
 }
 
 .inquiry-actions .button-primary:hover {
     background-color: #EAF3FF;
+    background-image: none;
     color: var(--first-color-alt);
+    box-shadow: 0 14px 30px -14px rgba(0, 20, 55, 0.9);
 }
 
 .inquiry-actions .button-primary .btn-spinner {

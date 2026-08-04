@@ -119,13 +119,22 @@
 
 @media (max-width: 768px) {
     .perks-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
     }
 }
 
-@media (max-width: 480px) {
+/* Two columns below ~640px leaves each card too narrow to hold a line of
+   text — drop to one, on the same breakpoint the values grid uses. */
+@media (max-width: 640px) {
     .perks-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .perk-card {
+        padding: 1.5rem 1.4rem;
     }
 }
 

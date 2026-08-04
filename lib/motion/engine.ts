@@ -35,14 +35,19 @@ export function initHomeMotion(): () => void {
        gesture travels. 0.11 took ~20 frames to converge, which is what made
        the stacked sections feel heavy — you scrolled, then waited for the
        page to arrive. 0.18 lands in roughly half that: still visibly
-       smoothed, no longer laggy. */
-    lerp: 0.18,
+       smoothed, no longer laggy. 0.22 tightens it once more so the page
+       tracks the wheel rather than trailing it — past ~0.3 the smoothing
+       stops being visible at all and it may as well be native scroll. */
+    lerp: 0.22,
     /* Distance per wheel notch. This is the actual "scroll speed" control —
-       1 meant a full first-to-last pass through the stacked sections took
-       far more wheeling than it should. 1.35 covers the page noticeably
-       faster while staying under the point where a single notch skips past
-       a whole stacked card. */
-    wheelMultiplier: 1.35,
+       1 meant a full first-to-last pass through the stacked sections took far
+       more wheeling than it should, and 1.35 was still a long haul across a
+       ~10,900px homepage. 1.8 covers that in roughly half the notches.
+
+       This is the ceiling worth using: the stacked cards hand over across
+       roughly one viewport each, so beyond ~2 a single notch can jump past a
+       whole card and the stack reads as a cut rather than a transition. */
+    wheelMultiplier: 1.8,
     /* syncTouch was ON and caused the mobile stutter. It takes momentum away
        from the browser's compositor and re-drives it from JS, so every frame
        has to wait on the main thread — on a phone that reads as juddering

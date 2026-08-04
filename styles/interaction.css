@@ -1,0 +1,111 @@
+/* ===========================================================================
+   POINTER / SCROLL INTERACTION GUARDS
+
+   Imported last, on purpose: every rule here exists to neutralise a :hover
+   effect declared in an earlier sheet, and CSS resolves ties by source order.
+   Moving this import up the list silently disables the whole file.
+
+   Two problems, both reported as "jitter" or "the page fluctuates":
+
+   1. DESKTOP — cards animate `transform` and a large-blur `box-shadow` on
+      hover. Scrolling with the cursor parked over the grid drags every card
+      through :hover in turn, so one wheel gesture starts a queue of 0.3s
+      lifts and shadow repaints. Frame profiling shows the pages paint fine
+      when nothing is hovered (blog index: p50 16.7ms, p99 17.6ms, zero frames
+      over 32ms across a full-page scroll) — the cost is entirely these
+      unintended hovers. ClientEffects marks <html> while a scroll is in
+      flight and the effects sit out until it stops.
+
+   2. TOUCH — a tap leaves :hover latched on the tapped card until you tap
+      somewhere else. One card stays lifted and shadowed while the rest are
+      flat, which reads as the list shifting under your thumb.
+   =========================================================================== */
+
+/* Every card that lifts on hover. Kept as one list rather than edited into
+   each sheet so the originals stay readable and this stays reversible. */
+.blog-card,
+.hx-card,
+.svc-card,
+.svc-process-card,
+.svc-related-card,
+.svc-why-card,
+.svc-stack-card,
+.service-card,
+.team-card,
+.why-card,
+.mv-card,
+.perk-card,
+.value-card,
+.cert-card {
+    /* Hint the compositor only for the property that actually moves. Without
+       this the browser re-rasterises the card's shadow on the main thread
+       each frame of the lift. */
+    will-change: auto;
+}
+
+html.is-scrolling .blog-card:hover,
+html.is-scrolling .hx-card:hover,
+html.is-scrolling .svc-card:hover,
+html.is-scrolling .svc-process-card:hover,
+html.is-scrolling .svc-related-card:hover,
+html.is-scrolling .svc-why-card:hover,
+html.is-scrolling .svc-stack-card:hover,
+html.is-scrolling .service-card:hover,
+html.is-scrolling .team-card:hover,
+html.is-scrolling .why-card:hover,
+html.is-scrolling .mv-card:hover,
+html.is-scrolling .perk-card:hover,
+html.is-scrolling .value-card:hover,
+html.is-scrolling .cert-card:hover {
+    transform: none;
+}
+
+/* Suppress the transition too. Without it, the moment scrolling stops the
+   card animates from the suppressed state into the hovered one — the same
+   movement, just delayed by 120ms. */
+html.is-scrolling .blog-card,
+html.is-scrolling .hx-card,
+html.is-scrolling .svc-card,
+html.is-scrolling .svc-process-card,
+html.is-scrolling .svc-related-card,
+html.is-scrolling .svc-why-card,
+html.is-scrolling .svc-stack-card,
+html.is-scrolling .service-card,
+html.is-scrolling .team-card,
+html.is-scrolling .why-card,
+html.is-scrolling .mv-card,
+html.is-scrolling .perk-card,
+html.is-scrolling .value-card,
+html.is-scrolling .cert-card {
+    transition: none;
+}
+
+/* Touch devices: no hover lift at all. `hover: none` matches phones and
+   tablets; a mouse plugged into the same device still gets the full effect
+   because the desktop rules live outside this query. */
+@media (hover: none) {
+
+    .blog-card:hover,
+    .hx-card:hover,
+    .svc-card:hover,
+    .svc-process-card:hover,
+    .svc-related-card:hover,
+    .svc-why-card:hover,
+    .svc-stack-card:hover,
+    .service-card:hover,
+    .team-card:hover,
+    .why-card:hover,
+    .mv-card:hover,
+    .perk-card:hover,
+    .value-card:hover,
+    .cert-card:hover {
+        transform: none;
+    }
+
+    /* Arrow nudges are the same latched-state problem in miniature. */
+    .blog-card:hover .blog-card-more i,
+    .hx-card:hover .hx-card-arrow,
+    .svc-card:hover .svc-card-icon {
+        transform: none;
+    }
+}

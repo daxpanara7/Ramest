@@ -40,16 +40,33 @@ export const SITE = {
  * Public profiles, used for both the footer icons and Organization.sameAs —
  * the strongest Knowledge Graph association signal.
  *
- * ⚠️ ADD REAL URLS HERE. Everything downstream is wired up and will light up
- * the moment entries are added: the footer renders icons only for profiles
- * listed here, and sameAs is derived from the same list. Only add URLs that
- * resolve — a broken sameAs is worse than an absent one.
+ * Add more as they go live (Instagram, X, GitHub, Clutch, Crunchbase); the
+ * footer and sameAs both read this one list, so they cannot drift. Only add
+ * URLs that resolve — a broken sameAs is worse than an absent one.
  *
- * Example:
- *   { label: "LinkedIn", icon: "fa-brands fa-linkedin-in",
- *     href: "https://www.linkedin.com/company/ramest-technolabs/" },
+ * Icons are inline SVG path data, NOT `fa-brands` classes. fa-brands-400.woff2
+ * is deliberately not shipped (vendor/fontawesome carries only the solid
+ * face), so a brand class renders an empty box and re-adding the file would
+ * drag 106 KB back onto the critical path of every page. Grab the path from
+ * the Font Awesome brand SVG and paste it here instead — about 1 KB, no
+ * request.
  */
-export const SOCIAL_LINKS: { label: string; icon: string; href: string }[] = [];
+export type SocialLink = {
+  label: string;
+  href: string;
+  /** Inline SVG geometry, rendered by the footer. */
+  viewBox: string;
+  path: string;
+};
+
+export const SOCIAL_LINKS: SocialLink[] = [
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/ramest-technolabs/",
+    viewBox: "0 0 448 512",
+    path: "M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z",
+  },
+];
 
 /** sameAs values for Organization schema — derived so the two never drift. */
 export const SOCIAL_PROFILES: string[] = SOCIAL_LINKS.map((s) => s.href);

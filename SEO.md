@@ -80,22 +80,32 @@ because buyers and Google both verify them:
 
 ## 2. Blocked — needs information only you have
 
-### 🔴 Social profile URLs (highest-value remaining code change)
+### 🟡 Social profile URLs — LinkedIn live, others still missing
 
-`Organization.sameAs` is the strongest Knowledge Graph association signal and
-is currently **empty**. Everything downstream is already wired: add entries to
-`SOCIAL_LINKS` in `lib/site.ts` and both the footer icons and `sameAs` light up
-automatically.
+`Organization.sameAs` is the strongest Knowledge Graph association signal. The
+company **LinkedIn page is now wired up**; every other profile is still absent.
+Add entries to `SOCIAL_LINKS` in `lib/site.ts` and both the footer icons and
+`sameAs` light up automatically.
 
 ```ts
-export const SOCIAL_LINKS = [
-  { label: "LinkedIn",  icon: "fa-brands fa-linkedin-in", href: "https://www.linkedin.com/company/…" },
-  { label: "Instagram", icon: "fa-brands fa-instagram",   href: "https://www.instagram.com/ramest_technolabs/" },
-  { label: "GitHub",    icon: "fa-brands fa-github",      href: "https://github.com/…" },
+export const SOCIAL_LINKS: SocialLink[] = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/ramest-technolabs/",
+    viewBox: "0 0 448 512", path: "M100.28 448H7.4V148.9…" },
 ];
 ```
 
+Note the shape: **inline SVG path data, not `fa-brands` classes.** The
+`fa-brands-400.woff2` file is deliberately not shipped (`vendor/fontawesome`
+carries only the solid face), so a brand class renders an empty box, and
+re-adding the file puts 106 KB back on the critical path of every page. Copy
+the `d` attribute out of the Font Awesome brand SVG instead.
+
 Only add URLs that resolve — a broken `sameAs` is worse than an absent one.
+
+**Off-site, and worth more than the code:** the LinkedIn page's own *Website*
+field must point at `https://www.ramesttechnolabs.com`. `sameAs` is one half of
+a two-way handshake; Google trusts the association far more when the profile
+links back.
 
 ### 🟡 Review schema
 

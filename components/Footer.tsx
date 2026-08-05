@@ -16,31 +16,6 @@ import { serviceCategories } from "@/lib/services";
  */
 
 /**
- * Icons are inline SVG, not Font Awesome brand classes. Two `fa-brands`
- * glyphs pulled the 106 KB fa-brands-400.woff2 onto the critical path of
- * every page — it was the single slowest request in the Lighthouse trace at
- * 911 ms. Inlining two paths costs about 1 KB and downloads nothing.
- *
- * Icon row shown until the real profile URLs land in SOCIAL_LINKS
- * (lib/site.ts). Rendered as inert <span>s, not <a href="#">, so nothing is
- * focusable or clickable while it has nowhere to go — a dead link is worse
- * than a plain glyph. The moment SOCIAL_LINKS is populated these are
- * replaced automatically by the real anchors below.
- */
-const SOCIAL_PLACEHOLDERS = [
-  {
-    label: "LinkedIn",
-    path: "M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z",
-    viewBox: "0 0 448 512",
-  },
-  {
-    label: "Instagram",
-    path: "M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z",
-    viewBox: "0 0 448 512",
-  },
-];
-
-/**
  * The column that replaced Contact.
  *
  * Chosen for what the footer was actually missing, not to fill space: before
@@ -196,36 +171,38 @@ export default function Footer() {
             <Link href="/legal">Terms &amp; Conditions</Link>
           </nav>
 
-          {/* Real anchors once profiles exist — SOCIAL_LINKS is the same
-              array Organization.sameAs is derived from — otherwise the inert
-              placeholder glyphs. */}
+          {/* SOCIAL_LINKS is the same array Organization.sameAs is derived
+              from (lib/site.ts), so the visible profile links and the
+              structured data can never disagree — which is the pairing Google
+              cross-checks when tying the site to the company entity.
+
+              rel="me" is the identity half of that: it marks the profile as
+              another presence of this same entity rather than an ordinary
+              outbound link.
+
+              Icons are inline SVG (about 1 KB, no request), never `fa-brands`
+              classes — see the note in lib/site.ts. */}
           <div className="footer-social">
-            {SOCIAL_LINKS.length > 0
-              ? SOCIAL_LINKS.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    aria-label={s.label}
-                    target="_blank"
-                    rel="noopener noreferrer me"
-                  >
-                    <i className={s.icon} aria-hidden="true" />
-                  </a>
-                ))
-              : SOCIAL_PLACEHOLDERS.map((s) => (
-                  <span key={s.label} className="footer-social-placeholder">
-                    <svg
-                      viewBox={s.viewBox}
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path d={s.path} />
-                    </svg>
-                  </span>
-                ))}
+            {SOCIAL_LINKS.map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                aria-label={`${SITE.name} on ${s.label}`}
+                target="_blank"
+                rel="noopener noreferrer me"
+              >
+                <svg
+                  viewBox={s.viewBox}
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d={s.path} />
+                </svg>
+              </a>
+            ))}
           </div>
         </div>
       </div>

@@ -337,10 +337,10 @@
     margin-left: auto;
 }
 
-/* Anchors and the inert placeholders share one appearance, so swapping in
-   real URLs changes behaviour only — never the look. */
-.footer-social a,
-.footer-social-placeholder {
+/* One circular chip per profile. Sized in rem so the row scales with the
+   bottom bar's own type, and the inline SVG inside inherits `color` through
+   fill="currentColor". */
+.footer-social a {
     display: inline-flex;
     align-items: center;
     justify-content: center;

@@ -28,6 +28,9 @@ yarn-error.log*
 
 # typescript
 next-env.d.ts
+# Incremental compiler cache — rewritten by every build, so tracking it meant
+# an unrelated 240KB diff in commits that only touched a stylesheet.
+*.tsbuildinfo
 
 # backend secrets & build
 backend/.env

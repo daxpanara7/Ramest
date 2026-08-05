@@ -420,12 +420,28 @@ export default function Page() {
                     already reports — not a second, different claim. */}
                 <div className="ci-proof">
                   {/* Four faces, as in the reference — the whole set would
-                      run into the headline. Eager, not lazy: this sits high
-                      on the page and each file is under 1 KB. */}
+                      run into the headline.
+
+                      Lazy, and it matters more than it looks. These sit about
+                      five viewports down, not "high on the page", and the
+                      files are 4-7 KB each rather than the sub-1 KB the old
+                      note claimed. Left eager, React emits a
+                      <link rel="preload" as="image"> for each one, so ~20 KB
+                      of avatars nobody has scrolled to yet competes with the
+                      render-blocking CSS and the title font for the first
+                      bytes on a phone connection — measurably delaying the
+                      hero H1, which is the LCP element on mobile. */}
                   <div className="ci-faces" aria-hidden="true">
                     {QUOTES.slice(0, 4).map((q) => (
                       <span className="ci-face" key={q.name}>
-                        <img src={q.image} alt="" width={52} height={52} />
+                        <img
+                          src={q.image}
+                          alt=""
+                          width={52}
+                          height={52}
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </span>
                     ))}
                   </div>

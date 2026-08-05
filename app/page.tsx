@@ -193,7 +193,7 @@ const QUOTES = [
 
 const STATS = [
   { value: "7", suffix: "+", label: "Years of Experience" },
-  { value: "30", suffix: "+", label: "Projects Delivered" },
+  { value: "40", suffix: "+", label: "Projects Delivered" },
   { value: "100", suffix: "%", label: "Client Satisfaction" },
   { value: "7", suffix: "+", label: "Countries Served" },
 ];
@@ -447,7 +447,7 @@ export default function Page() {
                   </div>
                   <div className="ci-proof-rule" />
                   <p className="ci-proof-stat">
-                    Standing strong with <strong>30+</strong> projects delivered
+                    Standing strong with <strong>40+</strong> projects delivered
                   </p>
                 </div>
               </div>

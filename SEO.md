@@ -80,12 +80,12 @@ because buyers and Google both verify them:
 
 ## 2. Blocked — needs information only you have
 
-### 🟡 Social profile URLs — LinkedIn live, others still missing
+### 🟡 Social profile URLs — LinkedIn + Instagram live, others still missing
 
 `Organization.sameAs` is the strongest Knowledge Graph association signal. The
-company **LinkedIn page is now wired up**; every other profile is still absent.
-Add entries to `SOCIAL_LINKS` in `lib/site.ts` and both the footer icons and
-`sameAs` light up automatically.
+company **LinkedIn and Instagram pages are now wired up**; other profiles are
+still absent. Add entries to `SOCIAL_LINKS` in `lib/site.ts` and both the
+footer icons and `sameAs` light up automatically.
 
 ```ts
 export const SOCIAL_LINKS: SocialLink[] = [

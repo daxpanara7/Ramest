@@ -1,0 +1,59 @@
+/* ===========================================================================
+   FINISHING SYSTEM — the details that make a site feel designed end to end:
+   branded text selection, accessible focus rings, a quiet branded scrollbar,
+   and crisper font rendering.
+
+   These rules used to live at the bottom of homepage.css. That was fine while
+   every stylesheet was imported globally, but homepage.css is now loaded only
+   by the homepage — and these are not homepage rules. Leaving them there
+   silently removed antialiasing, the focus ring and the scrollbar styling
+   from every other page: a visual-regression diff of all 15 routes showed
+   1-5% of pixels changing on pages that should not have changed at all,
+   because `-webkit-font-smoothing` alters how every glyph on the page is
+   rasterised.
+
+   Anything added here applies site-wide. Homepage-specific styling belongs in
+   homepage.css.
+   =========================================================================== */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+::selection {
+    background: #0357A8;
+    color: #fff;
+}
+
+:focus-visible {
+    outline: 2px solid #3898EC;
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* quiet branded scrollbar (WebKit + Firefox) */
+html {
+    scrollbar-color: rgba(3, 87, 168, 0.35) transparent;
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(3, 87, 168, 0.30);
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(3, 87, 168, 0.5);
+}

@@ -15,8 +15,16 @@
     /* Very light version */
     /* Deep footer blue: headings read as blue, still AA on white. */
     --title-color: #002B66;
-    --text-color: hsl(var(--hue), 8%, 45%);
-    --text-color-light: hsl(var(--hue), 8%, 65%);
+    /* Both greys are set by WCAG AA (4.5:1 for text under 24px), measured
+       against the lightest surfaces they actually sit on — white, the body
+       tint #FBFCFE, the stats band #ECF2F9 and the apply card #F6F8FC.
+       There is very little room on near-white: 45% missed on the stats band
+       (4.27:1) and the old 65% "light" was 2.3:1, which is not readable text
+       by any standard. The two tokens necessarily end up close together —
+       that is what AA costs on a white page — so hierarchy between body copy
+       and hints is carried by size and weight rather than by lightness. */
+    --text-color: hsl(var(--hue), 8%, 42%);
+    --text-color-light: hsl(var(--hue), 8%, 44%);
     --body-color: #FBFCFE;
     --container-color: #fff;
     --border-color: rgba(0, 0, 0, 0.1);
@@ -217,16 +225,53 @@ img {
     }
 }
 
-/* ==================== REVEAL ANIMATIONS ==================== */
+/* ==================== REVEAL ANIMATIONS ====================
+
+   The hidden state is scoped to `html.js-reveal`, a class added by the inline
+   bootstrap in <head> (lib/reveal-bootstrap.ts). If that script never runs —
+   JS disabled, blocked, or a browser without IntersectionObserver — the
+   selector never matches and every section renders fully visible. Hiding by
+   default meant a JS-less visit saw the hero and then a blank page all the
+   way down to the footer, and a slow connection saw the same void until the
+   React bundle finished hydrating.
+
+   `transition: all` was also wrong: it animated colour, shadow and border on
+   any state change, which is real paint work across whole sections. Only the
+   two properties that actually move are transitioned now. */
 .reveal {
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.js-reveal .reveal:not(.active) {
     opacity: 0;
     transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .reveal.active {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Set by the bootstrap on sections that were already in the viewport when it
+   ran. They are painted, not animated — nothing above the fold should fade in
+   under a user who is already looking at it, and a half-faded section is
+   genuinely unreadable while it lasts. */
+.reveal.reveal-instant,
+.reveal.reveal-instant .hx-rise {
+    transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .js-reveal .reveal:not(.active) {
+        opacity: 1;
+        transform: none;
+    }
+
+    .reveal {
+        transition: none;
+    }
 }
 
 .reveal-delayed {
@@ -1335,6 +1380,415 @@ img {
 
 .form-input:focus {
     border-color: var(--first-color);
+}
+
+/* ---- Invalid fields ----------------------------------------------------
+   Keyed off aria-invalid rather than a class, so the styling cannot drift out
+   of step with what assistive tech is told: if it looks wrong, it is also
+   announced as wrong. Deliberately not :invalid — the browser applies that
+   from the moment an empty required field renders, which would paint the whole
+   form red before anyone has typed. */
+.form-input[aria-invalid="true"],
+.apply-field input[aria-invalid="true"],
+[aria-invalid="true"] > .form-input {
+    border-color: #D93025;
+}
+
+.form-input[aria-invalid="true"]:focus,
+.apply-field input[aria-invalid="true"]:focus {
+    border-color: #D93025;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, .14);
+}
+
+.apply-field input[aria-invalid="true"]:focus {
+    box-shadow: 0 1px 0 0 #D93025;
+}
+
+.field-error {
+    margin: 0.4rem 0 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #C5221F;
+}
+
+/* ---- Field rows --------------------------------------------------------
+   Single column on purpose. The contact card is a ~420px sidebar panel, so
+   two-up columns leave roughly 140px of usable width per control — enough to
+   clip "Select Project Budget" mid-word and to squeeze the phone field's
+   country trigger against its own input. The class stays as grouping for the
+   markup; it just does not split the row. */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* ---- Phone field on the light contact card -----------------------------
+   PhoneField's own styles live with the homepage inquiry form, whose card is
+   dark — its box is a translucent white on a navy panel, which is invisible
+   here. These restate the same control in the light palette so it matches the
+   inputs above it. Scoped to .contact-form so the homepage keeps its version
+   untouched. */
+.contact-form .phone-field {
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--body-color);
+}
+
+.contact-form .phone-field.is-open,
+.contact-form .phone-field:focus-within {
+    border-color: var(--first-color);
+}
+
+/* Invalid wins over :focus-within — the field is still wrong while you are
+   standing in it, and reverting to the blue focus ring reads as "fixed".
+   Border only, no glow: the plain inputs above it are styled the same way, and
+   a ring on this one control alone makes it look like the worse error. */
+.contact-form .phone-field.is-invalid,
+.contact-form .phone-field.is-invalid:focus-within {
+    border-color: #D93025;
+}
+
+.contact-form .phone-country {
+    color: var(--text-color);
+    background: transparent;
+    border-radius: 0.45rem 0 0 0.45rem;
+}
+
+/* Beats the dark-theme rule, which strips the border for the pill layout but
+   also hands the input white text on a white card. */
+.contact-form .phone-input,
+.contact-form .phone-input:focus {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 1rem 1rem 1rem 0.6rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+    color: var(--text-color);
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+}
+
+/* ---- Themed select -----------------------------------------------------
+   The closed control. It is a button, not a <select>, so that the open list
+   can be the site's own .picker-pop panel below rather than the operating
+   system's grey menu — see components/sections/SelectField.tsx. Everything
+   here is sized to match .form-input exactly, since the two sit in the same
+   column. */
+.select-field {
+    position: relative;
+}
+
+.select-field-input {
+    display: block;
+    width: 100%;
+    /* Right padding leaves room for the chevron the wrapper draws. */
+    padding: 1rem 2.75rem 1rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--body-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    line-height: 1.2;
+    text-align: left;
+    outline: none;
+    transition: .3s;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.select-field-input:focus-visible,
+.select-field.is-open .select-field-input {
+    border-color: var(--first-color);
+}
+
+/* Unchosen state reads as a placeholder rather than an answer, matching the
+   grey of the real inputs' placeholder text. */
+.select-field-input.is-placeholder {
+    color: var(--text-color-light, #6b7280);
+}
+
+/* A long service name has to end in an ellipsis, not push the chevron out of
+   the control or wrap it onto a second line. */
+.select-field-value {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-field-chevron {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-color-light, #6b7280);
+    transition: transform 0.2s ease;
+    /* The chevron is decoration sitting over the control; without this the
+       click lands on the SVG and never opens the list. */
+    pointer-events: none;
+}
+
+.select-field.is-open .select-field-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* ---- Shared picker panel -----------------------------------------------
+   The dropped-open list for every picker on the site: the country code list
+   in PhoneField and the service and budget lists in SelectField. One panel,
+   so two dropdowns on the same form can never disagree about what a dropdown
+   looks like.
+
+   Portalled to <body>, because the cards these open inside clip their own
+   overflow for the corner radius, and positioned by usePickerPopover. It is
+   navy on light forms as well as dark ones — the panel is a surface of its
+   own, floating over the page, the way a menu is. */
+.picker-pop {
+    position: fixed;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(180deg, #0A3E82 0%, #052A55 100%);
+    box-shadow: 0 26px 60px -22px rgba(0, 12, 35, 0.9);
+    color: #fff;
+    animation: picker-pop-in 0.16s ease-out both;
+}
+
+@keyframes picker-pop-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .picker-pop { animation: none; }
+}
+
+.picker-search {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex: 0 0 auto;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.picker-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.picker-search input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.picker-list {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0.35rem;
+    overflow-y: auto;
+    /* Stops a flick past the end of the list from scrolling the page behind. */
+    overscroll-behavior: contain;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.picker-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.picker-list::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.28);
+    background-clip: padding-box;
+}
+
+.picker-group {
+    padding: 0.65rem 0.75rem 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.52);
+}
+
+.picker-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 0;
+    border-radius: 0.6rem;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.picker-opt.is-selected {
+    background: rgba(255, 255, 255, 0.09);
+    font-weight: 600;
+}
+
+/* One highlight for both mouse and keyboard: hovering moves the same index the
+   arrow keys move, so there is never a second, competing highlight. */
+.picker-opt.is-active {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.picker-opt:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: -2px;
+}
+
+.picker-opt-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.picker-opt-meta {
+    flex: 0 0 auto;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.picker-opt.is-active .picker-opt-meta,
+.picker-opt.is-selected .picker-opt-meta {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+/* Reserved on every row, drawn only on the selected one — otherwise the dial
+   codes jump sideways as the selection moves. */
+.picker-opt::after {
+    content: "";
+    flex: 0 0 0.5rem;
+    height: 0.8rem;
+    margin-left: 0.1rem;
+}
+
+.picker-opt.is-selected::after {
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    height: 0.72rem;
+    transform: rotate(45deg) translate(-1px, -2px);
+}
+
+.picker-empty {
+    padding: 1.2rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---- Attachment --------------------------------------------------------
+   The file input is hidden from sight but NOT from the accessibility tree or
+   the tab order (display:none would remove both). Its <label> is the visible
+   control, which is why clicking the label opens the picker for free. */
+.form-attach-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.form-attach-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1.15rem;
+    border-radius: 0.5rem;
+    border: 1px dashed var(--border-color);
+    background-color: var(--body-color);
+    color: var(--title-color, var(--text-color));
+    font-size: var(--small-font-size, 0.875rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.form-attach-label:hover {
+    border-color: var(--first-color);
+    color: var(--first-color);
+}
+
+/* Focus lives on the hidden input, so the ring has to be drawn on the label
+   the user actually sees. */
+.form-attach-input:focus-visible+.form-attach-label {
+    border-color: var(--first-color);
+    box-shadow: 0 0 0 3px rgba(3, 87, 168, 0.18);
+}
+
+.form-attach-hint,
+.form-attach-file {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-color-light, #6b7280);
+}
+
+.form-attach-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Long filenames truncate rather than wrapping the row onto three lines. */
+.form-attach-name {
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.form-attach-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.form-attach-remove:hover {
+    border-color: var(--first-color);
+    color: var(--first-color);
 }
 
 /* ==================== FOOTER ==================== */

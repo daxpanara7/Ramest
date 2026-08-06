@@ -1,44 +1,30 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+declare global {
+  interface Window {
+    __reveal?: { bind: () => void };
+  }
+}
 
 export default function ClientEffects() {
   const pathname = usePathname();
+  /* The inline <head> bootstrap has already bound the observer for the page
+     we loaded on. Re-binding here would remove `.active` from sections the
+     user is currently looking at and fade them back in — a flash on every
+     first render. So this only runs from the SECOND pathname onwards, i.e.
+     for client-side navigations, which is the only case the bootstrap cannot
+     see. */
+  const firstPath = useRef(true);
 
   useEffect(() => {
-    const revealElements = document.querySelectorAll(".reveal");
-
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "0px 0px -10% 0px",
-      }
-    );
-
-    revealElements.forEach((el) => {
-      // Re-bind after client navigation — without this, sections stay opacity:0
-      el.classList.remove("active");
-      revealObserver.observe(el);
-    });
-
-    // Reveal anything already in view immediately (e.g. stats band under hero)
-    requestAnimationFrame(() => {
-      revealElements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const inView =
-          rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
-        if (inView) el.classList.add("active");
-      });
-    });
+    if (firstPath.current) {
+      firstPath.current = false;
+    } else {
+      window.__reveal?.bind();
+    }
 
     /* Marks the document while a scroll is in flight.
      *
@@ -70,7 +56,6 @@ export default function ClientEffects() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      revealObserver.disconnect();
       window.removeEventListener("scroll", onScroll);
       if (idle) clearTimeout(idle);
       root.classList.remove("is-scrolling");

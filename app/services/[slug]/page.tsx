@@ -435,8 +435,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                     <Link href={item.href}>{item.title}</Link>
                   </h3>
                   <p className="svc-card-desc">{item.shortDescription}</p>
+                  {/* Names the destination for screen readers and link-list
+                      tools; "Learn more" alone repeats across every card. */}
                   <Link href={item.href} className="svc-card-link">
                     Learn more
+                    <span className="sr-only"> about {item.title}</span>
                     <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                   </Link>
                 </article>

@@ -1,11 +1,11 @@
 "use client";
 
 // Ported from ramest-admin-hub (Vite/TanStack) to Next.js. The user menu and
-// logout are wired to the real auth context; notifications stay on sample
-// data until a notifications API exists.
+// logout are wired to the real auth context; the bell reads the real
+// ActivityLog via /activity.
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Plus, ChevronRight } from "lucide-react";
+import { Bell, Plus, ChevronRight, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -18,10 +18,13 @@ import { Badge } from "@/components/ui/badge";
 import { useApi } from "@/lib/admin/use-api";
 import { relativeTime } from "@/lib/admin/format";
 import { useAuth } from "@/lib/admin/auth-context";
+import { toNotification, type ActivityEvent } from "@/lib/admin/notifications";
+import { cn } from "@/lib/utils";
 
 const CRUMBS: Record<string, string> = {
   dashboard: "Dashboard", blog: "Blog", categories: "Categories", tags: "Tags",
-  leads: "Contact Leads", newsletter: "Newsletter", seo: "SEO", geo: "GEO", aeo: "AEO",
+  leads: "Contact Leads", applications: "Job Applications",
+  newsletter: "Newsletter", seo: "SEO", geo: "GEO", aeo: "AEO",
   media: "Media Library", users: "Users", roles: "Roles", settings: "Settings",
   general: "General", company: "Company", email: "Email", security: "Security",
   logs: "Logs", activity: "Activity Logs", audit: "Audit Logs", profile: "Profile",
@@ -34,17 +37,24 @@ export function AppHeader() {
   const { user, logout } = useAuth();
   // Drop the leading "admin" segment — it's the app root, not a crumb.
   const parts = pathname.split("/").filter(Boolean).slice(1);
-  // Recent activity doubles as the notification feed — it is the only real
-  // event stream the system has. "Unread" is not modelled server-side, so
-  // the dot reflects whether anything happened in the last 24h rather than
-  // inventing a read/unread flag.
-  const { data: activity } = useApi<{
-    items: { id: string; action: string; entity: string | null; createdAt: string;
-             user: { name: string } | null }[];
-  }>("/activity?take=8");
+  /* Recent activity doubles as the notification feed — it is the only real
+     event stream the system has. Polled every 60s so a submission that lands
+     while the console is open shows up without a reload; "unread" is not
+     modelled server-side, so the count is what arrived in the last 24h
+     rather than an invented read/unread flag.
+
+     Counts INBOUND events only — a new application or enquiry is work waiting
+     for someone. Counting the admin's own edits and logins made the badge
+     permanently non-zero, which is the same as having no badge. */
+  const { data: activity } = useApi<{ items: ActivityEvent[] }>("/activity?take=12", {
+    refreshMs: 60_000,
+  });
   const events = activity?.items ?? [];
   const dayAgo = Date.now() - 86_400_000;
-  const unread = events.filter((e) => new Date(e.createdAt).getTime() >= dayAgo).length;
+  const notifications = events.map((e) => ({ event: e, ...toNotification(e) }));
+  const unread = notifications.filter(
+    (n) => n.kind === "inbound" && new Date(n.event.createdAt).getTime() >= dayAgo,
+  ).length;
   const firstName = user?.name.split(/\s+/)[0] ?? "";
   const initials = user
     ? user.name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()
@@ -100,33 +110,76 @@ export function AppHeader() {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 p-0">
+          <DropdownMenuContent align="end" className="w-[22rem] p-0">
             <div className="flex items-center justify-between border-b px-3 py-2.5">
               <DropdownMenuLabel className="p-0 text-sm">Notifications</DropdownMenuLabel>
-              <Badge variant="secondary" className="text-[10px]">{unread} new</Badge>
+              <Badge
+                variant={unread > 0 ? "default" : "secondary"}
+                className="text-[10px]"
+              >
+                {unread > 0 ? `${unread} new` : "up to date"}
+              </Badge>
             </div>
-            <div className="max-h-80 overflow-auto">
-              {events.length === 0 ? (
+            <div className="max-h-96 overflow-auto">
+              {notifications.length === 0 ? (
                 <p className="px-3 py-8 text-center text-sm text-muted-foreground">
                   No activity yet.
                 </p>
-              ) : events.map((e) => {
-                const fresh = new Date(e.createdAt).getTime() >= dayAgo;
+              ) : notifications.map((n) => {
+                const fresh = new Date(n.event.createdAt).getTime() >= dayAgo;
+                // Inbound = work waiting. Given the primary colour and the
+                // filled dot so it is separable from admin bookkeeping at a
+                // glance, which is the whole point of the panel.
+                const isNew = n.kind === "inbound" && fresh;
                 return (
-                  <div key={e.id} className="flex gap-3 border-b px-3 py-2.5 last:border-0 hover:bg-accent/40">
-                    <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${fresh ? "bg-primary" : "bg-muted"}`} />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{e.action}</p>
-                      <p className="line-clamp-2 text-xs text-muted-foreground">
-                        {e.user?.name ?? "System"}
-                        {e.entity ? ` · ${e.entity}` : ""}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-muted-foreground/70">{relativeTime(e.createdAt)}</p>
-                    </div>
-                  </div>
+                  <DropdownMenuItem
+                    key={n.event.id}
+                    asChild
+                    className="cursor-pointer rounded-none border-b p-0 last:border-0 focus:bg-accent/40"
+                  >
+                    <Link href={n.href} className="flex w-full gap-2.5 px-3 py-2.5">
+                      <span
+                        className={cn(
+                          "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
+                          isNew ? "bg-primary" : fresh ? "bg-primary/35" : "bg-muted",
+                        )}
+                      />
+                      <div className="min-w-0 flex-1">
+                        {/* Module first: which part of the console this belongs
+                            to is the thing you scan for. */}
+                        <div className="flex items-center gap-1.5">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "h-[17px] shrink-0 px-1.5 text-[9.5px] font-medium uppercase tracking-wide",
+                              isNew && "border-primary/30 bg-primary/10 text-primary",
+                            )}
+                          >
+                            {n.module}
+                          </Badge>
+                          {isNew && (
+                            <Inbox className="h-3 w-3 shrink-0 text-primary" aria-label="Needs review" />
+                          )}
+                        </div>
+                        <p className={cn("mt-1 truncate text-[13px]", isNew ? "font-semibold" : "font-medium")}>
+                          {n.title}
+                        </p>
+                        <p className="line-clamp-2 text-xs text-muted-foreground">{n.detail}</p>
+                        <p className="mt-0.5 text-[10px] text-muted-foreground/70">
+                          {relativeTime(n.event.createdAt)}
+                        </p>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
                 );
               })}
             </div>
+            <Link
+              href="/admin/logs/activity"
+              className="block border-t px-3 py-2 text-center text-xs font-medium text-primary hover:bg-accent/40"
+            >
+              View all activity
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
 

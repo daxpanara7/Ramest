@@ -3,8 +3,21 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api-base";
+import { useApiWarmup } from "@/lib/use-api-warmup";
 import { executeRecaptcha } from "@/lib/recaptcha";
 import RecaptchaNotice from "@/components/RecaptchaNotice";
+import PhoneField from "@/components/sections/PhoneField";
+import FieldError from "@/components/forms/FieldError";
+import { fieldAria, useFieldErrors } from "@/lib/useFieldErrors";
+import {
+  LIMITS,
+  validateCompany,
+  validateEmail,
+  validateMessage,
+  validateName,
+  validateOptionalPhone,
+} from "@/lib/form-validation";
+import { DEFAULT_COUNTRY, guessCountry, type Country } from "@/lib/country-codes";
 import { SITE } from "@/lib/site";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -33,20 +46,43 @@ function WhatsAppIcon() {
  * contact page uses, so every enquiry lands in one place in the admin panel
  * regardless of which form captured it.
  *
- * `service` distinguishes the two in the leads table — the contact page
- * leaves it empty, this one records what the visitor said they want built.
+ * `company` distinguishes the two in the leads table — the contact page
+ * leaves it empty, this one asks who the enquiry is from. It replaced a
+ * free-text "what you want to build" box, which duplicated the message field
+ * and produced a column of junk in the admin list; the company name is the
+ * one thing the message body almost never contains and that decides how a
+ * lead gets triaged.
  */
 export default function InquiryForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [service, setService] = useState("");
+  const [country, setCountry] = useState<Country>(DEFAULT_COUNTRY);
+  const [company, setCompany] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const [slow, setSlow] = useState(false);
   const slowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* Per-field rules, mirroring CreateLeadDto. `error` above stays for what the
+     server says back (throttled, captcha, network) — anything that is not
+     about one specific input. */
+  const { errors, validate, revalidate, validateAll } = useFieldErrors({
+    name: validateName,
+    email: validateEmail,
+    phone: validateOptionalPhone,
+    company: validateCompany,
+    message: validateMessage,
+  });
+  const FIELD_IDS = {
+    name: "inq-name",
+    email: "inq-email",
+    phone: "inq-phone",
+    company: "inq-company",
+    message: "inq-message",
+  };
 
   /* Bot filters that work even when reCAPTCHA cannot run (ad blocker, script
      blocked, keys not yet configured). See CreateLeadDto for the rationale —
@@ -57,11 +93,22 @@ export default function InquiryForm() {
     mountedAt.current = performance.now();
   }
 
-  // Same cold-start warm-up as the contact page: the API sleeps when idle.
-  useEffect(() => {
-    fetch(`${API_BASE}/health`, { method: "GET", keepalive: true }).catch(() => {});
+  /* Same cold-start warm-up as the contact page: the API sleeps when idle.
+     Fires on first engagement with the form rather than on mount — see
+     lib/use-api-warmup.ts. The redirect target is prefetched at the same
+     moment, which is still long before the submit that needs it. */
+  const formRef = useApiWarmup<HTMLFormElement>(() => {
     router.prefetch("/thank-you");
-  }, [router]);
+  });
+
+  /* Pre-select the dialling code from the browser locale. Deliberately after
+     mount, not as the initial state: `navigator` does not exist during the
+     server render, so seeding it there would be a hydration mismatch. India
+     stays the default when the locale carries no region. */
+  useEffect(() => {
+    const guess = guessCountry();
+    if (guess) setCountry(guess);
+  }, []);
 
   useEffect(() => () => {
     if (slowTimer.current) clearTimeout(slowTimer.current);
@@ -73,23 +120,17 @@ export default function InquiryForm() {
 
     const n = name.trim(), em = email.trim(), msg = message.trim();
 
-    if (!n || !em) {
-      setError("Please add your name and email.");
+    /* Declared in visual order so validateAll focuses the topmost failure.
+       Every rule here is enforced again server-side — this only saves a round
+       trip and puts the reason next to the input that caused it. */
+    if (
+      !validateAll({ name, email, phone, company, message }, FIELD_IDS)
+    ) {
       setStatus("error");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
-      setError("Please enter a valid email address.");
-      setStatus("error");
-      return;
-    }
-    // Server enforces @MinLength(10) on message; explain it here rather than
-    // letting it come back as a generic 400.
-    if (msg.length < 10) {
-      setError("Please tell us a little more — at least a sentence.");
-      setStatus("error");
-      return;
-    }
+
+    const digits = phone.replace(/\D/g, "");
 
     setStatus("sending");
     setSlow(false);
@@ -105,9 +146,15 @@ export default function InquiryForm() {
         body: JSON.stringify({
           name: n,
           email: em,
-          phone: phone.trim() || undefined,
-          service: service.trim() || undefined,
+          // Stored with the dialling code so the admin can dial it as-is;
+          // without it a bare "9510903725" is unusable from abroad.
+          phone: digits ? `+${country.dial} ${digits}` : undefined,
+          company: company.trim() || undefined,
           message: msg,
+          // Tells the admin which form this came from. This one is short by
+          // design, so service, budget and attachment are always empty here —
+          // without the marker those blanks look like missing data.
+          source: "home",
           recaptchaToken,
           website: honeypotRef.current?.value || undefined,
           elapsedMs: Math.round(performance.now() - mountedAt.current),
@@ -230,34 +277,61 @@ export default function InquiryForm() {
                 <p className="inquiry-title">Your Vision. Our Strategy. Your Success.</p>
               </div>
 
-              <form className="inquiry-form" onSubmit={submit} noValidate>
+              <form
+                ref={formRef}
+                className="inquiry-form"
+                onSubmit={submit}
+                noValidate
+              >
             <div className="inquiry-row">
               <div className="inquiry-field">
                 <label className="sr-only" htmlFor="inq-name">Your name</label>
                 <input id="inq-name" name="name" type="text" autoComplete="name"
                   placeholder="Enter your name*" value={name}
-                  onChange={(e) => setName(e.target.value)} required />
+                  maxLength={LIMITS.name}
+                  onChange={(e) => { setName(e.target.value); revalidate("name", e.target.value); }}
+                  onBlur={(e) => validate("name", e.target.value)}
+                  {...fieldAria("inq-name", errors.name)} required />
+                <FieldError id="inq-name-error" message={errors.name} />
               </div>
               <div className="inquiry-field">
                 <label className="sr-only" htmlFor="inq-email">Email address</label>
                 <input id="inq-email" name="email" type="email" autoComplete="email"
                   placeholder="Enter email address*" value={email}
-                  onChange={(e) => setEmail(e.target.value)} required />
+                  maxLength={LIMITS.email}
+                  onChange={(e) => { setEmail(e.target.value); revalidate("email", e.target.value); }}
+                  onBlur={(e) => validate("email", e.target.value)}
+                  {...fieldAria("inq-email", errors.email)} required />
+                <FieldError id="inq-email-error" message={errors.email} />
               </div>
             </div>
 
-            <div className="inquiry-row">
+            {/* Slightly wider left column — the phone field spends a third of
+                its width on the country trigger, the company box does not. */}
+            <div className="inquiry-row inquiry-row-phone">
               <div className="inquiry-field">
                 <label className="sr-only" htmlFor="inq-phone">Contact number</label>
-                <input id="inq-phone" name="phone" type="tel" autoComplete="tel"
-                  placeholder="Enter contact number" value={phone}
-                  onChange={(e) => setPhone(e.target.value)} />
+                <PhoneField
+                  id="inq-phone"
+                  value={phone}
+                  onValueChange={(v) => { setPhone(v); revalidate("phone", v); }}
+                  onBlur={(v) => validate("phone", v)}
+                  country={country}
+                  onCountryChange={setCountry}
+                  invalid={Boolean(errors.phone)}
+                  describedBy={errors.phone ? "inq-phone-error" : undefined}
+                />
+                <FieldError id="inq-phone-error" message={errors.phone} />
               </div>
               <div className="inquiry-field">
-                <label className="sr-only" htmlFor="inq-service">What you want to build</label>
-                <input id="inq-service" name="service" type="text"
-                  placeholder="What you want to build" value={service}
-                  onChange={(e) => setService(e.target.value)} maxLength={120} />
+                <label className="sr-only" htmlFor="inq-company">Company name</label>
+                <input id="inq-company" name="company" type="text" autoComplete="organization"
+                  placeholder="Enter company name" value={company}
+                  onChange={(e) => { setCompany(e.target.value); revalidate("company", e.target.value); }}
+                  onBlur={(e) => validate("company", e.target.value)}
+                  {...fieldAria("inq-company", errors.company)}
+                  maxLength={LIMITS.company} />
+                <FieldError id="inq-company-error" message={errors.company} />
               </div>
             </div>
 
@@ -265,8 +339,16 @@ export default function InquiryForm() {
               <label className="sr-only" htmlFor="inq-message">Message</label>
               <textarea id="inq-message" name="message" rows={5}
                 placeholder="Write any message here…" value={message}
-                onChange={(e) => setMessage(e.target.value)} required />
+                maxLength={LIMITS.message}
+                onChange={(e) => { setMessage(e.target.value); revalidate("message", e.target.value); }}
+                onBlur={(e) => validate("message", e.target.value)}
+                {...fieldAria("inq-message", errors.message)} required />
             </div>
+            {/* Outside .inquiry-field-grow on purpose: that box is a flex row
+                sized to the textarea, and an error inside it would sit beside
+                the box rather than under it. Keeping it out means the message
+                needs no change to the form's own layout rules. */}
+            <FieldError id="inq-message-error" message={errors.message} />
 
             {/* Honeypot. Hidden from people every way that matters — off-screen
                 via CSS, removed from the tab order, hidden from assistive

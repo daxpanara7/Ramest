@@ -1,0 +1,20 @@
+/* Homepage route bundle.
+ *
+ * The homepage needs four page-scoped sheets. Importing them as four separate
+ * `import` statements in app/page.tsx made Next emit four separate CSS chunks,
+ * so the page requested six stylesheets in total. They download in parallel
+ * over one HTTP/2 connection and cost little in a real browser — but each one
+ * is a separate node on the critical path, and Lighthouse's default
+ * *simulated* throttling charges for every one of them. Collapsing them into a
+ * single @import wrapper makes PostCSS inline all four into one chunk.
+ *
+ * ORDER IS LOAD-BEARING and must match the order these sheets had in
+ * globals.css: home -> homepage -> blog -> testimonials. testimonials.css and
+ * blog.css both style the testimonial rail, and testimonials.css only wins
+ * those ties because it comes last. Swapping them collapses the centre-focused
+ * carousel into a single card with no peeking cards either side.
+ */
+@import "./home.css";
+@import "./homepage.css";
+@import "./blog.css";
+@import "./testimonials.css";

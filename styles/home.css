@@ -142,7 +142,9 @@
     overflow: clip;
     background-color: var(--body-color);
     border-radius: 34px 34px 0 0;
-    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.16);
+    /* No box-shadow. The old upward shadow (0 -18px 50px / 0.16) read as a
+       frosted "glass" band floating above the curve instead of a card edge;
+       the border-top below is the only separation the stack needs. */
     /* Top highlight edge so each new card reads as a surface, not a line. */
     border-top: 1px solid var(--border-color);
     padding-top: 0.5rem;
@@ -167,15 +169,13 @@
 .stack-card:first-child {
     border-radius: 0;
     border-top: 0;
-    box-shadow: none;
 }
 
 /* Mobile/tablet keep the stacking — the --stack-top rule above makes tall
-   cards fully scrollable first — just with tighter corners and shadow. */
+   cards fully scrollable first — just with tighter corners. */
 @media (max-width: 768px) {
     .stack-card {
         border-radius: 20px 20px 0 0;
-        box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.14);
     }
 }
 

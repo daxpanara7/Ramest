@@ -1,3 +1,8 @@
+/* Route-scoped styles, bundled into ONE chunk — see styles/route-home.css for
+   which sheets it pulls in, why the order matters, and why they are not four
+   separate imports here. */
+import "../styles/route-home.css";
+
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
 import CtaBanner from "@/components/sections/CtaBanner";
@@ -457,10 +462,11 @@ export default function Page() {
           </section>
         </div>
 
-        {/* ---------- CARD 4 · Latest blogs ---------- */}
-        <div className="stack-card">
-          <LatestBlogs />
-        </div>
+        {/* ---------- CARD 4 · Latest blogs ----------
+            No .stack-card wrapper here: LatestBlogs renders its own, so a
+            zero-post build drops the whole card instead of leaving an empty
+            9px one whose top border + radius drew a bar above the FAQ. */}
+        <LatestBlogs />
 
         {/* ---------- CARD 5 · FAQ ---------- */}
         <div className="stack-card">

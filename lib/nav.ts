@@ -150,5 +150,5 @@ export const sitemapRoutes = [
   "/blog",
   "/contact",
   "/legal",
-  "/legal?tab=privacy",
+  "/legal/privacy",
 ] as const;

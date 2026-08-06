@@ -50,6 +50,14 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /**
+   * Build output directory. Overridable so a throwaway dev server can run
+   * alongside the `next start` on :3000 without clobbering its build — both
+   * default to `.next`, and a dev server writing there leaves the running
+   * production server serving a build that no longer exists on disk.
+   * Unset in CI and on Vercel, so production is always plain `.next`.
+   */
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Image optimization ON: Next/Vercel serves each <Image> as an optimized
   // responsive srcset (right size per device, modern formats) — required for
   // the responsive-images audit and crisp retina rendering at once.
@@ -83,7 +91,23 @@ const nextConfig: NextConfig = {
   // Hide the Next.js "N" badge — only appears in development
   devIndicators: false,
   async redirects() {
-    return htmlRedirects;
+    return [
+      ...htmlRedirects,
+      /* The privacy policy used to be a query-string tab on /legal. That kept
+         the whole route dynamic, which made Next stream its metadata into the
+         body instead of the head — see components/legal/LegalDocument.tsx.
+         Both documents are static routes now; this keeps every link, bookmark
+         and previously-indexed URL pointing at the right one. */
+      {
+        source: "/legal",
+        has: [{ type: "query" as const, key: "tab", value: "privacy" }],
+        destination: "/legal/privacy",
+        permanent: true,
+      },
+      /* No matching rule for `?tab=terms`: it was never a generated link, and
+         redirecting /legal?tab=terms to /legal would loop, because Next
+         carries the query string through to a destination that has none. */
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

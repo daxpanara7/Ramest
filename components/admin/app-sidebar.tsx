@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, FolderTree, Tag, Users2, Mail, Search,
   Globe, Sparkles, Image as ImageIcon, ShieldCheck, Settings, Activity,
-  ScrollText, LogOut, Newspaper, BrainCircuit, ChevronRight,
+  ScrollText, LogOut, Newspaper, BrainCircuit, ChevronRight, Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -44,8 +44,9 @@ const groups: Group[] = [
     { title: "Categories", url: "/admin/categories", icon: FolderTree },
     { title: "Tags", url: "/admin/tags", icon: Tag },
   ]},
-  { label: "Leads", items: [
+  { label: "Inbox", items: [
     { title: "Contact Leads", url: "/admin/leads", icon: Users2 },
+    { title: "Job Applications", url: "/admin/applications", icon: Briefcase },
     { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
   ]},
   { label: "Search", items: [

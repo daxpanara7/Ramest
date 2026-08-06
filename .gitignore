@@ -10,6 +10,9 @@
 
 # next.js
 .next/
+# Throwaway build dir for a dev server run alongside `next start`
+# (NEXT_DIST_DIR in next.config.ts).
+.next-*/
 /out/
 
 # production

@@ -53,6 +53,14 @@ export default function Page() {
         <div className="container about-container">
           <div className="about-image">
             <div className="img-box">
+              {/* This is the page's LCP element, so it needs to win the race
+                  against everything else the head preloads. `priority` alone
+                  was not enough: it emits a preload, but that preload lands
+                  after two font preloads and the header logo's, and the
+                  browser ranks fonts above images — the request did not even
+                  start until 1293ms on a throttled connection, which was the
+                  whole of the page's LCP. fetchPriority="high" marks it as
+                  the one image that matters. */}
               <Image
                 src="/assets/dax-panara.webp"
                 alt="Dax Panara, Founder and CEO of Ramest Technolabs"
@@ -60,6 +68,7 @@ export default function Page() {
                 width={480}
                 height={480}
                 priority
+                fetchPriority="high"
                 sizes="(max-width: 768px) 90vw, 420px"
               />
             </div>

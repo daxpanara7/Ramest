@@ -20,10 +20,28 @@ export type LegalSection = {
 
 export const LEGAL_TABS = [
   { key: "terms", label: "Terms & Conditions", href: "/legal" },
-  { key: "privacy", label: "Privacy Policy", href: "/legal?tab=privacy" },
+  { key: "privacy", label: "Privacy Policy", href: "/legal/privacy" },
 ] as const;
 
 export type LegalTabKey = (typeof LEGAL_TABS)[number]["key"];
+
+/** Canonical path for a legal document. Each has its own static route — see
+ *  components/legal/LegalDocument.tsx for why they are not one `?tab=` page. */
+export function legalPath(doc: LegalTabKey): string {
+  return doc === "privacy" ? "/legal/privacy" : "/legal";
+}
+
+export function legalHeading(doc: LegalTabKey): string {
+  return doc === "privacy" ? "Privacy Policy" : "Terms and Conditions";
+}
+
+/** Single source for the description used by both <head> and the JSON-LD, so
+ *  the two can never drift apart. */
+export function legalDescription(doc: LegalTabKey): string {
+  return doc === "privacy"
+    ? `How ${SITE.name} collects, uses, stores, and protects your personal information, and the rights you have over your data.`
+    : `The terms that govern your use of the ${SITE.name} website, including intellectual property, user content, and liability.`;
+}
 
 const FULL_ADDRESS = `${SITE.address.street}, ${SITE.address.city}, ${SITE.address.region} ${SITE.address.postalCode}, India`;
 

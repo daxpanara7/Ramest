@@ -247,13 +247,23 @@ export default function Header() {
         <Link href="/" className="logo">
           {/* Transparent white lettering on the permanent navy capsule.
               unoptimized: the optimizer's AVIF pass smears thin serif
-              strokes — served byte-exact. */}
+              strokes — served byte-exact. Confirmed by rendering the
+              optimizer's output next to the source at 3x: at quality 75 the
+              hairlines pick up a visible halo, and even at 85 they are softer
+              than the original.
+
+              So the file itself is sized correctly instead. The asset used to
+              be 528x206 for a slot that is at most 174x68 CSS px — enough for
+              a 3x display and 24 KB on the wire, in the same opening burst
+              that the LCP element is queued behind. 420x164 still covers a 2x
+              desktop (needs 348) and a 3x phone (needs ~168), and is 7 KB
+              lighter, with no resampling visible at display size. */}
           <Image
             src="/assets/logo_mark_light.webp"
             alt="Ramest Technolabs — IT consulting and software development"
             className="logo-img"
-            width={528}
-            height={206}
+            width={420}
+            height={164}
             priority
             unoptimized
           />

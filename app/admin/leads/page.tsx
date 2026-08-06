@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Download, Filter, Search, Users2, PhoneCall, CheckCircle2, XCircle,
-  AlertCircle, RefreshCw, Trash2, Loader2,
+  AlertCircle, RefreshCw, Trash2, Loader2, Building2, Home, Mail, Paperclip,
 } from "lucide-react";
 import { PageHeader, Section, Stat } from "@/components/admin/primitives";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiLeadStatusBadge } from "@/components/admin/badges";
 import { api, ApiError, API_BASE, getAccessToken } from "@/lib/admin/api";
+import { openAttachment } from "@/lib/admin/attachment";
 import { useApi, qs } from "@/lib/admin/use-api";
 import { formatDateTime, relativeTime } from "@/lib/admin/format";
 import { useConfirm } from "@/components/admin/use-confirm";
@@ -40,7 +41,11 @@ import { useConfirm } from "@/components/admin/use-confirm";
 type Lead = {
   id: string; name: string; email: string;
   phone: string | null; company: string | null; service: string | null;
+  budget: string | null;
+  /** "home" | "contact" — which form captured this. Null on legacy rows. */
+  source: string | null;
   message: string; status: string; adminNotes: string | null;
+  attachmentName: string | null; attachmentBytes: number | null;
   ip: string | null; country: string | null;
   recaptchaScore: number | null;
   createdAt: string; updatedAt: string;
@@ -140,8 +145,16 @@ export default function LeadsPage() {
           <TableHeader className="bg-muted/30">
             <TableRow className="hover:bg-transparent">
               <TableHead>Contact</TableHead>
+              {/* Company replaced the old Service column, because both forms
+                  now ask for it while only the contact form asks for a
+                  service. Service, budget and any attachment live in the
+                  detail sheet. */}
               <TableHead>Company</TableHead>
-              <TableHead>Service</TableHead>
+              {/* The two forms collect different things, so a blank service or
+                  budget means "this form never asked" far more often than it
+                  means "they skipped it". Without this column that is
+                  indistinguishable from missing data. */}
+              <TableHead>Source</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead className="text-right">Created</TableHead>
@@ -175,11 +188,25 @@ export default function LeadsPage() {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{l.company ?? "—"}</TableCell>
                 <TableCell>
-                  {l.service
-                    ? <Badge variant="outline" className="text-[10.5px]">{l.service}</Badge>
-                    : <span className="text-muted-foreground">—</span>}
+                  {l.company ? (
+                    <Badge variant="outline" className="max-w-[16rem] gap-1.5 text-[11px] font-medium">
+                      <Building2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+                      <span className="truncate" title={l.company}>{l.company}</span>
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <LeadSourceBadge
+                    source={l.source}
+                    attachment={
+                      l.attachmentName
+                        ? { leadId: l.id, name: l.attachmentName }
+                        : undefined
+                    }
+                  />
                 </TableCell>
                 <TableCell>{apiLeadStatusBadge(l.status)}</TableCell>
                 <TableCell className="font-mono text-xs text-muted-foreground">{l.phone ?? "—"}</TableCell>
@@ -281,8 +308,8 @@ function LeadSheet({
 
             <div className="mt-6 space-y-6">
               <div className="grid grid-cols-2 gap-3 text-sm">
+                <Detail label="Company" value={lead.company ?? "—"} />
                 <Detail label="Phone" value={lead.phone ?? "—"} />
-                <Detail label="Service" value={lead.service ?? "—"} />
                 <Detail label="Status" value={title(lead.status)} />
                 <Detail label="Created" value={formatDateTime(lead.createdAt)} />
                 <Detail label="Country" value={lead.country ?? "—"} />
@@ -290,6 +317,50 @@ function LeadSheet({
                   label="reCAPTCHA"
                   value={lead.recaptchaScore === null ? "not verified" : lead.recaptchaScore.toFixed(2)}
                 />
+                {/* Only leads captured before the form swapped this field for
+                    Company have one — showing an empty row on every new lead
+                    would just be noise. */}
+                {lead.service && <Detail label="Service (legacy)" value={lead.service} />}
+              </div>
+
+              <Separator />
+
+              {/* Enquiry detail. Only the contact form asks for service and
+                  budget, so on a homepage lead this block is just the source
+                  line — which is the point: it says why the rest is absent
+                  instead of leaving the reader to guess. */}
+              <div>
+                <h4 className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Enquiry</h4>
+                <dl className="grid grid-cols-[9rem_1fr] gap-x-3 gap-y-2 text-sm">
+                  <dt className="text-muted-foreground">Submitted from</dt>
+                  <dd><LeadSourceBadge source={lead.source} /></dd>
+
+                  <dt className="text-muted-foreground">Company</dt>
+                  <dd>{lead.company || <span className="text-muted-foreground">—</span>}</dd>
+
+                  <dt className="text-muted-foreground">Interested service</dt>
+                  <dd>{lead.service || <span className="text-muted-foreground">—</span>}</dd>
+
+                  <dt className="text-muted-foreground">Project budget</dt>
+                  <dd>
+                    {lead.budget
+                      ? <Badge variant="secondary" className="font-medium">{lead.budget}</Badge>
+                      : <span className="text-muted-foreground">—</span>}
+                  </dd>
+
+                  <dt className="text-muted-foreground">Attachment</dt>
+                  <dd>
+                    {lead.attachmentName ? (
+                      <AttachmentLink
+                        leadId={lead.id}
+                        name={lead.attachmentName}
+                        bytes={lead.attachmentBytes}
+                      />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </dd>
+                </dl>
               </div>
 
               <Separator />
@@ -310,7 +381,14 @@ function LeadSheet({
                       Per-event history needs an audit trail scoped to leads. */}
                   <li className="relative">
                     <span className="absolute -left-[21px] top-1 h-2 w-2 rounded-full bg-primary" />
-                    <p className="text-sm">Lead created from contact form</p>
+                    <p className="text-sm">
+                      Lead created from{" "}
+                      {lead.source === "home"
+                        ? "the home page form"
+                        : lead.source === "contact"
+                          ? "the contact page form"
+                          : "the website"}
+                    </p>
                     <p className="text-[11px] text-muted-foreground">{formatDateTime(lead.createdAt)}</p>
                   </li>
                   {lead.updatedAt !== lead.createdAt && (
@@ -378,6 +456,131 @@ function LeadSheet({
 }
 
 /** Uses fetch + blob, not <a href>, because the endpoint needs the Bearer header. */
+/**
+ * Which form a lead came from.
+ *
+ * Worth its own column because the two forms ask for different things: the
+ * homepage one is deliberately short, so its leads have no service, budget or
+ * attachment. Without this, those blanks read as data we failed to capture.
+ *
+ * Legacy rows predate the field and render as "Unknown" rather than being
+ * guessed into one bucket or the other.
+ */
+function LeadSourceBadge({
+  source,
+  attachment,
+}: {
+  source: string | null;
+  /** Set when the lead has a brief, so the row can link straight to it. */
+  attachment?: { leadId: string; name: string };
+}) {
+  const label =
+    source === "home" ? "Home page" : source === "contact" ? "Contact page" : "Unknown";
+
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <Badge
+        variant={source ? "outline" : "secondary"}
+        className="gap-1.5 text-[11px] font-medium"
+      >
+        {source === "home" ? (
+          <Home className="h-3 w-3 shrink-0 text-muted-foreground" />
+        ) : source === "contact" ? (
+          <Mail className="h-3 w-3 shrink-0 text-muted-foreground" />
+        ) : null}
+        {label}
+      </Badge>
+      {/* Flagged in the list so a lead with a brief is findable without
+          opening every row — and clickable, so it opens in a new tab without
+          a detour through the detail sheet. */}
+      {attachment ? (
+        <AttachmentIconButton leadId={attachment.leadId} name={attachment.name} />
+      ) : null}
+    </span>
+  );
+}
+
+/**
+ * The paperclip in a listing row: opens the brief in a new tab.
+ *
+ * stopPropagation because the row itself opens the detail sheet — without it,
+ * one click would do both.
+ */
+function AttachmentIconButton({ leadId, name }: { leadId: string; name: string }) {
+  const [busy, setBusy] = useState(false);
+
+  const onClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBusy(true);
+    const ok = await openAttachment(`/leads/${leadId}/attachment`, name);
+    setBusy(false);
+    if (!ok) alert("Could not open the attachment. The file may no longer be on the server.");
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      title={`Open ${name} in a new tab`}
+      aria-label={`Open attachment ${name} in a new tab`}
+      className="rounded p-0.5 text-muted-foreground transition-colors hover:text-primary disabled:opacity-50"
+    >
+      {busy ? (
+        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+      ) : (
+        <Paperclip className="h-3.5 w-3.5 shrink-0" />
+      )}
+    </button>
+  );
+}
+
+/** The named attachment row inside the detail sheet. */
+function AttachmentLink({
+  leadId,
+  name,
+  bytes,
+}: {
+  leadId: string;
+  name: string;
+  bytes: number | null;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const size =
+    bytes == null
+      ? null
+      : bytes < 1024 * 1024
+        ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+        : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+
+  const open = async () => {
+    setBusy(true);
+    setFailed(false);
+    const ok = await openAttachment(`/leads/${leadId}/attachment`, name);
+    setFailed(!ok);
+    setBusy(false);
+  };
+
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <Button variant="outline" size="sm" className="h-7 gap-1.5" onClick={open} disabled={busy}>
+        {busy ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Paperclip className="h-3.5 w-3.5" />
+        )}
+        <span className="max-w-[14rem] truncate" title={`Open ${name} in a new tab`}>{name}</span>
+      </Button>
+      {size ? <span className="text-xs text-muted-foreground">{size}</span> : null}
+      {failed ? (
+        <span className="text-xs text-destructive">Could not open — try again.</span>
+      ) : null}
+    </span>
+  );
+}
+
 function ExportButton({ status }: { status: string }) {
   const [busy, setBusy] = useState(false);
 

@@ -1,3 +1,8 @@
+/* Route-scoped styles. Imported here rather than in globals.css so
+   other pages do not download and parse them before they can paint —
+   see the note at the top of app/globals.css. */
+import "../../styles/company.css";
+
 import Link from "next/link";
 import { JsonLdScript } from "@/components/JsonLd";
 import PageHero from "@/components/sections/PageHero";

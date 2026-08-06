@@ -14,7 +14,14 @@ import { useAuth } from "./auth-context";
  * `reload()` re-fetches — call it after a mutation so the table reflects what
  * the server actually stored rather than what the client assumed.
  */
-export function useApi<T>(path: string | null) {
+export function useApi<T>(
+  path: string | null,
+  options: {
+    /** Re-fetch on this interval, for feeds that change without user action. */
+    refreshMs?: number;
+  } = {},
+) {
+  const { refreshMs } = options;
   const { loading: authLoading, user } = useAuth();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +51,31 @@ export function useApi<T>(path: string | null) {
   useEffect(() => {
     void run();
   }, [run]);
+
+  /**
+   * Optional polling. Skipped while the tab is hidden — a console left open
+   * in a background tab would otherwise keep the API awake all day for
+   * nobody, and Render bills that. A refetch fires on the way back to the tab
+   * so returning to it always shows current data.
+   */
+  useEffect(() => {
+    if (!refreshMs || authLoading || !user || !path) return;
+
+    const tick = () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      void run();
+    };
+    const id = setInterval(tick, refreshMs);
+    const onVisible = () => {
+      if (!document.hidden) void run();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [refreshMs, run, authLoading, user, path]);
 
   return { data, loading: loading || authLoading, error, reload: run };
 }

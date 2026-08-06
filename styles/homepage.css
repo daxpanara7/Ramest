@@ -115,13 +115,18 @@
 }
 
 /* Staggered child reveals, driven by the existing .reveal IntersectionObserver
-   (rect-based, so it works inside the sticky stack — unlike ScrollTrigger). */
+   (rect-based, so it works inside the sticky stack — unlike ScrollTrigger).
+   Hidden state is gated on html.js-reveal for the same reason as .reveal
+   itself: no script, no hiding. */
 .reveal .hx-rise {
-    opacity: 0;
-    transform: translateY(28px);
     transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
         transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: calc(var(--rise, 0) * 80ms);
+}
+
+.js-reveal .reveal:not(.active) .hx-rise {
+    opacity: 0;
+    transform: translateY(28px);
 }
 
 .reveal.active .hx-rise {
@@ -946,6 +951,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 
+    .js-reveal .reveal:not(.active) .hx-rise,
     .reveal .hx-rise {
         opacity: 1;
         transform: none;
@@ -1509,53 +1515,10 @@
 @media (max-width: 768px) {
 }
 
-/* ===========================================================================
-   FINISHING SYSTEM — the details that make a site feel designed end to end:
-   branded text selection, accessible focus rings, a quiet branded scrollbar,
-   crisper font rendering, and a stronger display weight for the hero.
-   =========================================================================== */
-
-body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
-
-::selection {
-    background: #0357A8;
-    color: #fff;
-}
-
-:focus-visible {
-    outline: 2px solid #3898EC;
-    outline-offset: 3px;
-    border-radius: 4px;
-}
-
-/* quiet branded scrollbar (WebKit + Firefox) */
-html {
-    scrollbar-color: rgba(3, 87, 168, 0.35) transparent;
-    scrollbar-width: thin;
-}
-
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(3, 87, 168, 0.30);
-    border-radius: 100px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(3, 87, 168, 0.5);
-}
+/* The site-wide "finishing system" that used to sit here — font smoothing,
+   ::selection, :focus-visible, the branded scrollbar — moved to
+   styles/finishing.css when this sheet became homepage-only. It applies to
+   every page, so it cannot live in a route-scoped stylesheet. */
 
 /* stronger display presence for the hero headline */
 .hx-hero-title {

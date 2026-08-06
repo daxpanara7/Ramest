@@ -49,6 +49,26 @@ export function apiLeadStatusBadge(status: string) {
   return <Badge className={cn(cls, map[status] ?? map.NEW)}>{label}</Badge>;
 }
 
+/**
+ * Job application status from the API enum. The ladder is colour-coded by
+ * how far along the candidate is — grey/blue early, amber mid-pipeline,
+ * green at the end — so a recruiter can read the column without parsing it.
+ */
+export function applicationStatusBadge(status: string) {
+  const map: Record<string, string> = {
+    NEW: "bg-primary/12 text-primary ring-1 ring-inset ring-primary/25",
+    REVIEWING: "bg-sky-500/12 text-sky-600 ring-1 ring-inset ring-sky-500/20",
+    SHORTLISTED: "bg-violet-500/12 text-violet-600 ring-1 ring-inset ring-violet-500/20",
+    INTERVIEWING: "bg-amber-500/12 text-amber-600 ring-1 ring-inset ring-amber-500/20",
+    OFFERED: "bg-teal-500/12 text-teal-600 ring-1 ring-inset ring-teal-500/20",
+    HIRED: "bg-emerald-500/12 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+    REJECTED: "bg-destructive/12 text-destructive ring-1 ring-inset ring-destructive/25",
+    SPAM: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+  };
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
+  return <Badge className={cn(cls, map[status] ?? map.NEW)}>{label}</Badge>;
+}
+
 /** Newsletter subscriber status: PENDING | ACTIVE | UNSUBSCRIBED. */
 export function subscriberStatusBadge(status: string) {
   const map: Record<string, string> = {

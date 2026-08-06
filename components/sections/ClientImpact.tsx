@@ -27,6 +27,10 @@ export type ClientQuote = {
  * Avatars are CSS gradients with initials: zero network requests, so the
  * section costs nothing on LCP. `image` swaps in a real photo per quote.
  */
+/** Stable id so the inline pre-paint centring script can find the rail.
+ *  Only ever one rail per page. */
+const RAIL_ID = "ci-rail";
+
 export default function ClientImpact({ quotes }: { quotes: ClientQuote[] }) {
   const railRef = useRef<HTMLDivElement>(null);
   /* Open on the middle card, not the first: the reference layout reads as a
@@ -36,12 +40,23 @@ export default function ClientImpact({ quotes }: { quotes: ClientQuote[] }) {
   const initial = Math.floor(quotes.length / 2);
   const [active, setActive] = useState(initial);
 
-  /* Jump the rail to the middle card before first paint. useLayoutEffect with
-     `behavior: instant` so the user never sees it start at the left and slide
-     — that would look like a glitch on load. */
+  /* Centre the middle card.
+   *
+   * useLayoutEffect alone could not do this on a first load. It runs before
+   * the browser paints REACT's commit, but the server-rendered HTML has
+   * already been painted long before hydration starts — so the rail was
+   * visibly drawn hard against its left edge and then snapped to the middle
+   * once the bundle arrived. The inline script rendered just after the rail
+   * (below) handles that case instead: it runs while the parser is still
+   * inside the body, before the first paint, so there is nothing to see.
+   *
+   * This effect is still needed for client-side navigation back to the page,
+   * where React reuses the DOM and inline scripts do not re-execute. The
+   * guard makes it a no-op whenever the rail is already positioned, so the
+   * two mechanisms can never fight. */
   useLayoutEffect(() => {
     const rail = railRef.current;
-    if (!rail) return;
+    if (!rail || rail.scrollLeft > 0) return;
     const el = rail.querySelectorAll<HTMLElement>(".ci-item")[initial];
     if (!el) return;
     rail.scrollLeft = el.offsetLeft - (rail.clientWidth - el.clientWidth) / 2;
@@ -113,6 +128,7 @@ export default function ClientImpact({ quotes }: { quotes: ClientQuote[] }) {
 
       <div
         className="ci-rail"
+        id={RAIL_ID}
         ref={railRef}
         role="region"
         aria-label="Client testimonials"
@@ -160,6 +176,16 @@ export default function ClientImpact({ quotes }: { quotes: ClientQuote[] }) {
           ))}
         </div>
       </div>
+
+      {/* Runs while the parser is still in the body, so the rail is centred
+          before the first paint rather than snapping there at hydration.
+          Reads geometry the stylesheet has already resolved (it is in <head>),
+          and does nothing if the markup is not what it expects. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){var r=document.getElementById(${JSON.stringify(RAIL_ID)});if(!r)return;var i=r.querySelectorAll('.ci-item')[${initial}];if(!i)return;r.scrollLeft=i.offsetLeft-(r.clientWidth-i.clientWidth)/2;})();`,
+        }}
+      />
 
       <div className="ci-dots" role="tablist" aria-label="Testimonial position">
         {quotes.map((q, i) => (

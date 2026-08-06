@@ -17,11 +17,18 @@ import { mediaUrl, type PublicPost } from "@/lib/blog";
 export function BlogCardCover({
   post,
   priority = false,
+  lcp = false,
   sizes = "(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 31vw",
 }: {
   post: Pick<PublicPost, "coverImage" | "category">;
   /** Only for covers above the fold — a lazy LCP image delays the paint. */
   priority?: boolean;
+  /** The single cover most likely to BE the LCP element — the first card.
+   *  `priority` alone only emits a preload, which the browser still ranks
+   *  below the head's font preloads; this marks it as the image to fetch
+   *  first. Deliberately one card, not all the eager ones: marking three
+   *  "highest" is the same as marking none. */
+  lcp?: boolean;
   sizes?: string;
 }) {
   const src = mediaUrl(post.coverImage?.url);
@@ -36,6 +43,7 @@ export function BlogCardCover({
           sizes={sizes}
           quality={75}
           priority={priority}
+          fetchPriority={lcp ? "high" : undefined}
           // Everything below the first row is lazy; `priority` already implies
           // eager, so this only applies to the rest.
           loading={priority ? undefined : "lazy"}

@@ -50,8 +50,8 @@ export default function LoginPage() {
             <Image
               src="/assets/logo_mark_light.webp"
               alt="Ramest Technolabs"
-              width={528}
-              height={206}
+              width={420}
+              height={164}
               priority
               className="h-16 w-auto self-start drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)] md:h-20"
             />

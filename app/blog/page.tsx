@@ -1,3 +1,8 @@
+/* Route-scoped styles. Imported here rather than in globals.css so
+   other pages do not download and parse them before they can paint —
+   see the note at the top of app/globals.css. */
+import "../../styles/blog.css";
+
 import Link from "next/link";
 import { BlogCardCover } from "@/components/blog/BlogCardCover";
 import { JsonLdScript } from "@/components/JsonLd";
@@ -107,7 +112,7 @@ export default async function BlogIndex({
                 <Link href={`/blog/${p.slug}`} aria-label={p.title}>
                   {/* Top row only is eager — it is the LCP candidate; the
                       other six load lazily as they scroll in. */}
-                  <BlogCardCover post={p} priority={i < 3} />
+                  <BlogCardCover post={p} priority={i < 3} lcp={i === 0} />
                 </Link>
                 <div className="blog-card-body">
                   <div className="blog-card-meta">

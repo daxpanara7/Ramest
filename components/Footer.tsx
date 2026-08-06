@@ -113,10 +113,18 @@ export default function Footer() {
             landmarks all called something different is noise in a screen
             reader's landmark list, where one clearly-labelled "Footer" is
             what people actually navigate by. */}
+        {/* h2, not h3.
+            These label link groups inside a top-level landmark — they are not
+            subordinate to any heading in the page content, so h3 was claiming
+            a level that nothing above it occupied. On a page whose content
+            happens to have no h2 (the blog index with no posts yet) that made
+            the outline jump h1 -> h3, which axe reports as an invalid heading
+            order. h2 is correct on every page and skips nothing. Styling is
+            by class, so nothing moves. */}
         <nav aria-label="Footer">
           <div className="footer-columns">
             <div>
-              <h3 className="footer-col-title">Services</h3>
+              <h2 className="footer-col-title">Services</h2>
               <ul className="footer-col-list">
                 {productCategory?.items.slice(0, 6).map((item) => (
                   <li key={item.slug}>
@@ -127,7 +135,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="footer-col-title">Industries</h3>
+              <h2 className="footer-col-title">Industries</h2>
               <ul className="footer-col-list">
                 {industriesCategory?.items.slice(0, 6).map((item) => (
                   <li key={item.slug}>
@@ -138,7 +146,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="footer-col-title">Company</h3>
+              <h2 className="footer-col-title">Company</h2>
               <ul className="footer-col-list">
                 {COMPANY_LINKS.map((l) => (
                   <li key={l.href}>
@@ -149,7 +157,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="footer-col-title">Explore</h3>
+              <h2 className="footer-col-title">Explore</h2>
               <ul className="footer-col-list">
                 {EXPLORE_LINKS.map((l) => (
                   <li key={l.href}>

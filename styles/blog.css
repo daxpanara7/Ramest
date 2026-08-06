@@ -967,6 +967,10 @@ html.is-scrolling .blog-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.inquiry-row-phone {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+}
+
 .inquiry-field input,
 .inquiry-field textarea {
     width: 100%;
@@ -997,6 +1001,132 @@ html.is-scrolling .blog-card {
     border-color: #fff;
     box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.14);
 }
+
+/* ---------------------------------------------------------------------------
+   PHONE FIELD — the closed control only
+
+   The wrapper carries the border and the fill; the trigger and the input are
+   transparent children stretched inside it. That way the row is exactly as
+   tall as a plain .inquiry-field input beside it — matching two paddings by
+   hand drifts the moment either font-size changes.
+   --------------------------------------------------------------------------- */
+
+.phone-field {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.phone-field:focus-within,
+.phone-field.is-open {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.14);
+}
+
+/* ---- Invalid fields on the navy panel ----------------------------------
+   The light-theme red (#D93025) is close to invisible against this gradient,
+   so the dark panel gets its own tint. Every rule here also names :focus /
+   :focus-within: those are declared above at equal specificity, and without
+   the repeat the white focus ring would win the moment someone clicks back
+   into the field they still have to fix — which reads as "fixed". */
+.inquiry-field .phone-field.is-invalid,
+.inquiry-field .phone-field.is-invalid:focus-within,
+.inquiry-field .phone-field.is-invalid.is-open,
+.inquiry-field input[aria-invalid="true"],
+.inquiry-field textarea[aria-invalid="true"],
+.inquiry-field input[aria-invalid="true"]:focus,
+.inquiry-field textarea[aria-invalid="true"]:focus {
+    border-color: #FF8A80;
+    box-shadow: 0 0 0 4px rgba(255, 138, 128, 0.16);
+}
+
+.inquiry-form .field-error {
+    color: #FFC9C4;
+}
+
+.phone-country {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 0.6rem 0 0.9rem;
+    border: 0;
+    border-radius: 0.7rem 0 0 0.7rem;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.phone-country:hover,
+.phone-field.is-open .phone-country {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.phone-country:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -3px;
+}
+
+/* Inset divider rather than a full-height border — a rule that runs edge to
+   edge cuts the pill in half; this reads as one field with two zones. */
+.phone-country::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.phone-dial {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.phone-caret {
+    opacity: 0.72;
+    transition: transform 0.2s ease;
+}
+
+.phone-field.is-open .phone-caret {
+    transform: rotate(180deg);
+}
+
+/* Flags come from regional-indicator codepoints, so the emoji font has to be
+   named explicitly — the body face has no glyphs for them. */
+.phone-flag {
+    flex: 0 0 auto;
+    font-size: 1.05rem;
+    line-height: 1;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+        "Twemoji Mozilla", sans-serif;
+}
+
+/* Beats .inquiry-field input, which would repaint the border inside the pill. */
+.inquiry-field .phone-field .phone-input,
+.inquiry-field .phone-field .phone-input:focus {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.95rem 1rem 0.95rem 0.7rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+}
+
+/* The dropped-open list is not here: it is the shared .picker-pop panel in
+   style.css, which the contact form's dropdowns open too. */
 
 .inquiry-error {
     margin: 0;

@@ -1452,6 +1452,18 @@
   position: relative;
 }
 
+/* Centre the track rather than letting it sit flush against the container's
+   left edge. The attribute selector is what gives this the specificity to
+   beat the `margin: 0` in the base rule above, which is why it is written
+   this way rather than folded into `.svc-timeline`. Used by both the service
+   detail pages and the careers hiring timeline — it lived in careers.css
+   until that sheet stopped being loaded site-wide, which quietly un-centred
+   it everywhere else. */
+.svc-timeline[data-steps] {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
 .svc-timeline[data-steps="4"] {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -1849,5 +1861,44 @@
 
   .svc-faq-banner {
     padding: 1.5rem 1.4rem;
+  }
+}
+
+/* Phones: the 3.2rem dot column plus its gutter eats a third of a 360px screen,
+   leaving the step copy on four-word lines. Tighten the rail and step the type
+   down. The connector rides the dot's centre line, so it moves with the width. */
+@media (max-width: 520px) {
+  .svc-timeline,
+  .svc-timeline[data-steps="3"],
+  .svc-timeline[data-steps="4"],
+  .svc-timeline[data-steps="5"],
+  .svc-timeline--four {
+    gap: 1.4rem;
+  }
+
+  .svc-timeline::before,
+  .svc-timeline[data-steps="3"]::before,
+  .svc-timeline[data-steps="4"]::before,
+  .svc-timeline[data-steps="5"]::before {
+    left: 1.35rem;
+  }
+
+  .svc-timeline-step {
+    grid-template-columns: 2.7rem 1fr;
+    column-gap: 0.9rem;
+  }
+
+  .svc-timeline-dot {
+    width: 2.7rem;
+    height: 2.7rem;
+    font-size: 1rem;
+  }
+
+  .svc-timeline-title {
+    font-size: 1.05rem;
+  }
+
+  .svc-timeline-desc {
+    font-size: 0.88rem;
   }
 }

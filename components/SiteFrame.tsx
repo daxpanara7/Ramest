@@ -102,22 +102,28 @@ export default function SiteFrame({ children }: { children: React.ReactNode }) {
      * frame inside rAF, and the expensive drift check is sampled rather than
      * run continuously.
      */
-    let maxScroll = 0;
-    const refreshMax = () => {
-      const doc = document.scrollingElement;
-      maxScroll = doc ? doc.scrollHeight - window.innerHeight : 0;
-    };
-
     const frame = () => {
       ticking = false;
 
-      // Clamp against a CACHED max — no scrollHeight read per frame. Only
-      // correct a real overshoot, with a 1px tolerance so sub-pixel rounding
-      // never triggers a write (a write every frame is itself the judder).
-      const doc = document.scrollingElement;
-      if (doc && maxScroll > 0 && doc.scrollTop > maxScroll + 1) {
-        doc.scrollTop = maxScroll;
-      }
+      /* The scroll clamp that used to live here is GONE.
+       *
+       * It compared scrollTop against a CACHED maxScroll and wrote
+       * `doc.scrollTop = maxScroll` whenever the live position looked larger.
+       * The cache is refreshed from a ResizeObserver and the resize event, so
+       * it is stale for at least a frame any time the document grows — and
+       * this page grows constantly: the sticky stack re-measures its cards on
+       * every viewport change, and a phone's URL bar collapsing does exactly
+       * that mid-scroll. A stale, too-small maxScroll made this yank the page
+       * backwards to a position the user had already scrolled past. That is
+       * the sudden jump people describe as the screen fluctuating, and it was
+       * worst on mobile where the URL bar guarantees the resize.
+       *
+       * Nothing needed the clamp. Browsers already refuse to scroll past the
+       * end of the document; scrollTop cannot legitimately exceed the maximum,
+       * so every write this made was a correction of a measurement error
+       * rather than of a real overshoot. Removing it also removes a layout
+       * write from the scroll path entirely.
+       */
 
       /* The drift self-heal that used to live here is GONE.
        *
@@ -148,32 +154,27 @@ export default function SiteFrame({ children }: { children: React.ReactNode }) {
     };
 
     sync();
-    refreshMax();
     parallax();
     // Fonts change text metrics after first measure — re-sync when ready.
     if (document.fonts?.ready) {
       document.fonts.ready.then(() => {
         sync();
-        refreshMax();
         parallax();
       });
     }
     const observer = new ResizeObserver(() => {
       sync();
-      refreshMax();
       parallax();
     });
     observer.observe(el);
     // Also watch the scrolling content: blog covers and late-loading media
-    // change the document height, which invalidates the cached maxScroll.
-    // This replaces what the polled self-heal was really protecting against,
-    // and it fires only when the height genuinely changes.
+    // change the footer's resting position, so the parallax needs re-seeding
+    // when the document height genuinely changes.
     if (shell) observer.observe(shell);
     window.addEventListener("scroll", onScroll, { passive: true });
-        // Named, so the cleanup below can actually remove it — an inline arrow
+    // Named, so the cleanup below can actually remove it — an inline arrow
     // here would leak a listener on every route change.
     const onResize = () => {
-      refreshMax();
       onScroll();
     };
     window.addEventListener("resize", onResize, { passive: true });

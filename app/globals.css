@@ -1,16 +1,36 @@
+/* SITE-WIDE STYLES ONLY.
+ *
+ * Everything imported here is render-blocking on EVERY route, so a sheet only
+ * belongs in this file if more or less every page needs it. It used to import
+ * all thirteen stylesheets, which meant each page downloaded and parsed the
+ * other pages' CSS before it could paint — Lighthouse measured the homepage
+ * bundle as 69% unused.
+ *
+ * Page-scoped sheets are now imported by the route that uses them (Next emits
+ * a separate CSS chunk per route), listed here so the split stays discoverable:
+ *
+ *   home.css, homepage.css, testimonials.css  -> app/page.tsx
+ *   blog.css                                  -> app/blog/*, app/contact, app/page.tsx
+ *   careers.css                               -> app/careers/page.tsx
+ *   legal.css                                 -> app/legal/layout.tsx
+ *   company.css                               -> app/company/page.tsx
+ *   certifications.css                        -> app/certifications/page.tsx
+ *   thank-you.css                             -> app/thank-you/page.tsx
+ *
+ * Which sheet is used by which route was measured, not guessed — by matching
+ * the class names each sheet defines against the class names in every route's
+ * rendered HTML. Re-check before moving anything else.
+ *
+ * NOTE on order: route CSS loads AFTER this file, so interaction.css is no
+ * longer globally last. It stays correct because every rule in it is written
+ * as `html.is-scrolling .card:hover`, which outranks the plain `.card:hover`
+ * it neutralises on specificity — not on source order. Keep it that way.
+ */
 @import "../styles/style.css";
-@import "../styles/home.css";
-@import "../styles/company.css";
-@import "../styles/careers.css";
-@import "../styles/certifications.css";
 @import "../styles/services.css";
-@import "../styles/homepage.css";
-@import "../styles/legal.css";
-@import "../styles/thank-you.css";
-@import "../styles/blog.css";
-@import "../styles/testimonials.css";
 @import "../styles/footer.css";
-/* Must stay last — see the file header. */
+@import "../styles/finishing.css";
+/* Must stay last of the global sheets — see the file header. */
 @import "../styles/interaction.css";
 
 :root {

@@ -128,8 +128,14 @@ export default function ServicesPage() {
                       <li key={tag}>{tag}</li>
                     ))}
                   </ul>
+                  {/* "Learn more" on its own is the same accessible name on
+                      every card in the grid, which is no use to anyone
+                      tabbing through them or reading a list of links. The
+                      visually-hidden half names the destination without
+                      changing the design. */}
                   <Link href={service.href} className="svc-card-link">
                     Learn more
+                    <span className="sr-only"> about {service.title}</span>
                     <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                   </Link>
                 </article>

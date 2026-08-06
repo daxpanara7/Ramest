@@ -8,6 +8,7 @@ import { AuditModule } from './common/audit/audit.module';
 import { MailModule } from './common/mail/mail.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LeadsModule } from './modules/leads/leads.module';
+import { ApplicationsModule } from './modules/applications/applications.module';
 import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -34,6 +35,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     MailModule,
     AuthModule,
     LeadsModule,
+    ApplicationsModule,
     UsersModule,
     RolesModule,
     DashboardModule,

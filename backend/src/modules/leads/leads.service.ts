@@ -1,10 +1,13 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ContactLead, LeadStatus } from '@prisma/client';
+import { randomBytes } from 'crypto';
+import { extname } from 'path';
 import { MailService } from '../../common/mail/mail.service';
 import { RecaptchaService } from '../../common/recaptcha/recaptcha.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { AuthUser } from '../../common/decorators/current-user.decorator';
+import { StorageService } from '../media/storage.service';
 import { LeadsRepository } from './leads.repository';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
@@ -19,7 +22,8 @@ const ALL_STATUSES: LeadStatus[] = [
   LeadStatus.SPAM,
 ];
 
-const CSV_HEADER = 'name,email,phone,company,service,status,country,createdAt';
+const CSV_HEADER =
+  'name,email,phone,company,service,budget,source,status,country,attachment,createdAt';
 
 /**
  * Floor for a genuine fill of this form (name + email + a 10-char-minimum
@@ -27,6 +31,30 @@ const CSV_HEADER = 'name,email,phone,company,service,status,country,createdAt';
  * a lost customer, so it only catches submissions no human could produce.
  */
 const MIN_FILL_MS = 2_500;
+
+/**
+ * What a prospect may attach to an enquiry: a brief, a spec, a wireframe, a
+ * requirements sheet. Whitelisted rather than blacklisted — anything not
+ * listed here is refused, so an .exe or .svg (which can carry script) never
+ * reaches the bucket.
+ */
+export const ALLOWED_ATTACHMENT_MIME: Record<string, string> = {
+  'application/pdf': '.pdf',
+  'application/msword': '.doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+  'application/vnd.ms-excel': '.xls',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+  'application/vnd.ms-powerpoint': '.ppt',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'application/zip': '.zip',
+  'text/plain': '.txt',
+};
+
+export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
+
+type StoredAttachment = { key: string; name: string; mime: string; bytes: number };
 
 @Injectable()
 export class LeadsService {
@@ -38,7 +66,55 @@ export class LeadsService {
     private readonly recaptcha: RecaptchaService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
+
+  /**
+   * Resolves a lead's attachment for the authed admin download endpoint.
+   * Returns a stream rather than a URL so the bucket can stay private — a
+   * client's brief is commercially sensitive and must not sit behind a
+   * guessable public link.
+   */
+  async resolveAttachment(id: string) {
+    // findOne already 404s on a missing or soft-deleted lead.
+    const lead = await this.findOne(id);
+    if (!lead.attachmentKey) throw new NotFoundException('This lead has no attachment');
+
+    return {
+      stream: await this.storage.getStream(lead.attachmentKey),
+      mimeType: lead.attachmentMime ?? 'application/octet-stream',
+      filename: lead.attachmentName ?? 'attachment',
+    };
+  }
+
+  /**
+   * Writes the upload to the configured bucket under a random key.
+   *
+   * The stored key is random, never the visitor's filename: filenames from the
+   * public internet are attacker-controlled and would otherwise let someone
+   * traverse paths or overwrite another lead's file. The original name is kept
+   * in a separate column purely for display in the admin.
+   */
+  private async storeAttachment(file: Express.Multer.File): Promise<StoredAttachment> {
+    const ext = ALLOWED_ATTACHMENT_MIME[file.mimetype];
+    if (!ext) {
+      throw new Error(`Rejected attachment type ${file.mimetype}`);
+    }
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      throw new Error(`Attachment too large (${file.size} bytes)`);
+    }
+
+    const key = `leads/${randomBytes(16).toString('hex')}${ext}`;
+    await this.storage.save(file, key);
+
+    return {
+      key,
+      // Cap the display name too — it is echoed into the admin UI.
+      name: (file.originalname || `attachment${extname(ext)}`).slice(0, 200),
+      mime: file.mimetype,
+      bytes: file.size,
+    };
+  }
 
   /**
    * Task 12 flow: (1) score + persist, (2) notify the team, (3) confirm to the
@@ -46,7 +122,11 @@ export class LeadsService {
    * already safely stored, and losing the DB write to a mail outage would be
    * the worst outcome.
    */
-  async create(dto: CreateLeadDto, meta: { ip?: string; country?: string; userAgent?: string }) {
+  async create(
+    dto: CreateLeadDto,
+    meta: { ip?: string; country?: string; userAgent?: string },
+    file?: Express.Multer.File,
+  ) {
     /* --- layer 1: deterministic filters, dropped silently ----------------
        These catch the traffic reCAPTCHA is weakest against — plain scripted
        POSTs that never execute the page's JS.
@@ -91,13 +171,38 @@ export class LeadsService {
     // behaviour intact behind that flag.
     const looksLikeSpam = score !== null && score < minScore;
 
+    /* --- layer 3: store the attachment, if one came with the enquiry ------
+       Deliberately after the bot and captcha gates: a discarded submission
+       must never cost us a bucket write. Spam-scored leads are still stored
+       (they are kept for review), so the file follows the row.
+
+       A failed upload must not lose the enquiry — the brief is a nice-to-have
+       and the message is the thing we actually need — so this degrades to a
+       lead without an attachment and logs loudly. */
+    let attachment: StoredAttachment | null = null;
+    if (file) {
+      try {
+        attachment = await this.storeAttachment(file);
+      } catch (err) {
+        this.logger.error(
+          `Attachment upload failed for ${dto.email}; keeping the lead without it: ${(err as Error).message}`,
+        );
+      }
+    }
+
     const lead = await this.leads.create({
       name: dto.name,
       email: dto.email,
       phone: dto.phone,
       company: dto.company,
       service: dto.service,
+      budget: dto.budget,
+      source: dto.source,
       message: dto.message,
+      attachmentKey: attachment?.key,
+      attachmentName: attachment?.name,
+      attachmentMime: attachment?.mime,
+      attachmentBytes: attachment?.bytes,
       ip: meta.ip,
       country: meta.country,
       userAgent: meta.userAgent,
@@ -107,6 +212,23 @@ export class LeadsService {
 
     // Do not email the team for spam-scored submissions.
     if (!looksLikeSpam) {
+      /* Feeds the admin notification bell, which reads the ActivityLog — the
+         only event stream the system has. Without this a new enquiry is
+         invisible in the console until someone reloads the list. userId is
+         null because the actor is the public, not a logged-in user. */
+      await this.audit.record({
+        userId: null,
+        action: 'lead.created',
+        entity: 'ContactLead',
+        entityId: lead.id,
+        ip: meta.ip,
+        metadata: {
+          name: lead.name,
+          email: lead.email,
+          company: lead.company,
+          service: lead.service,
+        },
+      });
       void this.dispatchEmails(lead);
     }
 
@@ -206,7 +328,21 @@ export class LeadsService {
   async exportCsv(status?: LeadStatus): Promise<string> {
     const rows = await this.leads.findForExport({ status });
     const lines = rows.map((r) =>
-      [r.name, r.email, r.phone, r.company, r.service, r.status, r.country, r.createdAt.toISOString()]
+      [
+        r.name,
+        r.email,
+        r.phone,
+        r.company,
+        r.service,
+        r.budget,
+        r.source,
+        r.status,
+        r.country,
+        // The file itself cannot travel in a CSV; the name tells the reader
+        // one exists and to open the lead in the admin to fetch it.
+        r.attachmentName,
+        r.createdAt.toISOString(),
+      ]
         .map(csvEscape)
         .join(','),
     );

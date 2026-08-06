@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -13,6 +14,15 @@ import { Transform } from 'class-transformer';
 /** Trim strings so " " does not pass @IsNotEmpty and stored data is clean. */
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
+
+/**
+ * The two public forms. They collect different things — the homepage form is
+ * deliberately short (name, email, phone, company, message) while the contact
+ * page also asks for service, budget and an optional brief — so the admin
+ * needs to know which one a lead came from to read the blanks correctly.
+ */
+export const LEAD_SOURCES = ['home', 'contact'] as const;
+export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 /**
  * Public contact-form payload (Task 11). Every field is validated and length-
@@ -48,6 +58,28 @@ export class CreateLeadDto {
   @IsString()
   @MaxLength(120)
   service?: string;
+
+  /**
+   * Indicative budget band, picked from the contact form's dropdown. Stored as
+   * the label the visitor actually saw ("$25K - $75K") rather than a code, so
+   * the admin never has to decode it and changing the bands later cannot
+   * silently reinterpret historical leads.
+   */
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(60)
+  budget?: string;
+
+  /**
+   * Which form produced this lead. Constrained rather than free text because
+   * the admin filters and badges on it — an unexpected value would render as
+   * an unlabelled row.
+   */
+  @IsOptional()
+  @Transform(trim)
+  @IsIn(LEAD_SOURCES, { message: 'Unknown form source' })
+  source?: LeadSource;
 
   @Transform(trim)
   @IsString()

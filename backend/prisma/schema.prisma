@@ -244,9 +244,22 @@ model ContactLead {
   phone      String?
   company    String?
   service    String? // which service they enquired about
+  budget     String? // indicative range picked from the form's dropdown
   message    String
   status     LeadStatus @default(NEW)
   adminNotes String?
+
+  /// Which form produced this lead — "home" or "contact". The two forms ask
+  /// for different things (contact also collects service, budget and a file),
+  /// so the admin needs this to explain why some rows have blanks.
+  source String?
+
+  /// Optional brief/spec the visitor attached. Mirrors JobApplication's resume
+  /// columns so both uploads behave the same way.
+  attachmentKey   String? @unique // storage key in the bucket
+  attachmentName  String? // original filename, shown in the admin
+  attachmentMime  String?
+  attachmentBytes Int?
 
   // Captured server-side, never trusted from the client
   ip          String?
@@ -264,6 +277,60 @@ model ContactLead {
 
   @@index([status, createdAt])
   @@index([email])
+}
+
+// ---------------------------------------------------------------------------
+// CAREERS / JOB APPLICATIONS
+// ---------------------------------------------------------------------------
+
+enum ApplicationStatus {
+  NEW
+  REVIEWING
+  SHORTLISTED
+  INTERVIEWING
+  OFFERED
+  HIRED
+  REJECTED
+  SPAM
+}
+
+/// A submission from the public careers "Apply Now" form.
+///
+/// The resume is intentionally NOT a MediaAsset: that library is image-only
+/// and publicly readable via /api/media/file/:key. A CV is personal data, so
+/// it is stored under its own key and served only through an authorised
+/// admin route (GET /api/applications/:id/resume).
+model JobApplication {
+  id             String            @id @default(cuid())
+  fullName       String
+  email          String
+  phone          String
+  totalExperience String           // free text — "3 years", "Fresher", "6+"
+  position       String            // role applied for
+  coverNote      String?
+  status         ApplicationStatus @default(NEW)
+  adminNotes     String?
+
+  // Resume file (nullable — an application without a CV is still worth having)
+  resumeKey      String?           @unique // storage key on disk / bucket
+  resumeName     String?           // original filename, shown in the admin
+  resumeMime     String?
+  resumeBytes    Int?
+
+  // Captured server-side, never trusted from the client
+  ip             String?
+  country        String?
+  userAgent      String?
+  recaptchaScore Float?
+  source         String? // "careers" — which page the application came from
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([position])
 }
 
 // ---------------------------------------------------------------------------

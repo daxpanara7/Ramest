@@ -23,6 +23,8 @@ const PERMISSIONS: Record<string, string> = {
   'newsletter:write': 'Manage subscribers',
   'lead:read': 'View contact leads',
   'lead:write': 'Update leads & notes',
+  'application:read': 'View job applications',
+  'application:write': 'Update applications & notes',
   'media:read': 'View media library',
   'media:write': 'Upload / delete media',
   'seo:read': 'View SEO command center',
@@ -39,9 +41,13 @@ const ROLES: Record<string, string[] | '*'> = {
     'media:read', 'media:write',
     'newsletter:read', 'newsletter:write',
     'lead:read', 'lead:write',
+    'application:read', 'application:write',
     'seo:read',
   ],
-  viewer: ['dashboard:read', 'blog:read', 'lead:read', 'newsletter:read', 'seo:read'],
+  viewer: [
+    'dashboard:read', 'blog:read', 'lead:read', 'application:read',
+    'newsletter:read', 'seo:read',
+  ],
 };
 
 async function main() {

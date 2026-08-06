@@ -1,7 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { promises as fs } from 'fs';
-import { join } from 'path';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { createReadStream, promises as fs } from 'fs';
+import { dirname, join } from 'path';
+import type { Readable } from 'stream';
 
 export interface StoredFile {
   key: string;
@@ -14,12 +21,16 @@ export type StorageMode = 'cloud' | 'local';
  * Storage abstraction used by MediaService.
  *
  * - "cloud" mode is selected when STORAGE_BUCKET + STORAGE_ACCESS_KEY are both
- *   set (intended for S3 / Cloudflare R2). The AWS SDK is intentionally NOT a
- *   dependency of this project yet, so cloud writes are a documented stub that
- *   throws instead of silently doing nothing — see saveToCloud() below.
+ *   set. Backed by the S3 API, which Cloudflare R2 implements, so the same
+ *   client serves either — R2 only needs STORAGE_ENDPOINT pointing at
+ *   https://<account-id>.r2.cloudflarestorage.com.
  * - "local" mode (the default for local/dev) writes to backend/uploads/ and
- *   serves files back via GET /api/media/file/:key. This mode is fully
- *   functional.
+ *   serves files back via GET /api/media/file/:key.
+ *
+ * ⚠️ Local mode is for development only. On Render the container filesystem is
+ * ephemeral and no persistent disk is mounted, so anything written there is
+ * gone on the next deploy, restart or instance recycle. Production must run in
+ * cloud mode or uploads will quietly disappear.
  */
 @Injectable()
 export class StorageService {
@@ -27,10 +38,40 @@ export class StorageService {
   private readonly uploadsDir = join(process.cwd(), 'uploads');
   readonly mode: StorageMode;
 
+  private readonly client: S3Client | null;
+  private readonly bucket: string;
+  /** Public base URL files are served from — R2 custom domain or S3 website. */
+  private readonly publicUrl: string;
+
   constructor(private readonly config: ConfigService) {
     const bucket = this.config.get<string>('STORAGE_BUCKET');
     const accessKey = this.config.get<string>('STORAGE_ACCESS_KEY');
     this.mode = bucket && accessKey ? 'cloud' : 'local';
+    this.bucket = bucket ?? '';
+    this.publicUrl = (this.config.get<string>('STORAGE_PUBLIC_URL') ?? '').replace(/\/$/, '');
+
+    if (this.mode === 'cloud') {
+      const endpoint = this.config.get<string>('STORAGE_ENDPOINT');
+      this.client = new S3Client({
+        // R2 ignores region but the SDK requires one; "auto" is R2's convention.
+        region: this.config.get<string>('STORAGE_REGION') ?? 'auto',
+        ...(endpoint ? { endpoint } : {}),
+        credentials: {
+          accessKeyId: accessKey!,
+          secretAccessKey: this.config.get<string>('STORAGE_SECRET_KEY') ?? '',
+        },
+      });
+      if (!this.publicUrl) {
+        // Not fatal: files still upload, but the URLs handed to the admin and
+        // the site would be unusable, so this needs to be loud.
+        this.logger.error(
+          'STORAGE_PUBLIC_URL is not set — uploads will succeed but their public URLs will be wrong.',
+        );
+      }
+    } else {
+      this.client = null;
+    }
+
     this.logger.log(`Media storage mode: ${this.mode}`);
   }
 
@@ -45,7 +86,16 @@ export class StorageService {
    */
   async remove(key: string): Promise<void> {
     if (this.mode === 'cloud') {
-      this.logger.warn(`remove(${key}) skipped — cloud storage not configured`);
+      try {
+        await this.client!.send(
+          new DeleteObjectCommand({ Bucket: this.bucket, Key: key }),
+        );
+      } catch (err) {
+        // Best effort by contract: the soft-deleted row is the source of
+        // truth, so a failed object delete must not fail the request. Logged
+        // because it leaks storage until someone reconciles it.
+        this.logger.warn(`remove(${key}) failed: ${(err as Error).message}`);
+      }
       return;
     }
     try {
@@ -60,36 +110,52 @@ export class StorageService {
     return join(this.uploadsDir, key);
   }
 
+  /**
+   * Reads an object back as a stream, for endpoints that serve private files
+   * through the API instead of handing out a bucket URL. Works in either mode
+   * so the admin behaves identically in dev and production.
+   */
+  async getStream(key: string): Promise<Readable> {
+    if (this.mode === 'cloud') {
+      const out = await this.client!.send(
+        new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      if (!out.Body) throw new Error(`Empty object body for ${key}`);
+      return out.Body as Readable;
+    }
+    return createReadStream(this.localFilePath(key));
+  }
+
   private async saveToLocal(file: Express.Multer.File, key: string): Promise<StoredFile> {
-    await fs.mkdir(this.uploadsDir, { recursive: true });
-    await fs.writeFile(this.localFilePath(key), file.buffer);
+    const target = this.localFilePath(key);
+    // Create the key's own directory, not just uploads/. Keys are namespaced
+    // ("leads/<id>.pdf"), which is free in a bucket but a real subdirectory on
+    // disk — mkdir'ing only uploads/ left nested writes failing with ENOENT.
+    await fs.mkdir(dirname(target), { recursive: true });
+    await fs.writeFile(target, file.buffer);
     return { key, url: `/api/media/file/${key}` };
   }
 
   /**
-   * TODO(cloud storage): implement with the AWS SDK v3 (@aws-sdk/client-s3)
-   * once that dependency is approved for this project. Do not add the aws-sdk
-   * package speculatively — this stub exists so a deployment that sets
-   * STORAGE_BUCKET/STORAGE_ACCESS_KEY without finishing the integration fails
-   * loudly (500) instead of silently writing to local disk.
+   * S3-compatible write, used for both AWS S3 and Cloudflare R2.
    *
-   * Sketch of the real implementation:
-   *   const client = new S3Client({
-   *     region: this.config.get('STORAGE_REGION'),
-   *     credentials: {
-   *       accessKeyId: this.config.get('STORAGE_ACCESS_KEY')!,
-   *       secretAccessKey: this.config.get('STORAGE_SECRET_KEY')!,
-   *     },
-   *   });
-   *   await client.send(new PutObjectCommand({
-   *     Bucket: this.config.get('STORAGE_BUCKET'),
-   *     Key: key,
-   *     Body: file.buffer,
-   *     ContentType: file.mimetype,
-   *   }));
-   *   return { key, url: `${this.config.get('STORAGE_PUBLIC_URL')}/${key}` };
+   * Deliberately no ACL parameter: R2 rejects it outright, and modern S3
+   * buckets with Object Ownership enforced do too. Public read access is a
+   * property of the bucket (an R2 custom domain, or an S3 bucket policy), not
+   * of each object.
    */
-  private async saveToCloud(_file: Express.Multer.File, _key: string): Promise<StoredFile> {
-    throw new Error('cloud storage not configured');
+  private async saveToCloud(file: Express.Multer.File, key: string): Promise<StoredFile> {
+    await this.client!.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        // Content-addressed keys never change contents, so they can be cached
+        // hard by the CDN in front of the bucket.
+        CacheControl: 'public, max-age=31536000, immutable',
+      }),
+    );
+    return { key, url: `${this.publicUrl}/${key}` };
   }
 }

@@ -507,6 +507,21 @@ html.is-scrolling .blog-card {
     margin: 1.5rem 0;
 }
 
+/* Cover art carried in the article body rather than as a MediaAsset. Sits
+   flush at the top of the copy — no top margin, and it breaks out to the
+   container width so it reads as the article hero. */
+.post-inline-cover {
+    margin: 0 0 2.25rem;
+}
+
+.post-inline-cover img {
+    display: block;
+    width: 100%;
+    margin: 0;
+    border-radius: 18px;
+    box-shadow: 0 30px 60px -40px rgba(3, 87, 168, 0.6);
+}
+
 .post-body blockquote {
     margin: 1.5rem 0;
     padding: 0.85rem 1.25rem;

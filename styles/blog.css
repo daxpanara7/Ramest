@@ -396,7 +396,7 @@ html.is-scrolling .blog-card {
 }
 
 .post-head {
-    max-width: 46rem;
+    max-width: 62rem;
     margin: 0 auto 2.5rem;
     text-align: center;
 }
@@ -406,7 +406,9 @@ html.is-scrolling .blog-card {
    the cover paints (zero CLS). */
 .post-cover {
     position: relative;
-    max-width: 52rem;
+    /* Full container width — the cover is the article's hero and reads as
+       cramped when it is narrower than the cards on every other page. */
+    max-width: 71.25rem;
     margin: 0 auto 2.75rem;
     aspect-ratio: 16 / 9;
     border-radius: 22px;
@@ -445,8 +447,12 @@ html.is-scrolling .blog-card {
     opacity: 0.8;
 }
 
+/* 60rem rather than the ~44rem a pure typography rule would pick: the rest of
+   the site lays out on a 1140px container, and an article half that width read
+   as a different site. Paragraphs keep a comfortable measure because the body
+   font-size steps up with it. */
 .post-body {
-    max-width: 44rem;
+    max-width: 60rem;
     margin: 0 auto;
     padding: 2.5rem 0 0;
     border-top: 1px solid var(--border-color);
@@ -454,10 +460,10 @@ html.is-scrolling .blog-card {
 
 /* Long-form typography for server-rendered HTML we do not control. */
 .post-body p {
-    font-size: 1.02rem;
-    line-height: 1.85;
+    font-size: 1.09rem;
+    line-height: 1.8;
     color: var(--text-color);
-    margin: 0 0 1.25rem;
+    margin: 0 0 1.3rem;
 }
 
 .post-body h2,
@@ -468,8 +474,8 @@ html.is-scrolling .blog-card {
     margin: 2.25rem 0 0.85rem;
 }
 
-.post-body h2 { font-size: 1.5rem; }
-.post-body h3 { font-size: 1.2rem; }
+.post-body h2 { font-size: 1.7rem; }
+.post-body h3 { font-size: 1.28rem; }
 
 .post-body ul,
 .post-body ol {
@@ -528,7 +534,7 @@ html.is-scrolling .blog-card {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    max-width: 44rem;
+    max-width: 60rem;
     margin: 2.5rem auto 0;
 }
 

@@ -40,6 +40,19 @@ COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY --from=build --chown=node:node /app/package.json ./package.json
+
+# Both upload paths write under /app/uploads at runtime — resumes via
+# ResumeStorageService, and media via StorageService whenever it falls back to
+# "local" mode (no STORAGE_BUCKET/STORAGE_ACCESS_KEY set). WORKDIR created
+# /app as root, so their recursive mkdir runs as "node" inside a root-owned
+# directory and fails with EACCES — surfacing as a 500 on the careers form.
+# Create the tree while still root and hand it to node.
+#
+# NOTE: this makes uploads *writable*, not *durable*. Render's container
+# filesystem is ephemeral, so a redeploy still wipes these files; mount a disk
+# at /app/uploads to keep them.
+RUN mkdir -p /app/uploads/resumes && chown -R node:node /app/uploads
+
 USER node
 
 EXPOSE 4000
